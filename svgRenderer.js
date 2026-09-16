@@ -5,7 +5,7 @@
 export function renderPatternSVG(draftData, scale = 20) {
   const d = draftData;
   const w = (d.dimensions.totalWidth + 4) * scale;
-  const h = (d.dimensions.totalHeight + 4) * scale;
+  const h = (d.dimensions.totalHeight + 6) * scale;
   const ox = 2 * scale;
   const oy = 2 * scale;
 
@@ -21,7 +21,7 @@ export function renderPatternSVG(draftData, scale = 20) {
       .trued-line { stroke: #0275d8; stroke-width: 2; fill: none; }
       .guide-line { stroke: #d9534f; stroke-dasharray: 3,3; stroke-width: 1.5; fill: none; }
       .point { fill: #d9534f; }
-      .check-pass { fill: #5cb85c; font-weight: bold; }
+      .check-pass { fill: #2e7d32; font-weight: bold; }
       .label { font-family: sans-serif; font-size: 11px; fill: #333; }
     </style>
   `;
@@ -33,54 +33,52 @@ export function renderPatternSVG(draftData, scale = 20) {
   // Grid Lines
   svg += `<line class="grid-line" x1="${px(lines.cb)}" y1="${py(lines.bustLineY)}" x2="${px(lines.cf)}" y2="${py(lines.bustLineY)}" />`;
   svg += `<line class="grid-line" x1="${px(lines.cb)}" y1="${py(lines.waistLineY)}" x2="${px(lines.cf)}" y2="${py(lines.waistLineY)}" />`;
+  svg += `<line class="grid-line" x1="${px(lines.cb)}" y1="${py(lines.hipLineY)}" x2="${px(lines.cf)}" y2="${py(lines.hipLineY)}" />`;
 
   // Center Back / Center Front
   svg += `<line class="pattern-line" x1="${px(lines.cb)}" y1="${py(lines.topLineY)}" x2="${px(lines.cb)}" y2="${py(lines.hipLineY)}" />`;
   svg += `<line class="pattern-line" x1="${px(lines.cf)}" y1="${py(lines.topLineY)}" x2="${px(lines.cf)}" y2="${py(front.waistCenterPoint.y)}" />`;
 
-  // --- IMAGE 1 CHECK: RULED & TRUED FRONT SHOULDER SEAM ---
-  // Trued NP -> Inner Leg -> Fold Peak -> Outer Leg -> SP
+  // --- FRONT SHOULDER SEAM & DART TRUEING ---
   svg += `<line class="trued-line" x1="${px(front.neckPoint.x)}" y1="${py(front.neckPoint.y)}" x2="${px(front.dartInnerLeg.x)}" y2="${py(front.dartInnerLeg.y)}" />`;
   svg += `<line class="trued-line" x1="${px(front.dartInnerLeg.x)}" y1="${py(front.dartInnerLeg.y)}" x2="${px(front.dartFoldPeak.x)}" y2="${py(front.dartFoldPeak.y)}" />`;
   svg += `<line class="trued-line" x1="${px(front.dartFoldPeak.x)}" y1="${py(front.dartFoldPeak.y)}" x2="${px(front.dartOuterLeg.x)}" y2="${py(front.dartOuterLeg.y)}" />`;
   svg += `<line class="trued-line" x1="${px(front.dartOuterLeg.x)}" y1="${py(front.dartOuterLeg.y)}" x2="${px(front.shoulderPoint.x)}" y2="${py(front.shoulderPoint.y)}" />`;
 
-  // Closed Shoulder Straight Trueing Line (Red Dashed Reference)
+  // Closed Shoulder Straight Trueing Reference
   svg += `<line class="guide-line" x1="${px(front.neckPoint.x)}" y1="${py(front.neckPoint.y)}" x2="${px(front.shoulderPoint.x)}" y2="${py(front.shoulderPoint.y)}" />`;
 
   // Dart Legs to Bust Apex
   svg += `<line class="pattern-line" x1="${px(front.dartInnerLeg.x)}" y1="${py(front.dartInnerLeg.y)}" x2="${px(front.trueBustPoint.x)}" y2="${py(front.trueBustPoint.y)}" />`;
   svg += `<line class="pattern-line" x1="${px(front.dartOuterLeg.x)}" y1="${py(front.dartOuterLeg.y)}" x2="${px(front.trueBustPoint.x)}" y2="${py(front.trueBustPoint.y)}" />`;
 
-  // --- IMAGES 2 & 3 CHECKS: CONTINUOUS NECKLINE & MATCHED SHOULDER SEAMS ---
-  // Back Neck Curve
+  // --- NECKLINES ---
   const backNeck = `M ${px(lines.cb)} ${py(lines.topLineY)} Q ${px(back.neckPoint.x - 0.5)} ${py(lines.topLineY + 0.5)}, ${px(back.neckPoint.x)} ${py(back.neckPoint.y)}`;
   svg += `<path class="pattern-line" d="${backNeck}" />`;
   svg += `<line class="trued-line" x1="${px(back.neckPoint.x)}" y1="${py(back.neckPoint.y)}" x2="${px(back.shoulderPoint.x)}" y2="${py(back.shoulderPoint.y)}" />`;
 
-  // Front Neck Curve
   const frontNeck = `M ${px(front.neckPoint.x)} ${py(front.neckPoint.y)} Q ${px(front.neckPoint.x)} ${py(front.baseOfNeck.y)}, ${px(front.baseOfNeck.x)} ${py(front.baseOfNeck.y)}`;
   svg += `<path class="pattern-line" d="${frontNeck}" />`;
 
-  // --- IMAGE 4 CHECK: BLENDED LOWER ARMHOLE CURVE ACROSS SIDE SEAMS ---
+  // --- FRONT ARMHOLE CURVE ---
   const frontArmhole = `M ${px(front.shoulderPoint.x)} ${py(front.shoulderPoint.y)}
                         Q ${px(front.spCpMidpoint.x)} ${py(front.spCpMidpoint.y)}, ${px(front.chestPoint.x)} ${py(front.chestPoint.y)}
                         Q ${px(front.armhole45Point.x)} ${py(front.armhole45Point.y)}, ${px(front.underarmPoint.x)} ${py(front.underarmPoint.y)}`;
   svg += `<path class="trued-line" d="${frontArmhole}" />`;
 
-  // Smooth S-Curve Side Seam
+  // Side Seam Curve
   const sideSeamPath = `M ${px(front.underarmPoint.x)} ${py(lines.bustLineY)}
                         Q ${px(front.underarmPoint.x)} ${py(lines.trueBustLineY)}, ${px(front.waistSideX)} ${py(lines.waistLineY)}`;
   svg += `<path class="trued-line" d="${sideSeamPath}" />`;
 
-  // Render Pattern Verification Legend Block
+  // --- VERIFICATION BOX ---
   const checks = d.qualityChecks;
   svg += `
-    <g transform="translate(${px(lines.cb + 0.5)}, ${py(lines.hipLineY + 1)})">
-      <rect width="260" height="70" fill="#f8f9fa" stroke="#ccc" rx="4" />
+    <g transform="translate(${px(lines.cb + 0.5)}, ${py(lines.hipLineY + 0.5)})">
+      <rect width="280" height="75" fill="#f8f9fa" stroke="#ccc" rx="4" />
       <text x="10" y="20" class="label" style="font-weight:bold;">Pattern Verification Checks:</text>
-      <text x="10" y="40" class="label">Shoulder Lengths Match: <tspan class="check-pass">${checks.shoulderSeamsMatch ? 'PASS ✓' : 'FAIL ✗'}</tspan> (${checks.netBackShoulderLength}" / ${checks.netFrontShoulderLength}")</text>
-      <text x="10" y="58" class="label">Side Seam Alignment Delta: <tspan class="check-pass">${checks.sideSeamDelta < 0.1 ? 'PASS ✓' : 'ADJUST ⚠'}</tspan> (${checks.sideSeamDelta}")</text>
+      <text x="10" y="42" class="label">Shoulder Lengths Match: <tspan class="check-pass">${checks.shoulderSeamsMatch ? 'PASS ✓' : 'FAIL ✗'}</tspan> (${checks.netBackShoulderLength}" / ${checks.netFrontShoulderLength}")</text>
+      <text x="10" y="60" class="label">Side Seam Alignment Delta: <tspan class="check-pass">${checks.sideSeamDelta < 0.1 ? 'PASS ✓' : 'ADJUST ⚠'}</tspan> (${checks.sideSeamDelta}")</text>
     </g>
   `;
 
