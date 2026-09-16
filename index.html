@@ -34,45 +34,45 @@
       <h3>Measurements (Inches)</h3>
       <div class="form-group">
         <label for="bust">Bust</label>
-        <input type="number" id="bust" value="35.5" step="0.25">
+        <input type="number" id="bust" value="43" step="0.25">
       </div>
       <div class="form-group">
         <label for="waist">Waist</label>
-        <input type="number" id="waist" value="29" step="0.25">
+        <input type="number" id="waist" value="23.5" step="0.25">
       </div>
       <div class="form-group">
         <label for="hip">Hip</label>
-        <input type="number" id="hip" value="42.5" step="0.25">
+        <input type="number" id="hip" value="44" step="0.25">
       </div>
       <div class="form-group">
         <label for="backWidth">Across Back Width</label>
-        <input type="number" id="backWidth" value="14.25" step="0.25">
+        <input type="number" id="backWidth" value="13.5" step="0.25">
       </div>
       <div class="form-group">
         <label for="chestWidth">Across Chest Width</label>
-        <input type="number" id="chestWidth" value="11.25" step="0.25">
+        <input type="number" id="chestWidth" value="14.25" step="0.25">
       </div>
       <div class="form-group">
         <label for="shoulderLength">Shoulder Length</label>
-        <input type="number" id="shoulderLength" value="6" step="0.25">
+        <input type="number" id="shoulderLength" value="6.25" step="0.25">
       </div>
       <div class="form-group">
         <label for="backNeckToWaist">Back Neck to Waist</label>
-        <input type="number" id="backNeckToWaist" value="18.25" step="0.25">
+        <input type="number" id="backNeckToWaist" value="18.5" step="0.25">
       </div>
       <div class="form-group">
         <label for="waistToHip">Waist to Hip</label>
-        <input type="number" id="waistToHip" value="9.75" step="0.25">
+        <input type="number" id="waistToHip" value="9.5" step="0.25">
       </div>
 
       <h3>Drafting Options</h3>
       <div class="form-group">
-        <label for="easeProfile">Garment Fit &amp; Ease Profile</label>
+        <label for="easeProfile">Block Type &amp; Ease Allowance</label>
         <select id="easeProfile">
-          <option value="fitted">0.0" Fit (Bust: 0", Waist: 0", Hip: 0")</option>
-          <option value="standard">1.5" Fit (Bust: +1.5", Waist: +1.0", Hip: +1.5")</option>
-          <option value="classic" selected>2.0" Fit (Bust: +2.0", Waist: +1.5", Hip: +2.0")</option>
-          <option value="relaxed">4.0" Fit (Bust: +4.0", Waist: +2.5", Hip: +3.0")</option>
+          <option value="corset">Corset / Foundation Block (Bust: 0", Waist: -1.0", Hip: 0")</option>
+          <option value="close">Close-Fitting Bodice Block (Bust: +1.5", Waist: +1.0", Hip: +1.5")</option>
+          <option value="standard" selected>Standard Bodice Block (Bust: +2.0", Waist: +1.5", Hip: +2.0")</option>
+          <option value="loose">Loose-Fitting / Outerwear Block (Bust: +4.0", Waist: +2.5", Hip: +3.0")</option>
         </select>
       </div>
       <div class="checkbox-group">
@@ -91,14 +91,14 @@
 
   <script>
     const EASE_PROFILES = {
-      fitted:   { bust: 0.0, waist: 0.0, hip: 0.0 },
-      standard: { bust: 1.5, waist: 1.0, hip: 1.5 },
-      classic:  { bust: 2.0, waist: 1.5, hip: 2.0 },
-      relaxed:  { bust: 4.0, waist: 2.5, hip: 3.0 }
+      corset:   { bust: 0.0, waist: -1.0, hip: 0.0 },
+      close:    { bust: 1.5, waist: 1.0, hip: 1.5 },
+      standard: { bust: 2.0, waist: 1.5, hip: 2.0 },
+      loose:    { bust: 4.0, waist: 2.5, hip: 3.0 }
     };
 
     function calculateBodice(m, profileKey, showGrid) {
-      const ease = EASE_PROFILES[profileKey] || EASE_PROFILES.classic;
+      const ease = EASE_PROFILES[profileKey] || EASE_PROFILES.standard;
 
       const easeBust = m.bust + ease.bust;
       const easeWaist = m.waist + ease.waist;
@@ -115,8 +115,8 @@
       const backHipW = easeHip / 4 - 0.25;
       const frontHipW = easeHip / 4 + 0.25;
 
-      const maxHalfWidth = Math.max(backBustW + frontBustW, backHipW + frontHipW);
-      const totalWidth = maxHalfWidth + 4; // 4" gap between back and front blocks
+      const blockGap = 3.0;
+      const totalWidth = backBustW + frontBustW + blockGap;
       const totalHeight = m.backNeckToWaist + m.waistToHip;
 
       const topY = 1.0;
@@ -127,14 +127,18 @@
 
       const neckW = (m.bust / 8 + 1.25) / 2;
 
-      // Dynamic Waist Intake Calculation
+      // Waist Intake Calculation
       const totalBustWidth = backBustW + frontBustW;
       const totalWaistWidthNeeded = easeWaist / 2;
       const totalWaistIntake = Math.max(0, totalBustWidth - totalWaistWidthNeeded);
 
-      const sideWaistW = totalWaistIntake * 0.35;
-      const f_waistDartW = totalWaistIntake * 0.35;
-      const b_waistDartW = totalWaistIntake * 0.30;
+      // Max side seam reduction capped to prevent overlapping curves
+      const maxSideSeamIntake = totalWaistIntake * 0.4;
+      const remainingIntake = totalWaistIntake - maxSideSeamIntake;
+
+      const sideWaistIntakeEach = maxSideSeamIntake / 2;
+      const b_waistDartW = remainingIntake * 0.45;
+      const f_waistDartW = remainingIntake * 0.55;
 
       // --- BACK POINTS ---
       const b_np = { x: neckW, y: topY };
@@ -162,15 +166,13 @@
       const f_waistDartTop = { x: f_apex.x, y: trueBustY + 0.75 };
       const f_waistDartBottom = { x: f_apex.x, y: waistY + (m.waistToHip * 0.55) };
 
-      // Underarm Point (UP)
-      const upX = backBustW + 2.0;
+      // Underarm Point (UP) & Side Seams
+      const upX = backBustW + (blockGap / 2);
       const upY = bustY + 0.5;
 
-      // Side Seam Waist Points
-      const sideWaistLeft = upX - (sideWaistW / 2);
-      const sideWaistRight = upX + (sideWaistW / 2);
+      const sideWaistLeft = backBustW - sideWaistIntakeEach;
+      const sideWaistRight = backBustW + blockGap + sideWaistIntakeEach;
 
-      // Dynamic Hip Flare Points (Determined directly by Hip measurement)
       const backHipX = backHipW;
       const frontHipX = f_cfX - frontHipW;
 
@@ -181,7 +183,7 @@
         lines: { topY, bustY, trueBustY, waistY, hipY },
         cbX: 0,
         cfX: f_cfX,
-        up: { x: upX, y: upY, leftW: sideWaistLeft, rightW: sideWaistRight },
+        up: { x: upX, y: upY, leftW: sideWaistLeft, rightW: sideWaistRight, backBustW, frontBustX: backBustW + blockGap },
         hip: { backHipX, frontHipX },
         back: {
           np: b_np, sp: b_sp, halfBackW,
@@ -236,10 +238,10 @@
         svg += `<line class="guide-line" x1="${s(d.totalW - f.halfChestW)}" y1="${s(l.topY)}" x2="${s(d.totalW - f.halfChestW)}" y2="${s(l.bustY)}" />`;
 
         svg += `<text class="title-lbl" x="${s(d.totalW / 2) - 30}" y="${s(l.topY) - 10}">Top Line</text>`;
-        svg += `<text class="lbl" x="${s(d.totalW * 0.35)}" y="${s(l.bustY) - 4}">Bust Line</text>`;
-        svg += `<text class="lbl" x="${s(d.totalW * 0.31)}" y="${s(l.trueBustY) - 4}">True Bust Line</text>`;
-        svg += `<text class="lbl" x="${s(d.totalW * 0.34)}" y="${s(l.waistY) - 4}">Waist Line</text>`;
-        svg += `<text class="lbl" x="${s(d.totalW * 0.35)}" y="${s(l.hipY) - 4}">Hip Line</text>`;
+        svg += `<text class="lbl" x="${s(d.totalW * 0.4)}" y="${s(l.bustY) - 4}">Bust Line</text>`;
+        svg += `<text class="lbl" x="${s(d.totalW * 0.38)}" y="${s(l.trueBustY) - 4}">True Bust Line</text>`;
+        svg += `<text class="lbl" x="${s(d.totalW * 0.4)}" y="${s(l.waistY) - 4}">Waist Line</text>`;
+        svg += `<text class="lbl" x="${s(d.totalW * 0.4)}" y="${s(l.hipY) - 4}">Hip Line</text>`;
 
         svg += `<text class="title-lbl" x="-20" y="${s(l.topY) - 10}">CB</text>`;
         svg += `<text class="title-lbl" x="${s(d.totalW) + 5}" y="${s(l.topY) - 10}">CF</text>`;
@@ -270,9 +272,11 @@
       // ARMHOLE SCYE CURVE
       svg += `<path class="scye" d="M ${s(b.sp.x)} ${s(b.sp.y)} C ${s(b.halfBackW)} ${s(l.bustY - 1)}, ${s(d.up.x - 1.2)} ${s(d.up.y)}, ${s(d.up.x)} ${s(d.up.y)} C ${s(d.up.x + 1.2)} ${s(d.up.y)}, ${s(d.totalW - f.halfChestW)} ${s(l.bustY - 1)}, ${s(f.sp.x)} ${s(f.sp.y)}" />`;
 
-      // DYNAMIC SIDE SEAMS (Bust -> Waist -> Hip Curve)
-      svg += `<path class="dart" d="M ${s(d.up.x)} ${s(d.up.y)} Q ${s(d.up.x - 0.1)} ${s(l.waistY * 0.7)}, ${s(d.up.leftW)} ${s(l.waistY)} Q ${s(d.up.leftW - 0.2)} ${s(l.waistY + (l.hipY - l.waistY)*0.5)}, ${s(d.hip.backHipX)} ${s(l.hipY)}" />`;
-      svg += `<path class="dart" d="M ${s(d.up.x)} ${s(d.up.y)} Q ${s(d.up.x + 0.1)} ${s(l.waistY * 0.7)}, ${s(d.up.rightW)} ${s(l.waistY)} Q ${s(d.up.rightW + 0.2)} ${s(l.waistY + (l.hipY - l.waistY)*0.5)}, ${s(d.hip.frontHipX)} ${s(l.hipY)}" />`;
+      // BACK SIDE SEAM (UP -> Back Waist -> Back Hip)
+      svg += `<path class="outline" d="M ${s(d.up.x)} ${s(d.up.y)} Q ${s(d.up.backBustW)} ${s(l.bustY + 1)}, ${s(d.up.leftW)} ${s(l.waistY)} Q ${s(d.up.leftW + (d.hip.backHipX - d.up.leftW)*0.4)} ${s(l.waistY + (l.hipY - l.waistY)*0.5)}, ${s(d.hip.backHipX)} ${s(l.hipY)}" />`;
+
+      // FRONT SIDE SEAM (UP -> Front Waist -> Front Hip)
+      svg += `<path class="outline" d="M ${s(d.up.x)} ${s(d.up.y)} Q ${s(d.up.frontBustX)} ${s(l.bustY + 1)}, ${s(d.up.rightW)} ${s(l.waistY)} Q ${s(d.up.rightW - (d.up.rightW - d.hip.frontHipX)*0.4)} ${s(l.waistY + (l.hipY - l.waistY)*0.5)}, ${s(d.hip.frontHipX)} ${s(l.hipY)}" />`;
 
       // BACK WAIST DART
       const b_left = b.waistDartX - (b.waistDartW / 2);
@@ -296,14 +300,14 @@
 
     function updatePattern() {
       const measurements = {
-        bust: parseFloat(document.getElementById('bust').value) || 35.5,
-        waist: parseFloat(document.getElementById('waist').value) || 29,
-        hip: parseFloat(document.getElementById('hip').value) || 42.5,
-        backWidth: parseFloat(document.getElementById('backWidth').value) || 14.25,
-        chestWidth: parseFloat(document.getElementById('chestWidth').value) || 11.25,
-        shoulderLength: parseFloat(document.getElementById('shoulderLength').value) || 6,
-        backNeckToWaist: parseFloat(document.getElementById('backNeckToWaist').value) || 18.25,
-        waistToHip: parseFloat(document.getElementById('waistToHip').value) || 9.75,
+        bust: parseFloat(document.getElementById('bust').value) || 43,
+        waist: parseFloat(document.getElementById('waist').value) || 23.5,
+        hip: parseFloat(document.getElementById('hip').value) || 44,
+        backWidth: parseFloat(document.getElementById('backWidth').value) || 13.5,
+        chestWidth: parseFloat(document.getElementById('chestWidth').value) || 14.25,
+        shoulderLength: parseFloat(document.getElementById('shoulderLength').value) || 6.25,
+        backNeckToWaist: parseFloat(document.getElementById('backNeckToWaist').value) || 18.5,
+        waistToHip: parseFloat(document.getElementById('waistToHip').value) || 9.5,
       };
 
       const profileKey = document.getElementById('easeProfile').value;
