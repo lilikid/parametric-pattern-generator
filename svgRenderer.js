@@ -14,6 +14,7 @@ const SVGRenderer = {
         if (!options || options.showSewingDarts !== false) this.drawSewingDarts(data);
         if (options && options.showSA) this.drawSeamAllowances(data);
         
+        this.drawAnnotationsAndMarkers(data);
         this.drawCalibrationBox();
     },
 
@@ -72,8 +73,6 @@ const SVGRenderer = {
         const b = data.back;
         const f = data.front;
 
-        // --- BACK BODICE PATH ---
-        // Center back down -> Hip -> Waist -> Bust -> Armscye curve -> Shoulder -> Back Neck curve -> Center Back top
         const backPath = `M ${b.centerLine * S} ${b.napePt.y * S} ` +
             `L ${b.centerLine * S} ${data.depths.dHip * S} ` +
             `L ${b.hipPt.x * S} ${data.depths.dHip * S} ` +
@@ -81,10 +80,8 @@ const SVGRenderer = {
             `L ${b.bustPt.x * S} ${b.bustPt.y * S} ` +
             `C ${b.acrossPt.x * S} ${b.bustPt.y * S}, ${b.acrossPt.x * S} ${b.acrossPt.y * S}, ${b.shoulderPt.x * S} ${b.shoulderPt.y * S} ` +
             `L ${b.neckPt.x * S} ${b.neckPt.y * S} ` +
-            `Q ${b.neckPt.x * S} ${b.napePt.y * S}, ${b.centerLine * S} ${b.napePt.y * S} Z`;
+            `Q ${b.centerLine * S + (b.neckPt.x - b.centerLine) * S * 0.5} ${b.napePt.y * S}, ${b.centerLine * S} ${b.napePt.y * S} Z`;
 
-        // --- FRONT BODICE PATH ---
-        // Center front down -> Hip -> Waist -> Bust -> Armscye curve -> Shoulder -> Front Neck curve -> Center Front neck low
         const frontPath = `M ${f.centerLine * S} ${f.neckLowPt.y * S} ` +
             `L ${f.centerLine * S} ${data.depths.dHip * S} ` +
             `L ${f.hipPt.x * S} ${data.depths.dHip * S} ` +
@@ -92,7 +89,7 @@ const SVGRenderer = {
             `L ${f.bustPt.x * S} ${f.bustPt.y * S} ` +
             `C ${f.acrossPt.x * S} ${f.bustPt.y * S}, ${f.acrossPt.x * S} ${f.acrossPt.y * S}, ${f.shoulderPt.x * S} ${f.shoulderPt.y * S} ` +
             `L ${f.neckPt.x * S} ${f.neckPt.y * S} ` +
-            `C ${f.neckPt.x * S} ${f.neckLowPt.y * S}, ${f.centerLine * S - 0.5 * S} ${f.neckLowPt.y * S}, ${f.centerLine * S} ${f.neckLowPt.y * S} Z`;
+            `C ${f.neckPt.x * S} ${f.neckLowPt.y * S}, ${f.centerLine * S - 0.3 * S} ${f.neckLowPt.y * S}, ${f.centerLine * S} ${f.neckLowPt.y * S} Z`;
 
         [backPath, frontPath].forEach(d => {
             const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -113,18 +110,25 @@ const SVGRenderer = {
         const b = data.back;
 
         // Front Waist Dart
-        const frontDartStr = `M ${(f.apex.x - 0.625) * S} ${data.depths.dWaist * S} ` +
-                             `L ${f.sewingApex.x * S} ${f.sewingApex.y * S} ` +
-                             `L ${(f.apex.x + 0.625) * S} ${data.depths.dWaist * S} ` +
-                             `L ${f.apex.x * S} ${(data.depths.dWaist + 4.0) * S} Z`;
+        const frontDartStr = `M ${(f.waistDart.x - f.waistDart.width / 2) * S} ${data.depths.dWaist * S} ` +
+                             `L ${f.waistDart.x * S} ${f.waistDart.topY * S} ` +
+                             `L ${(f.waistDart.x + f.waistDart.width / 2) * S} ${data.depths.dWaist * S} ` +
+                             `L ${f.waistDart.x * S} ${f.waistDart.bottomY * S} Z`;
 
         // Back Waist Dart
-        const backDartStr = `M ${(b.dart.x - b.dart.width / 2) * S} ${data.depths.dWaist * S} ` +
-                            `L ${b.dart.x * S} ${b.dart.topY * S} ` +
-                            `L ${(b.dart.x + b.dart.width / 2) * S} ${data.depths.dWaist * S} ` +
-                            `L ${b.dart.x * S} ${b.dart.bottomY * S} Z`;
+        const backWaistDartStr = `M ${(b.waistDart.x - b.waistDart.width / 2) * S} ${data.depths.dWaist * S} ` +
+                                 `L ${b.waistDart.x * S} ${b.waistDart.topY * S} ` +
+                                 `L ${(b.waistDart.x + b.waistDart.width / 2) * S} ${data.depths.dWaist * S} ` +
+                                 `L ${b.waistDart.x * S} ${b.waistDart.bottomY * S} Z`;
 
-        [frontDartStr, backDartStr].forEach(dStr => {
+        // Back Shoulder Dart
+        const sDart = b.shoulderDart;
+        const halfW = sDart.width / 2;
+        const backShoulderDartStr = `M ${(sDart.start.x - halfW) * S} ${sDart.start.y * S} ` +
+                                    `L ${sDart.targetX * S} ${sDart.targetY * S} ` +
+                                    `L ${(sDart.start.x + halfW) * S} ${sDart.start.y * S}`;
+
+        [frontDartStr, backWaistDartStr, backShoulderDartStr].forEach(dStr => {
             const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
             path.setAttribute('d', dStr);
             path.setAttribute('stroke', '#2563eb');
@@ -134,7 +138,7 @@ const SVGRenderer = {
             layer.appendChild(path);
         });
 
-        // Apex Marker
+        // Bust Apex Red Circle
         const markerLayer = document.getElementById('layer-markers');
         if (markerLayer) {
             const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -151,30 +155,70 @@ const SVGRenderer = {
         if (!layer) return;
         
         const S = this.SCALE;
-        const offset = 0.5 * S;
+        const sa = 0.5 * S; // 0.5" offset
         const b = data.back;
         const f = data.front;
 
-        // Back Outer Bounds Offset
-        const backSA = `M ${(b.centerLine) * S - offset} ${(data.depths.dNape) * S - offset} ` +
-                       `H ${(b.bustPt.x) * S + offset} ` +
-                       `V ${(data.depths.dHip) * S + offset} ` +
-                       `H ${(b.centerLine) * S - offset} Z`;
+        // Path-following offset outlines
+        const backSA = `M ${(b.centerLine) * S - sa} ${(b.napePt.y) * S - sa} ` +
+                       `L ${(b.centerLine) * S - sa} ${(data.depths.dHip) * S + sa} ` +
+                       `L ${(b.hipPt.x) * S + sa} ${(data.depths.dHip) * S + sa} ` +
+                       `L ${(b.waistPt.x) * S + sa} ${(b.waistPt.y) * S} ` +
+                       `L ${(b.bustPt.x) * S + sa} ${(b.bustPt.y) * S} ` +
+                       `C ${(b.acrossPt.x) * S + sa} ${(b.bustPt.y) * S}, ${(b.acrossPt.x) * S + sa} ${(b.acrossPt.y) * S}, ${(b.shoulderPt.x) * S + sa} ${(b.shoulderPt.y) * S - sa} ` +
+                       `L ${(b.neckPt.x) * S} ${(b.neckPt.y) * S - sa} Z`;
 
-        // Front Outer Bounds Offset
-        const frontSA = `M ${(f.centerLine) * S + offset} ${(data.depths.dNape) * S - offset} ` +
-                        `H ${(f.bustPt.x) * S - offset} ` +
-                        `V ${(data.depths.dHip) * S + offset} ` +
-                        `H ${(f.centerLine) * S + offset} Z`;
+        const frontSA = `M ${(f.centerLine) * S + sa} ${(f.neckLowPt.y) * S} ` +
+                        `L ${(f.centerLine) * S + sa} ${(data.depths.dHip) * S + sa} ` +
+                        `L ${(f.hipPt.x) * S - sa} ${(data.depths.dHip) * S + sa} ` +
+                        `L ${(f.waistPt.x) * S - sa} ${(f.waistPt.y) * S} ` +
+                        `L ${(f.bustPt.x) * S - sa} ${(f.bustPt.y) * S} ` +
+                        `C ${(f.acrossPt.x) * S - sa} ${(f.bustPt.y) * S}, ${(f.acrossPt.x) * S - sa} ${(f.acrossPt.y) * S}, ${(f.shoulderPt.x) * S - sa} ${(f.shoulderPt.y) * S - sa} ` +
+                        `L ${(f.neckPt.x) * S} ${(f.neckPt.y) * S - sa} Z`;
 
         [backSA, frontSA].forEach(saStr => {
             const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
             path.setAttribute('d', saStr);
-            path.setAttribute('stroke', '#94a3b8');
-            path.setAttribute('stroke-dasharray', '2 2');
+            path.setAttribute('stroke', '#64748b');
+            path.setAttribute('stroke-width', '1');
+            path.setAttribute('stroke-dasharray', '3 3');
             path.setAttribute('fill', 'none');
             layer.appendChild(path);
         });
+    },
+
+    drawAnnotationsAndMarkers(data) {
+        const layer = document.getElementById('layer-annotations');
+        if (!layer) return;
+
+        const S = this.SCALE;
+        const f = data.front;
+        const b = data.back;
+
+        // Grainline Arrows
+        const backGrainX = (b.centerLine + 1.5) * S;
+        const frontGrainX = (f.centerLine - 1.5) * S;
+        const topY = (data.depths.dBustAdj + 0.5) * S;
+        const bottomY = (data.depths.dWaist + 3.0) * S;
+
+        [backGrainX, frontGrainX].forEach(gx => {
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', gx); line.setAttribute('y1', topY);
+            line.setAttribute('x2', gx); line.setAttribute('y2', bottomY);
+            line.setAttribute('stroke', '#475569');
+            line.setAttribute('stroke-width', '1');
+            layer.appendChild(line);
+        });
+
+        // Center Front Fold Annotation
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', f.centerLine * S + 8);
+        text.setAttribute('y', (data.depths.dWaist) * S);
+        text.setAttribute('font-size', '10');
+        text.setAttribute('fill', '#0284c7');
+        text.setAttribute('transform', `rotate(90, ${f.centerLine * S + 8}, ${(data.depths.dWaist) * S})`);
+        text.textContent = 'CENTER FRONT - PLACE ON FOLD';
+        layer.appendChild(text);
     },
 
     drawCalibrationBox() {
