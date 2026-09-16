@@ -11,7 +11,7 @@ const SVGRenderer = {
             this.drawBackgroundGrid(unit, options.showSubdivisions !== false);
         }
         if (!options || options.showBaseLines !== false) {
-            this.drawBaseLines(data.depths);
+            this.drawBaseLines(data.depths, data.back.centerLine, data.front.centerLine);
         }
         
         this.drawPatternOutlines(data);
@@ -84,25 +84,35 @@ const SVGRenderer = {
         }
     },
 
-    drawBaseLines(depths) {
+    drawBaseLines(depths, backCenter, frontCenter) {
         const layer = document.getElementById('layer-baselines');
         if (!layer) return;
         
         const lines = [
-            { name: 'Nape Line', y: depths.dNape },
-            { name: 'Bust Line', y: depths.dBustAdj },
-            { name: 'Waist Line', y: depths.dWaist },
-            { name: 'Hip Line', y: depths.dHip }
+            { name: 'NAPE LINE', y: depths.dNape },
+            { name: 'BUST LINE', y: depths.dBustAdj },
+            { name: 'WAIST LINE', y: depths.dWaist },
+            { name: 'HIP LINE', y: depths.dHip }
         ];
 
         lines.forEach(l => {
             const yPx = l.y * this.SCALE;
             const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            line.setAttribute('x1', '20'); line.setAttribute('y1', yPx);
+            line.setAttribute('x1', '40'); line.setAttribute('y1', yPx);
             line.setAttribute('x2', '1100'); line.setAttribute('y2', yPx);
-            line.setAttribute('stroke', '#94a3b8');
-            line.setAttribute('stroke-dasharray', '4 4');
+            line.setAttribute('stroke', '#64748b');
+            line.setAttribute('stroke-width', '1');
+            line.setAttribute('stroke-dasharray', '6 4');
             layer.appendChild(line);
+
+            const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            label.setAttribute('x', '45');
+            label.setAttribute('y', yPx - 4);
+            label.setAttribute('font-size', '9');
+            label.setAttribute('font-weight', '600');
+            label.setAttribute('fill', '#475569');
+            label.textContent = l.name;
+            layer.appendChild(label);
         });
     },
 
@@ -121,7 +131,7 @@ const SVGRenderer = {
             `L ${b.bustPt.x * S} ${b.bustPt.y * S} ` +
             `C ${b.acrossPt.x * S} ${b.bustPt.y * S}, ${b.acrossPt.x * S} ${b.acrossPt.y * S}, ${b.shoulderPt.x * S} ${b.shoulderPt.y * S} ` +
             `L ${b.neckPt.x * S} ${b.neckPt.y * S} ` +
-            `Q ${b.centerLine * S + (b.neckPt.x - b.centerLine) * S * 0.5} ${b.napePt.y * S}, ${b.centerLine * S} ${b.napePt.y * S} Z`;
+            `Q ${b.centerLine * S + (b.neckPt.x - b.centerLine) * S * 0.4} ${b.napePt.y * S}, ${b.centerLine * S} ${b.napePt.y * S} Z`;
 
         const frontPath = `M ${f.centerLine * S} ${f.neckLowPt.y * S} ` +
             `L ${f.centerLine * S} ${data.depths.dHip * S} ` +
@@ -130,7 +140,7 @@ const SVGRenderer = {
             `L ${f.bustPt.x * S} ${f.bustPt.y * S} ` +
             `C ${f.acrossPt.x * S} ${f.bustPt.y * S}, ${f.acrossPt.x * S} ${f.acrossPt.y * S}, ${f.shoulderPt.x * S} ${f.shoulderPt.y * S} ` +
             `L ${f.neckPt.x * S} ${f.neckPt.y * S} ` +
-            `C ${f.neckPt.x * S} ${f.neckLowPt.y * S}, ${f.centerLine * S - 0.3 * S} ${f.neckLowPt.y * S}, ${f.centerLine * S} ${f.neckLowPt.y * S} Z`;
+            `C ${f.neckPt.x * S} ${f.neckLowPt.y * S}, ${f.centerLine * S - (f.centerLine - f.neckPt.x) * S * 0.8} ${f.neckLowPt.y * S}, ${f.centerLine * S} ${f.neckLowPt.y * S} Z`;
 
         [backPath, frontPath].forEach(d => {
             const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -198,13 +208,15 @@ const SVGRenderer = {
         const b = data.back;
         const f = data.front;
 
+        // Curved seam allowance for Back Neckline and Front Neckline
         const backSA = `M ${(b.centerLine) * S - sa} ${(b.napePt.y) * S - sa} ` +
                        `L ${(b.centerLine) * S - sa} ${(data.depths.dHip) * S + sa} ` +
                        `L ${(b.hipPt.x) * S + sa} ${(data.depths.dHip) * S + sa} ` +
                        `L ${(b.waistPt.x) * S + sa} ${(b.waistPt.y) * S} ` +
                        `L ${(b.bustPt.x) * S + sa} ${(b.bustPt.y) * S} ` +
                        `C ${(b.acrossPt.x) * S + sa} ${(b.bustPt.y) * S}, ${(b.acrossPt.x) * S + sa} ${(b.acrossPt.y) * S}, ${(b.shoulderPt.x) * S + sa} ${(b.shoulderPt.y) * S - sa} ` +
-                       `L ${(b.neckPt.x) * S} ${(b.neckPt.y) * S - sa} Z`;
+                       `L ${(b.neckPt.x) * S} ${(b.neckPt.y) * S - sa} ` +
+                       `Q ${(b.centerLine * S + (b.neckPt.x - b.centerLine) * S * 0.4)} ${(b.napePt.y * S - sa)}, ${(b.centerLine) * S - sa} ${(b.napePt.y) * S - sa} Z`;
 
         const frontSA = `M ${(f.centerLine) * S + sa} ${(f.neckLowPt.y) * S} ` +
                         `L ${(f.centerLine) * S + sa} ${(data.depths.dHip) * S + sa} ` +
@@ -212,7 +224,8 @@ const SVGRenderer = {
                         `L ${(f.waistPt.x) * S - sa} ${(f.waistPt.y) * S} ` +
                         `L ${(f.bustPt.x) * S - sa} ${(f.bustPt.y) * S} ` +
                         `C ${(f.acrossPt.x) * S - sa} ${(f.bustPt.y) * S}, ${(f.acrossPt.x) * S - sa} ${(f.acrossPt.y) * S}, ${(f.shoulderPt.x) * S - sa} ${(f.shoulderPt.y) * S - sa} ` +
-                        `L ${(f.neckPt.x) * S} ${(f.neckPt.y) * S - sa} Z`;
+                        `L ${(f.neckPt.x) * S} ${(f.neckPt.y) * S - sa} ` +
+                        `C ${(f.neckPt.x) * S - sa} ${(f.neckLowPt.y) * S}, ${(f.centerLine * S - (f.centerLine - f.neckPt.x) * S * 0.8)} ${(f.neckLowPt.y) * S + sa}, ${(f.centerLine) * S + sa} ${(f.neckLowPt.y) * S} Z`;
 
         [backSA, frontSA].forEach(saStr => {
             const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
