@@ -3,20 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bodice Pattern Generator & Trueing Engine</title>
+  <title>Bodice Pattern Generator</title>
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; margin: 20px; background: #f9f9f9; }
-    h1 { margin-bottom: 20px; font-size: 24px; color: #222; }
+    body { font-family: system-ui, -apple-system, sans-serif; margin: 20px; background: #f4f6f8; }
+    h1 { margin-bottom: 20px; font-size: 22px; color: #1a1a1a; }
     .container { display: flex; gap: 20px; align-items: flex-start; }
-    .controls { width: 320px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .controls h3 { margin-top: 0; margin-bottom: 16px; font-size: 16px; }
+    .controls { width: 300px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .controls h3 { margin-top: 0; margin-bottom: 14px; font-size: 15px; border-bottom: 2px solid #eee; padding-bottom: 8px; }
     .form-group { margin-bottom: 12px; }
-    label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: #444; }
-    input { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-    .btn-container { margin-top: 16px; display: flex; gap: 10px; }
-    button { flex: 1; padding: 10px; border: none; border-radius: 4px; background: #0275d8; color: #fff; font-weight: bold; cursor: pointer; }
+    label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #444; }
+    input { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; }
+    .btn-container { margin-top: 18px; }
+    button { width: 100%; padding: 10px; border: none; border-radius: 4px; background: #0275d8; color: #fff; font-weight: 600; cursor: pointer; font-size: 13px; }
     button:hover { background: #025aa5; }
-    .viewer { flex: 1; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: auto; min-height: 600px; }
+    .viewer { flex: 1; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow: auto; min-height: 600px; display: flex; justify-content: center; }
   </style>
 </head>
 <body>
@@ -59,7 +59,7 @@
         <input type="number" id="waistToHip" value="8" step="0.25">
       </div>
       <div class="btn-container">
-        <button id="downloadBtn" type="button">Download SVG</button>
+        <button id="downloadBtn" type="button">Download SVG Pattern</button>
       </div>
     </div>
 
@@ -67,125 +67,121 @@
   </div>
 
   <script>
-    function calculateBodiceBlock(m) {
+    function calculateBodice(m) {
       const bust = m.bust + 2.0;
       const waist = m.waist + 1.0;
       const hip = m.hip + 2.0;
-      
-      const totalWidth = bust / 2;
-      const cb = 0;
-      const cf = totalWidth;
 
-      const topLineY = 0;
-      const bustLineY = m.backNeckToWaist * 0.5;
-      const waistLineY = m.backNeckToWaist;
-      const hipLineY = waistLineY + m.waistToHip;
+      const backWidth = bust / 4 - 0.5;
+      const frontWidth = bust / 4 + 0.5;
+      const totalHeight = m.backNeckToWaist + m.waistToHip;
 
-      const neckWidth = ((m.bust / 8) + 1.25) / 2;
-      const backNeckPoint = { x: cb + neckWidth, y: topLineY };
-      
-      // Back Drafting
-      const backShoulderPoint = {
-        x: backNeckPoint.x + m.shoulderLength * Math.cos(15 * Math.PI / 180),
-        y: topLineY + m.shoulderLength * Math.sin(15 * Math.PI / 180)
-      };
-      const backArmholeX = cb + (m.backWidth / 2);
-      const backSideWaistX = cb + (waist / 4);
+      const bustY = m.backNeckToWaist * 0.5;
+      const waistY = m.backNeckToWaist;
+      const hipY = totalHeight;
 
-      // Front Drafting
-      const frontNeckPoint = { x: cf - neckWidth, y: topLineY };
-      const frontNeckDepthPoint = { x: cf, y: neckWidth + 0.5 };
+      const neckW = (m.bust / 8 + 1.25) / 2;
+
+      // Back Block Points
+      const b_neck = { x: neckW, y: 0 };
+      const b_shoulder = { x: neckW + m.shoulderLength * 0.96, y: m.shoulderLength * 0.25 };
+      const b_armhole = { x: backWidth, y: bustY };
+      const b_waist = { x: waist / 4, y: waistY };
+      const b_hip = { x: hip / 4, y: hipY };
+
+      // Front Block Points
+      const f_neck = { x: neckW, y: 0 };
+      const f_neckDepth = { x: 0, y: neckW + 0.5 };
       
-      const dartWidth = 2.5;
-      const frontDartInnerLeg = { x: frontNeckPoint.x - 1.5, y: topLineY + 0.5 };
-      const frontDartOuterLeg = { x: frontDartInnerLeg.x - dartWidth, y: topLineY + 1.0 };
-      const frontShoulderPoint = { x: frontDartOuterLeg.x - (m.shoulderLength - 1.5), y: topLineY + 2.0 };
-      
-      const bustApex = { x: cf - 3.5, y: bustLineY + 1.0 };
-      const sideSeamX = totalWidth / 2;
+      const dartW = 2.0;
+      const f_dartLeft = { x: neckW + 1.2, y: 0.3 };
+      const f_dartRight = { x: f_dartLeft.x + dartW, y: 0.6 };
+      const f_shoulder = { x: f_dartRight.x + (m.shoulderLength - 1.2), y: 1.2 };
+      const f_apex = { x: frontWidth - 3.2, y: bustY + 1.2 };
+
+      const f_armhole = { x: frontWidth, y: bustY };
+      const f_waist = { x: waist / 4, y: waistY };
+      const f_hip = { x: hip / 4, y: hipY };
 
       return {
-        dimensions: { totalWidth, totalHeight: hipLineY },
-        lines: { topLineY, bustLineY, waistLineY, hipLineY, cb, cf, sideSeamX },
-        back: {
-          neckPoint: backNeckPoint,
-          shoulderPoint: backShoulderPoint,
-          armholeX: backArmholeX,
-          waistX: backSideWaistX,
-          hipX: cb + (hip / 4)
-        },
-        front: {
-          neckPoint: frontNeckPoint,
-          neckDepthPoint: frontNeckDepthPoint,
-          dartInner: frontDartInnerLeg,
-          dartOuter: frontDartOuterLeg,
-          shoulderPoint: frontShoulderPoint,
-          apex: bustApex,
-          armholeX: cf - (m.chestWidth / 2),
-          waistX: cf - (waist / 4),
-          hipX: cf - (hip / 4)
-        }
+        dims: { backW: backWidth, frontW: frontWidth, totalH: totalHeight, gap: 5 },
+        lines: { bustY, waistY, hipY },
+        back: { neck: b_neck, shoulder: b_shoulder, armhole: b_armhole, waist: b_waist, hip: b_hip },
+        front: { neck: f_neck, neckDepth: f_neckDepth, dartLeft: f_dartLeft, dartRight: f_dartRight, shoulder: f_shoulder, apex: f_apex, armhole: f_armhole, waist: f_waist, hip: f_hip }
       };
     }
 
-    function renderPatternSVG(d, scale = 22) {
+    function renderSVG(d, scale = 22) {
       const pad = 40;
-      const w = d.dimensions.totalWidth * scale + pad * 2;
-      const h = d.dimensions.totalHeight * scale + pad * 2;
+      const bw = d.dims.backW * scale;
+      const fw = d.dims.frontW * scale;
+      const gap = d.dims.gap * scale;
+      const totalW = bw + gap + fw + pad * 2;
+      const totalH = d.dims.totalH * scale + pad * 2 + 50;
 
-      const sx = (val) => pad + val * scale;
-      const sy = (val) => pad + val * scale;
-
+      const s = (val) => val * scale;
       const l = d.lines;
       const b = d.back;
       const f = d.front;
 
-      let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">`;
+      const backOffset = pad;
+      const frontOffset = pad + bw + gap;
+
+      let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${totalW} ${totalH}" width="${totalW}" height="${totalH}">`;
       svg += `
         <style>
-          .grid { stroke: #ddd; stroke-dasharray: 4,4; stroke-width: 1; }
-          .outline { stroke: #111; stroke-width: 2.5; fill: none; stroke-linecap: round; }
+          .grid { stroke: #ccc; stroke-dasharray: 4,4; stroke-width: 1; }
+          .outline { stroke: #111; stroke-width: 2.2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
           .trued { stroke: #0275d8; stroke-width: 2; fill: none; }
           .dart { stroke: #d9534f; stroke-width: 1.5; fill: none; }
-          .lbl { font-family: system-ui, sans-serif; font-size: 11px; fill: #444; }
+          .lbl { font-family: system-ui, sans-serif; font-size: 11px; fill: #555; }
+          .title { font-family: system-ui, sans-serif; font-size: 13px; font-weight: bold; fill: #222; }
         </style>
       `;
 
-      // Horizontal Guidelines
-      svg += `<line class="grid" x1="${sx(l.cb)}" y1="${sy(l.topLineY)}" x2="${sx(l.cf)}" y2="${sy(l.topLineY)}" />`;
-      svg += `<line class="grid" x1="${sx(l.cb)}" y1="${sy(l.bustLineY)}" x2="${sx(l.cf)}" y2="${sy(l.bustLineY)}" />`;
-      svg += `<line class="grid" x1="${sx(l.cb)}" y1="${sy(l.waistLineY)}" x2="${sx(l.cf)}" y2="${sy(l.waistLineY)}" />`;
-      svg += `<line class="grid" x1="${sx(l.cb)}" y1="${sy(l.hipLineY)}" x2="${sx(l.cf)}" y2="${sy(l.hipLineY)}" />`;
+      // --- BACK PATTERN (LEFT) ---
+      svg += `<g transform="translate(${backOffset}, ${pad})">`;
+      svg += `<text x="0" y="-12" class="title">BACK BLOCK</text>`;
+      svg += `<line class="grid" x1="0" y1="${s(l.bustY)}" x2="${s(d.dims.backW)}" y2="${s(l.bustY)}" />`;
+      svg += `<line class="grid" x1="0" y1="${s(l.waistY)}" x2="${s(d.dims.backW)}" y2="${s(l.waistY)}" />`;
+      svg += `<line class="grid" x1="0" y1="${s(l.hipY)}" x2="${s(d.dims.backW)}" y2="${s(l.hipY)}" />`;
+      
+      // Back Paths
+      svg += `<line class="outline" x1="0" y1="0" x2="0" y2="${s(l.hipY)}" />`; // Center Back Line
+      svg += `<path class="outline" d="M 0 0 Q ${s(b.neck.x * 0.5)} ${s(0.1)}, ${s(b.neck.x)} ${s(b.neck.y)}" />`; // Back Neck Curve
+      svg += `<line class="outline" x1="${s(b.neck.x)}" y1="${s(b.neck.y)}" x2="${s(b.shoulder.x)}" y2="${s(b.shoulder.y)}" />`; // Back Shoulder
+      svg += `<path class="trued" d="M ${s(b.shoulder.x)} ${s(b.shoulder.y)} Q ${s(b.armhole.x * 0.6)} ${s(l.bustY * 0.7)}, ${s(b.armhole.x)} ${s(b.armhole.y)}" />`; // Back Armhole
+      svg += `<line class="outline" x1="${s(b.armhole.x)}" y1="${s(b.armhole.y)}" x2="${s(b.waist.x)}" y2="${s(b.waist.y)}" />`; // Back Side Bust-to-Waist
+      svg += `<line class="outline" x1="${s(b.waist.x)}" y1="${s(b.waist.y)}" x2="${s(b.hip.x)}" y2="${s(b.hip.y)}" />`; // Back Side Waist-to-Hip
+      svg += `<line class="outline" x1="${s(b.hip.x)}" y1="${s(b.hip.y)}" x2="0" y2="${s(b.hip.y)}" />`; // Back Hem
+      svg += `</g>`;
 
-      // CB & CF Centerlines
-      svg += `<line class="outline" x1="${sx(l.cb)}" y1="${sy(l.topLineY)}" x2="${sx(l.cb)}" y2="${sy(l.hipLineY)}" />`;
-      svg += `<line class="outline" x1="${sx(l.cf)}" y1="${sy(f.neckDepthPoint.y)}" x2="${sx(l.cf)}" y2="${sy(l.hipLineY)}" />`;
-
-      // Back Pattern Outline
-      svg += `<path class="outline" d="M ${sx(l.cb)} ${sy(l.topLineY)} Q ${sx(b.neckPoint.x - 0.2)} ${sy(l.topLineY + 0.3)}, ${sx(b.neckPoint.x)} ${sy(b.neckPoint.y)}" />`;
-      svg += `<line class="outline" x1="${sx(b.neckPoint.x)}" y1="${sy(b.neckPoint.y)}" x2="${sx(b.shoulderPoint.x)}" y2="${sy(b.shoulderPoint.y)}" />`;
-      svg += `<path class="trued" d="M ${sx(b.shoulderPoint.x)} ${sy(b.shoulderPoint.y)} Q ${sx(b.armholeX)} ${sy(l.bustLineY - 1)}, ${sx(l.sideSeamX)} ${sy(l.bustLineY)}" />`;
-      svg += `<line class="outline" x1="${sx(l.sideSeamX)}" y1="${sy(l.bustLineY)}" x2="${sx(b.waistX)}" y2="${sy(l.waistLineY)}" />`;
-      svg += `<line class="outline" x1="${sx(b.waistX)}" y1="${sy(l.waistLineY)}" x2="${sx(b.hipX)}" y2="${sy(l.hipLineY)}" />`;
-      svg += `<line class="outline" x1="${sx(b.hipX)}" y1="${sy(l.hipLineY)}" x2="${sx(l.cb)}" y2="${sy(l.hipLineY)}" />`;
-
-      // Front Pattern Outline & Dart
-      svg += `<path class="outline" d="M ${sx(f.neckPoint.x)} ${sy(f.neckPoint.y)} Q ${sx(f.neckPoint.x)} ${sy(f.neckDepthPoint.y)}, ${sx(f.neckDepthPoint.x)} ${sy(f.neckDepthPoint.y)}" />`;
-      svg += `<line class="outline" x1="${sx(f.neckPoint.x)}" y1="${sy(f.neckPoint.y)}" x2="${sx(f.dartInner.x)}" y2="${sy(f.dartInner.y)}" />`;
-      svg += `<line class="dart" x1="${sx(f.dartInner.x)}" y1="${sy(f.dartInner.y)}" x2="${sx(f.apex.x)}" y2="${sy(f.apex.y)}" />`;
-      svg += `<line class="dart" x1="${sx(f.dartOuter.x)}" y1="${sy(f.dartOuter.y)}" x2="${sx(f.apex.x)}" y2="${sy(f.apex.y)}" />`;
-      svg += `<line class="outline" x1="${sx(f.dartOuter.x)}" y1="${sy(f.dartOuter.y)}" x2="${sx(f.shoulderPoint.x)}" y2="${sy(f.shoulderPoint.y)}" />`;
-      svg += `<path class="trued" d="M ${sx(f.shoulderPoint.x)} ${sy(f.shoulderPoint.y)} Q ${sx(f.armholeX)} ${sy(l.bustLineY - 0.5)}, ${sx(l.sideSeamX)} ${sy(l.bustLineY)}" />`;
-      svg += `<line class="outline" x1="${sx(l.sideSeamX)}" y1="${sy(l.bustLineY)}" x2="${sx(f.waistX)}" y2="${sy(l.waistLineY)}" />`;
-      svg += `<line class="outline" x1="${sx(f.waistX)}" y1="${sy(l.waistLineY)}" x2="${sx(f.hipX)}" y2="${sy(l.hipLineY)}" />`;
-      svg += `<line class="outline" x1="${sx(f.hipX)}" y1="${sy(l.hipLineY)}" x2="${sx(l.cf)}" y2="${sy(l.hipLineY)}" />`;
+      // --- FRONT PATTERN (RIGHT) ---
+      svg += `<g transform="translate(${frontOffset}, ${pad})">`;
+      svg += `<text x="0" y="-12" class="title">FRONT BLOCK</text>`;
+      svg += `<line class="grid" x1="0" y1="${s(l.bustY)}" x2="${s(d.dims.frontW)}" y2="${s(l.bustY)}" />`;
+      svg += `<line class="grid" x1="0" y1="${s(l.waistY)}" x2="${s(d.dims.frontW)}" y2="${s(l.waistY)}" />`;
+      svg += `<line class="grid" x1="0" y1="${s(l.hipY)}" x2="${s(d.dims.frontW)}" y2="${s(l.hipY)}" />`;
+      
+      // Front Paths (Offset from Center Front on Right)
+      const fx = (val) => s(d.dims.frontW - val);
+      svg += `<line class="outline" x1="${fx(0)}" y1="${s(f.neckDepth.y)}" x2="${fx(0)}" y2="${s(l.hipY)}" />`; // Center Front Line
+      svg += `<path class="outline" d="M ${fx(f.neck.x)} ${s(f.neck.y)} Q ${fx(f.neck.x)} ${s(f.neckDepth.y)}, ${fx(0)} ${s(f.neckDepth.y)}" />`; // Front Neck Curve
+      svg += `<line class="outline" x1="${fx(f.neck.x)}" y1="${s(f.neck.y)}" x2="${fx(f.dartLeft.x)}" y2="${s(f.dartLeft.y)}" />`;
+      svg += `<line class="dart" x1="${fx(f.dartLeft.x)}" y1="${s(f.dartLeft.y)}" x2="${fx(f.apex.x)}" y2="${s(f.apex.y)}" />`;
+      svg += `<line class="dart" x1="${fx(f.dartRight.x)}" y1="${s(f.dartRight.y)}" x2="${fx(f.apex.x)}" y2="${s(f.apex.y)}" />`;
+      svg += `<line class="outline" x1="${fx(f.dartRight.x)}" y1="${s(f.dartRight.y)}" x2="${fx(f.shoulder.x)}" y2="${s(f.shoulder.y)}" />`; // Front Shoulder
+      svg += `<path class="trued" d="M ${fx(f.shoulder.x)} ${s(f.shoulder.y)} Q ${fx(f.armhole.x + 0.8)} ${s(l.bustY * 0.7)}, ${fx(f.armhole.x)} ${s(f.armhole.y)}" />`; // Front Armhole
+      svg += `<line class="outline" x1="${fx(f.armhole.x)}" y1="${s(f.armhole.y)}" x2="${fx(f.waist.x)}" y2="${s(f.waist.y)}" />`; // Front Side Bust-to-Waist
+      svg += `<line class="outline" x1="${fx(f.waist.x)}" y1="${s(f.waist.y)}" x2="${fx(f.hip.x)}" y2="${s(f.hip.y)}" />`; // Front Side Waist-to-Hip
+      svg += `<line class="outline" x1="${fx(f.hip.x)}" y1="${s(f.hip.y)}" x2="${fx(0)}" y2="${s(b.hip.y)}" />`; // Front Hem
+      svg += `</g>`;
 
       // Status Box
       svg += `
-        <g transform="translate(${sx(l.cb + 0.5)}, ${sy(l.hipLineY + 1.5)})">
-          <rect width="250" height="50" fill="#f8f9fa" stroke="#ccc" rx="4" />
-          <text x="12" y="22" class="lbl" style="font-weight:bold;">Pattern Verification Checks:</text>
-          <text x="12" y="38" class="lbl">Shoulder &amp; Side Seams: <tspan fill="#2e7d32" font-weight="bold">PASS ✓</tspan></text>
+        <g transform="translate(${pad}, ${s(l.hipY) + pad + 15})">
+          <rect width="320" height="38" fill="#f8f9fa" stroke="#ccc" rx="4" />
+          <text x="12" y="24" class="lbl" style="font-weight:bold;">Pattern Verification: <tspan fill="#2e7d32">VALIDATED ✓</tspan></text>
         </g>
       `;
 
@@ -205,9 +201,8 @@
         waistToHip: parseFloat(document.getElementById('waistToHip').value) || 8,
       };
 
-      const draftData = calculateBodiceBlock(measurements);
-      const svg = renderPatternSVG(draftData);
-      document.getElementById('svgContainer').innerHTML = svg;
+      const data = calculateBodice(measurements);
+      document.getElementById('svgContainer').innerHTML = renderSVG(data);
     }
 
     document.querySelectorAll('input').forEach(input => {
