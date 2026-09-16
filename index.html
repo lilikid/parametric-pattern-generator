@@ -3,28 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parametric Bodice Pattern Generator</title>
+    <title>Parametric Pattern Generator</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8fafc; color: #1e293b; display: flex; height: 100vh; overflow: hidden; }
         
-        /* Sidebar Panel */
-        #sidebar { width: 320px; background: #ffffff; border-right: 1px solid #e2e8f0; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
-        h2 { font-size: 1.2rem; font-weight: 600; color: #0f172a; margin-bottom: 10px; }
-        .section-title { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 8px; }
+        #sidebar { width: 360px; background: #ffffff; border-right: 1px solid #e2e8f0; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+        h2 { font-size: 1.1rem; font-weight: 700; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; }
+        .section-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-top: 4px; }
         
-        .input-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
-        label { font-size: 0.85rem; font-weight: 500; color: #334155; }
-        input[type="number"], select { padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; }
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .input-group { display: flex; flex-direction: column; gap: 4px; }
+        .input-group.full { grid-column: span 2; }
+        label { font-size: 0.8rem; font-weight: 600; color: #334155; }
+        input[type="number"], select { padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.85rem; width: 100%; }
         
         .toggle-group { display: flex; flex-direction: column; gap: 8px; }
-        .checkbox-label { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer; }
+        .checkbox-label { display: flex; align-items: center; gap: 8px; font-size: 0.825rem; cursor: pointer; color: #334155; font-weight: 500; }
         .checkbox-label input { cursor: pointer; }
 
-        /* Main Canvas View */
         #main-view { flex: 1; display: flex; flex-direction: column; background: #f1f5f9; position: relative; }
         #toolbar { height: 50px; background: #ffffff; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
-        .btn { background: #2563eb; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 500; cursor: pointer; font-size: 0.85rem; }
+        .btn { background: #2563eb; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
         .btn:hover { background: #1d4ed8; }
 
         #svg-container { flex: 1; overflow: auto; display: flex; align-items: center; justify-content: center; padding: 20px; }
@@ -33,71 +33,105 @@
 </head>
 <body>
 
-    <!-- SIDEBAR CONTROLS -->
     <div id="sidebar">
         <div>
             <h2>Pattern Controls</h2>
-            <div class="input-group">
+            <div class="input-group full" style="margin-top: 10px;">
                 <label for="unit-select">Measurement Unit</label>
                 <select id="unit-select">
                     <option value="inch" selected>Inches (in)</option>
                     <option value="cm">Centimeters (cm)</option>
                 </select>
             </div>
-            <div class="input-group">
-                <label for="ease-select">Silhouette Ease</label>
+            <div class="input-group full" style="margin-top: 8px;">
+                <label for="ease-select">Silhouette & Ease Selection</label>
                 <select id="ease-select">
-                    <option value="1.0">Fitted (1.0")</option>
-                    <option value="1.5">Semi-Fitted (1.5")</option>
-                    <option value="2.0">Loose (2.0")</option>
+                    <option value="-2.0">Corset / Compression (-2.00")</option>
+                    <option value="0.5">Close-Fitting / Knit (0.50")</option>
+                    <option value="1.25" selected>Standard Fitted Block (1.25") [Default]</option>
+                    <option value="2.0">Semi-Fitted / Daywear (2.00")</option>
+                    <option value="3.5">Loose / Outerwear (3.50")</option>
                 </select>
             </div>
         </div>
 
         <div>
-            <div class="section-title">Measurements</div>
-            <div class="input-group">
-                <label for="m-bust">Bust Circumference</label>
-                <input type="number" id="m-bust" value="36.0" step="0.25">
-            </div>
-            <div class="input-group">
-                <label for="m-waist">Waist Circumference</label>
-                <input type="number" id="m-waist" value="28.0" step="0.25">
-            </div>
-            <div class="input-group">
-                <label for="m-hip">Hip Circumference</label>
-                <input type="number" id="m-hip" value="38.0" step="0.25">
-            </div>
-            <div class="input-group">
-                <label for="m-back-waist">Back Waist Length</label>
-                <input type="number" id="m-back-waist" value="16.5" step="0.25">
+            <div class="section-title">Anatomic Measurements</div>
+            <div class="input-grid" style="margin-top: 6px;">
+                <div class="input-group">
+                    <label for="m-bust">Bust (B)</label>
+                    <input type="number" id="m-bust" value="36.0" step="0.25">
+                </div>
+                <div class="input-group">
+                    <label for="m-waist">Waist (W)</label>
+                    <input type="number" id="m-waist" value="28.0" step="0.25">
+                </div>
+                <div class="input-group">
+                    <label for="m-hip">Hips (H)</label>
+                    <input type="number" id="m-hip" value="38.0" step="0.25">
+                </div>
+                <div class="input-group">
+                    <label for="m-back-waist">Back Waist (BW)</label>
+                    <input type="number" id="m-back-waist" value="16.5" step="0.25">
+                </div>
+                <div class="input-group">
+                    <label for="m-waist-hip">Waist-to-Hip (WH)</label>
+                    <input type="number" id="m-waist-hip" value="8.0" step="0.25">
+                </div>
+                <div class="input-group">
+                    <label for="m-back-width">Back Width (BWidth)</label>
+                    <input type="number" id="m-back-width" value="14.0" step="0.25">
+                </div>
+                <div class="input-group">
+                    <label for="m-chest-width">Chest Width (CWidth)</label>
+                    <input type="number" id="m-chest-width" value="13.0" step="0.25">
+                </div>
+                <div class="input-group">
+                    <label for="m-shoulder">Shoulder Length (S)</label>
+                    <input type="number" id="m-shoulder" value="5.0" step="0.25">
+                </div>
+                <div class="input-group">
+                    <label for="m-arm-len">Arm Length (A)</label>
+                    <input type="number" id="m-arm-len" value="23.0" step="0.25">
+                </div>
+                <div class="input-group">
+                    <label for="m-top-arm">Top Arm Circ. (TA)</label>
+                    <input type="number" id="m-top-arm" value="11.5" step="0.25">
+                </div>
             </div>
         </div>
 
         <div>
-            <div class="section-title">Layer Visibility</div>
-            <div class="toggle-group">
+            <div class="section-title">Display & Canvas Toggles</div>
+            <div class="toggle-group" style="margin-top: 8px;">
                 <label class="checkbox-label">
                     <input type="checkbox" id="toggle-grid" checked>
-                    Background Grid
+                    Show Interactive Background Grid
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="toggle-subdivisions" checked>
+                    Grid Subdivisions (Minor Lines)
                 </label>
                 <label class="checkbox-label">
                     <input type="checkbox" id="toggle-baselines" checked>
-                    Reference Lines
+                    Show Construction Base Lines
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="toggle-apex" checked>
+                    Show Apex / Bust Point Marker
                 </label>
                 <label class="checkbox-label">
                     <input type="checkbox" id="toggle-darts" checked>
-                    Sewing Darts
+                    Show Sewing Darts
                 </label>
                 <label class="checkbox-label">
                     <input type="checkbox" id="toggle-sa" checked>
-                    Seam Allowance (0.5")
+                    Show Seam Allowances (1/2" / 1.3cm)
                 </label>
             </div>
         </div>
     </div>
 
-    <!-- MAIN SVG DISPLAY -->
     <div id="main-view">
         <div id="toolbar">
             <span style="font-weight: 600; font-size: 0.9rem;">2D Pattern Workspace</span>
@@ -117,44 +151,68 @@
         </div>
     </div>
 
-    <!-- ENGINE SCRIPTS -->
-    <script src="measurements.js"></script>
     <script src="draftingEngine.js"></script>
     <script src="svgRenderer.js"></script>
     
     <script>
-        // Main App Controller Wiring
-        function updateApp() {
-            const measurements = {
-                B: parseFloat(document.getElementById('m-bust').value) || 36.0,
-                W: parseFloat(document.getElementById('m-waist').value) || 28.0,
-                H: parseFloat(document.getElementById('m-hip').value) || 38.0,
-                BW: parseFloat(document.getElementById('m-back-waist').value) || 16.5,
-            };
+        let previousUnit = 'inch';
 
-            const easeVal = parseFloat(document.getElementById('ease-select').value);
+        function syncUnitValues(targetUnit) {
+            if (previousUnit === targetUnit) return;
+            const factor = targetUnit === 'cm' ? 2.54 : (1 / 2.54);
+            const inputs = ['m-bust', 'm-waist', 'm-hip', 'm-back-waist', 'm-waist-hip', 'm-back-width', 'm-chest-width', 'm-shoulder', 'm-arm-len', 'm-top-arm'];
+            
+            inputs.forEach(id => {
+                const el = document.getElementById(id);
+                if (el && el.value) {
+                    el.value = (parseFloat(el.value) * factor).toFixed(2);
+                }
+            });
+            previousUnit = targetUnit;
+        }
+
+        function updateApp() {
             const unitVal = document.getElementById('unit-select').value;
+            syncUnitValues(unitVal);
+
+            // Convert to inches internally for mathematical stability
+            const toInches = (val) => unitVal === 'cm' ? val / 2.54 : val;
+
+            const rawEase = parseFloat(document.getElementById('ease-select').value);
+            const easeValInches = unitVal === 'cm' ? rawEase / 2.54 : rawEase;
+
+            const measurements = {
+                B: toInches(parseFloat(document.getElementById('m-bust').value) || 36.0),
+                W: toInches(parseFloat(document.getElementById('m-waist').value) || 28.0),
+                H: toInches(parseFloat(document.getElementById('m-hip').value) || 38.0),
+                BW: toInches(parseFloat(document.getElementById('m-back-waist').value) || 16.5),
+                WH: toInches(parseFloat(document.getElementById('m-waist-hip').value) || 8.0),
+                BWidth: toInches(parseFloat(document.getElementById('m-back-width').value) || 14.0),
+                CWidth: toInches(parseFloat(document.getElementById('m-chest-width').value) || 13.0),
+                S: toInches(parseFloat(document.getElementById('m-shoulder').value) || 5.0),
+                A: toInches(parseFloat(document.getElementById('m-arm-len').value) || 23.0),
+                TA: toInches(parseFloat(document.getElementById('m-top-arm').value) || 11.5)
+            };
 
             const options = {
                 unit: unitVal,
                 showGrid: document.getElementById('toggle-grid').checked,
+                showSubdivisions: document.getElementById('toggle-subdivisions').checked,
                 showBaseLines: document.getElementById('toggle-baselines').checked,
+                showApex: document.getElementById('toggle-apex').checked,
                 showSewingDarts: document.getElementById('toggle-darts').checked,
                 showSA: document.getElementById('toggle-sa').checked
             };
 
-            // Calculate geometry and render to SVG
-            const patternData = DraftingEngine.calculatePattern(measurements, easeVal);
+            const patternData = DraftingEngine.calculatePattern(measurements, easeValInches);
             SVGRenderer.render(patternData, options);
         }
 
-        // Attach listeners to all UI inputs
         document.querySelectorAll('input, select').forEach(element => {
             element.addEventListener('change', updateApp);
             element.addEventListener('input', updateApp);
         });
 
-        // Initial render on load
         window.addEventListener('DOMContentLoaded', updateApp);
     </script>
 </body>
