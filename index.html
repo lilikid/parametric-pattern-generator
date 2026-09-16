@@ -34,23 +34,23 @@
       <h3>Measurements (Inches)</h3>
       <div class="form-group">
         <label for="bust">Bust</label>
-        <input type="number" id="bust" value="43" step="0.25">
+        <input type="number" id="bust" value="38.5" step="0.25">
       </div>
       <div class="form-group">
         <label for="waist">Waist</label>
-        <input type="number" id="waist" value="23.5" step="0.25">
+        <input type="number" id="waist" value="28.75" step="0.25">
       </div>
       <div class="form-group">
         <label for="hip">Hip</label>
-        <input type="number" id="hip" value="44" step="0.25">
+        <input type="number" id="hip" value="42" step="0.25">
       </div>
       <div class="form-group">
         <label for="backWidth">Across Back Width</label>
-        <input type="number" id="backWidth" value="13.5" step="0.25">
+        <input type="number" id="backWidth" value="14.0" step="0.25">
       </div>
       <div class="form-group">
         <label for="chestWidth">Across Chest Width</label>
-        <input type="number" id="chestWidth" value="14.25" step="0.25">
+        <input type="number" id="chestWidth" value="13.5" step="0.25">
       </div>
       <div class="form-group">
         <label for="shoulderLength">Shoulder Length</label>
@@ -62,7 +62,7 @@
       </div>
       <div class="form-group">
         <label for="waistToHip">Waist to Hip</label>
-        <input type="number" id="waistToHip" value="9.5" step="0.25">
+        <input type="number" id="waistToHip" value="9.0" step="0.25">
       </div>
 
       <h3>Drafting Options</h3>
@@ -107,11 +107,9 @@
       const halfBackW = m.backWidth / 2;
       const halfChestW = m.chestWidth / 2;
 
-      // Base block widths at bust line
       const backBustW = easeBust / 4 - 0.25;
       const frontBustW = easeBust / 4 + 0.25;
 
-      // Base block widths at hip line
       const backHipW = easeHip / 4 - 0.25;
       const frontHipW = easeHip / 4 + 0.25;
 
@@ -119,51 +117,51 @@
       const totalWidth = backBustW + frontBustW + blockGap;
       const totalHeight = m.backNeckToWaist + m.waistToHip;
 
-      const topY = 1.0;
+      const topY = 1.5; // leave space for test square at top
       const bustY = topY + m.backNeckToWaist * 0.5;
-      const trueBustY = bustY + 1.25;
+      const trueBustY = bustY + 1.0;
       const waistY = topY + m.backNeckToWaist;
       const hipY = topY + totalHeight;
 
       const neckW = (m.bust / 8 + 1.25) / 2;
 
-      // Waist Intake Calculation
+      // Waist Intake Calculations
       const totalBustWidth = backBustW + frontBustW;
       const totalWaistWidthNeeded = easeWaist / 2;
       const totalWaistIntake = Math.max(0, totalBustWidth - totalWaistWidthNeeded);
 
-      // Max side seam reduction capped to prevent overlapping curves
-      const maxSideSeamIntake = totalWaistIntake * 0.4;
+      const maxSideSeamIntake = totalWaistIntake * 0.35;
       const remainingIntake = totalWaistIntake - maxSideSeamIntake;
 
       const sideWaistIntakeEach = maxSideSeamIntake / 2;
-      const b_waistDartW = remainingIntake * 0.45;
-      const f_waistDartW = remainingIntake * 0.55;
+      const b_waistDartW = remainingIntake * 0.4;
+      const f_waistDartW = remainingIntake * 0.6;
 
       // --- BACK POINTS ---
       const b_np = { x: neckW, y: topY };
-      const b_shoulderDrop = topY + 1.5;
+      const b_shoulderDrop = topY + 1.25;
       const b_sp = { x: neckW + m.shoulderLength + 0.5, y: b_shoulderDrop };
 
-      const b_shDartInner = { x: neckW + (m.shoulderLength * 0.4), y: topY + 0.6 };
-      const b_shDartOuter = { x: b_shDartInner.x + 0.5, y: topY + 0.75 };
-      const b_shDartApex = { x: b_shDartInner.x + 0.1, y: topY + 3.0 };
+      const b_shDartInner = { x: neckW + (m.shoulderLength * 0.38), y: topY + 0.4 };
+      const b_shDartOuter = { x: b_shDartInner.x + 0.5, y: topY + 0.5 };
+      const b_shDartApex = { x: b_shDartInner.x + 0.1, y: topY + 2.75 };
 
       const b_waistDartX = backBustW * 0.45;
-      const b_waistDartTop = { x: b_waistDartX, y: trueBustY };
+      const b_waistDartTop = { x: b_waistDartX, y: trueBustY - 0.5 };
       const b_waistDartBottom = { x: b_waistDartX, y: waistY + (m.waistToHip * 0.6) };
 
       // --- FRONT POINTS ---
       const f_cfX = totalWidth;
       const f_np = { x: f_cfX - neckW, y: topY };
-      const f_sp = { x: f_cfX - neckW - m.shoulderLength - 1.5, y: b_shoulderDrop + 0.2 };
+      const f_sp = { x: f_cfX - neckW - m.shoulderLength - 1.0, y: b_shoulderDrop + 0.2 };
 
-      const f_apex = { x: f_cfX - (m.bust / 10 + 0.5), y: trueBustY };
+      // Accurate Bust Apex Placement
+      const f_apex = { x: f_cfX - (m.bust / 10 + 0.75), y: trueBustY };
 
-      const f_shDartInner = { x: f_cfX - neckW - 1.2, y: topY + 0.4 };
-      const f_shDartOuter = { x: f_shDartInner.x - 1.2, y: topY + 0.8 };
+      const f_shDartInner = { x: f_cfX - neckW - 1.0, y: topY + 0.3 };
+      const f_shDartOuter = { x: f_shDartInner.x - 1.0, y: topY + 0.6 };
 
-      const f_waistDartTop = { x: f_apex.x, y: trueBustY + 0.75 };
+      const f_waistDartTop = { x: f_apex.x, y: f_apex.y + 0.5 };
       const f_waistDartBottom = { x: f_apex.x, y: waistY + (m.waistToHip * 0.55) };
 
       // Underarm Point (UP) & Side Seams
@@ -219,10 +217,18 @@
           .dart { stroke: #111; stroke-width: 1.8; fill: none; }
           .lbl { font-family: system-ui, sans-serif; font-size: 11px; fill: #333; font-weight: 500; }
           .title-lbl { font-family: system-ui, sans-serif; font-size: 12px; fill: #111; font-weight: bold; }
+          .calibration-box { fill: none; stroke: #111; stroke-width: 1.5; }
         </style>
       `;
 
       svg += `<g transform="translate(${pad}, ${pad})">`;
+
+      // 2" x 2" CALIBRATION TEST SQUARE (Top Left Corner)
+      svg += `<rect class="calibration-box" x="0" y="0" width="${s(2)}" height="${s(2)}" />`;
+      svg += `<line class="guide-line" x1="0" y1="${s(1)}" x2="${s(2)}" y2="${s(1)}" />`;
+      svg += `<line class="guide-line" x1="${s(1)}" y1="0" x2="${s(1)}" y2="${s(2)}" />`;
+      svg += `<text class="lbl" x="4" y="16">2" x 2"</text>`;
+      svg += `<text class="lbl" x="4" y="30">Test Square</text>`;
 
       // OUTER FRAME
       svg += `<rect class="frame" x="0" y="${s(l.topY)}" width="${s(d.totalW)}" height="${s(l.hipY - l.topY)}" />`;
@@ -234,9 +240,6 @@
         svg += `<line class="grid" x1="0" y1="${s(l.waistY)}" x2="${s(d.totalW)}" y2="${s(l.waistY)}" />`;
         svg += `<line class="grid" x1="0" y1="${s(l.hipY)}" x2="${s(d.totalW)}" y2="${s(l.hipY)}" />`;
 
-        svg += `<line class="guide-line" x1="${s(b.halfBackW)}" y1="${s(l.topY)}" x2="${s(b.halfBackW)}" y2="${s(l.bustY)}" />`;
-        svg += `<line class="guide-line" x1="${s(d.totalW - f.halfChestW)}" y1="${s(l.topY)}" x2="${s(d.totalW - f.halfChestW)}" y2="${s(l.bustY)}" />`;
-
         svg += `<text class="title-lbl" x="${s(d.totalW / 2) - 30}" y="${s(l.topY) - 10}">Top Line</text>`;
         svg += `<text class="lbl" x="${s(d.totalW * 0.4)}" y="${s(l.bustY) - 4}">Bust Line</text>`;
         svg += `<text class="lbl" x="${s(d.totalW * 0.38)}" y="${s(l.trueBustY) - 4}">True Bust Line</text>`;
@@ -245,11 +248,6 @@
 
         svg += `<text class="title-lbl" x="-20" y="${s(l.topY) - 10}">CB</text>`;
         svg += `<text class="title-lbl" x="${s(d.totalW) + 5}" y="${s(l.topY) - 10}">CF</text>`;
-        svg += `<text class="lbl" x="${s(b.np.x) - 8}" y="${s(l.topY) - 6}">NP</text>`;
-        svg += `<text class="lbl" x="${s(b.sp.x) - 6}" y="${s(b.sp.y) - 8}">SP</text>`;
-        svg += `<text class="lbl" x="${s(f.np.x) - 8}" y="${s(l.topY) - 6}">NP</text>`;
-        svg += `<text class="lbl" x="${s(f.sp.x) - 14}" y="${s(f.sp.y) - 8}">SP</text>`;
-        svg += `<text class="title-lbl" x="${s(d.up.x) - 8}" y="${s(d.up.y) - 8}">UP</text>`;
       }
 
       // BACK NECK & SHOULDER
@@ -260,23 +258,21 @@
       svg += `<line class="outline" x1="${s(b.shDartOuter.x)}" y1="${s(b.shDartOuter.y)}" x2="${s(b.sp.x)}" y2="${s(b.sp.y)}" />`;
 
       // FRONT NECK & SHOULDER
-      svg += `<path class="outline" d="M ${s(d.totalW)} ${s(l.topY + 2.5)} Q ${s(d.totalW - f.np.x * 0.1)} ${s(l.topY + 2.5)}, ${s(f.np.x)} ${s(f.np.y)}" />`;
+      svg += `<path class="outline" d="M ${s(d.totalW)} ${s(l.topY + 2.2)} Q ${s(d.totalW - f.np.x * 0.1)} ${s(l.topY + 2.2)}, ${s(f.np.x)} ${s(f.np.y)}" />`;
       svg += `<line class="outline" x1="${s(f.np.x)}" y1="${s(f.np.y)}" x2="${s(f.shDartInner.x)}" y2="${s(f.shDartInner.y)}" />`;
       svg += `<line class="dart" x1="${s(f.shDartInner.x)}" y1="${s(f.shDartInner.y)}" x2="${s(f.apex.x)}" y2="${s(f.apex.y)}" />`;
       svg += `<line class="dart" x1="${s(f.shDartOuter.x)}" y1="${s(f.shDartOuter.y)}" x2="${s(f.apex.x)}" y2="${s(f.apex.y)}" />`;
       svg += `<line class="outline" x1="${s(f.shDartOuter.x)}" y1="${s(f.shDartOuter.y)}" x2="${s(f.sp.x)}" y2="${s(f.sp.y)}" />`;
 
-      // BUST APEX MARKER
-      svg += `<text font-family="system-ui" font-size="14" font-weight="bold" x="${s(f.apex.x) + 6}" y="${s(f.apex.y) + 4}">x</text>`;
+      // BUST APEX MARKER ('x')
+      svg += `<text font-family="system-ui" font-size="14" font-weight="bold" x="${s(f.apex.x) - 4}" y="${s(f.apex.y) + 5}">x</text>`;
 
       // ARMHOLE SCYE CURVE
-      svg += `<path class="scye" d="M ${s(b.sp.x)} ${s(b.sp.y)} C ${s(b.halfBackW)} ${s(l.bustY - 1)}, ${s(d.up.x - 1.2)} ${s(d.up.y)}, ${s(d.up.x)} ${s(d.up.y)} C ${s(d.up.x + 1.2)} ${s(d.up.y)}, ${s(d.totalW - f.halfChestW)} ${s(l.bustY - 1)}, ${s(f.sp.x)} ${s(f.sp.y)}" />`;
+      svg += `<path class="scye" d="M ${s(b.sp.x)} ${s(b.sp.y)} C ${s(b.halfBackW)} ${s(l.bustY - 0.5)}, ${s(d.up.x - 1.0)} ${s(d.up.y)}, ${s(d.up.x)} ${s(d.up.y)} C ${s(d.up.x + 1.0)} ${s(d.up.y)}, ${s(d.totalW - f.halfChestW)} ${s(l.bustY - 0.5)}, ${s(f.sp.x)} ${s(f.sp.y)}" />`;
 
-      // BACK SIDE SEAM (UP -> Back Waist -> Back Hip)
-      svg += `<path class="outline" d="M ${s(d.up.x)} ${s(d.up.y)} Q ${s(d.up.backBustW)} ${s(l.bustY + 1)}, ${s(d.up.leftW)} ${s(l.waistY)} Q ${s(d.up.leftW + (d.hip.backHipX - d.up.leftW)*0.4)} ${s(l.waistY + (l.hipY - l.waistY)*0.5)}, ${s(d.hip.backHipX)} ${s(l.hipY)}" />`;
-
-      // FRONT SIDE SEAM (UP -> Front Waist -> Front Hip)
-      svg += `<path class="outline" d="M ${s(d.up.x)} ${s(d.up.y)} Q ${s(d.up.frontBustX)} ${s(l.bustY + 1)}, ${s(d.up.rightW)} ${s(l.waistY)} Q ${s(d.up.rightW - (d.up.rightW - d.hip.frontHipX)*0.4)} ${s(l.waistY + (l.hipY - l.waistY)*0.5)}, ${s(d.hip.frontHipX)} ${s(l.hipY)}" />`;
+      // REFINED SIDE SEAMS (Concave waist shaping + convex hip flare)
+      svg += `<path class="outline" d="M ${s(d.up.x)} ${s(d.up.y)} Q ${s(d.up.backBustW + 0.2)} ${s(l.waistY - 1.5)}, ${s(d.up.leftW)} ${s(l.waistY)} Q ${s(d.up.leftW - 0.2)} ${s(l.waistY + (l.hipY - l.waistY)*0.4)}, ${s(d.hip.backHipX)} ${s(l.hipY)}" />`;
+      svg += `<path class="outline" d="M ${s(d.up.x)} ${s(d.up.y)} Q ${s(d.up.frontBustX - 0.2)} ${s(l.waistY - 1.5)}, ${s(d.up.rightW)} ${s(l.waistY)} Q ${s(d.up.rightW + 0.2)} ${s(l.waistY + (l.hipY - l.waistY)*0.4)}, ${s(d.hip.frontHipX)} ${s(l.hipY)}" />`;
 
       // BACK WAIST DART
       const b_left = b.waistDartX - (b.waistDartW / 2);
@@ -286,11 +282,11 @@
       svg += `<line class="dart" x1="${s(b_left)}" y1="${s(l.waistY)}" x2="${s(b.waistDartBottom.x)}" y2="${s(b.waistDartBottom.y)}" />`;
       svg += `<line class="dart" x1="${s(b_right)}" y1="${s(l.waistY)}" x2="${s(b.waistDartBottom.x)}" y2="${s(b.waistDartBottom.y)}" />`;
 
-      // FRONT WAIST DART
+      // FRONT WAIST DART (Directly to Bust Apex)
       const f_left = f.apex.x - (f.waistDartW / 2);
       const f_right = f.apex.x + (f.waistDartW / 2);
-      svg += `<line class="dart" x1="${s(f_left)}" y1="${s(l.waistY)}" x2="${s(f.waistDartTop.x)}" y2="${s(f.waistDartTop.y)}" />`;
-      svg += `<line class="dart" x1="${s(f_right)}" y1="${s(l.waistY)}" x2="${s(f.waistDartTop.x)}" y2="${s(f.waistDartTop.y)}" />`;
+      svg += `<line class="dart" x1="${s(f_left)}" y1="${s(l.waistY)}" x2="${s(f.apex.x)}" y2="${s(f.apex.y)}" />`;
+      svg += `<line class="dart" x1="${s(f_right)}" y1="${s(l.waistY)}" x2="${s(f.apex.x)}" y2="${s(f.apex.y)}" />`;
       svg += `<line class="dart" x1="${s(f_left)}" y1="${s(l.waistY)}" x2="${s(f.waistDartBottom.x)}" y2="${s(f.waistDartBottom.y)}" />`;
       svg += `<line class="dart" x1="${s(f_right)}" y1="${s(l.waistY)}" x2="${s(f.waistDartBottom.x)}" y2="${s(f.waistDartBottom.y)}" />`;
 
@@ -300,14 +296,14 @@
 
     function updatePattern() {
       const measurements = {
-        bust: parseFloat(document.getElementById('bust').value) || 43,
-        waist: parseFloat(document.getElementById('waist').value) || 23.5,
-        hip: parseFloat(document.getElementById('hip').value) || 44,
-        backWidth: parseFloat(document.getElementById('backWidth').value) || 13.5,
-        chestWidth: parseFloat(document.getElementById('chestWidth').value) || 14.25,
+        bust: parseFloat(document.getElementById('bust').value) || 38.5,
+        waist: parseFloat(document.getElementById('waist').value) || 28.75,
+        hip: parseFloat(document.getElementById('hip').value) || 42,
+        backWidth: parseFloat(document.getElementById('backWidth').value) || 14.0,
+        chestWidth: parseFloat(document.getElementById('chestWidth').value) || 13.5,
         shoulderLength: parseFloat(document.getElementById('shoulderLength').value) || 6.25,
         backNeckToWaist: parseFloat(document.getElementById('backNeckToWaist').value) || 18.5,
-        waistToHip: parseFloat(document.getElementById('waistToHip').value) || 9.5,
+        waistToHip: parseFloat(document.getElementById('waistToHip').value) || 9.0,
       };
 
       const profileKey = document.getElementById('easeProfile').value;
