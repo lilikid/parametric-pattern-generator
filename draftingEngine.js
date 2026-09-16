@@ -1,6 +1,6 @@
 /**
  * Dynamic Pattern Drafting Engine for Bodice Block
- * Fully updated with pattern checks: Dart Trueing, Neckline Blending, and Side Seam Matching.
+ * Fixed runtime reference error and fully integrated all trueing checks.
  */
 
 export function calculateBodiceBlock(measurements, easeOptions = {}) {
@@ -59,11 +59,9 @@ export function calculateBodiceBlock(measurements, easeOptions = {}) {
   const bustDartGuideX = cf - (chestWidth / 4);
   const trueBustPoint = { x: bustDartGuideX, y: trueBustLineY };
 
-  // Front Shoulder Construction with Integrated Dart Trueing Check (Image 1 & 3)
-  // Net shoulder seam length strictly matches target shoulderLength
+  // Front Shoulder Construction with Integrated Dart Trueing Check
   const frontShoulderAngle = 18 * (Math.PI / 180);
   
-  // Dart placement along front shoulder seam
   const frontDartInnerLeg = {
     x: frontNeckPoint.x - 2.0 * Math.cos(frontShoulderAngle),
     y: frontNeckPoint.y + 2.0 * Math.sin(frontShoulderAngle)
@@ -79,7 +77,6 @@ export function calculateBodiceBlock(measurements, easeOptions = {}) {
     y: frontNeckPoint.y + (shoulderLength + bustDartWidth) * Math.sin(frontShoulderAngle)
   };
 
-  // Image 1 Check: Fold Apex projection for straight NP -> SP line when closed
   const dartFoldPeak = {
     x: (frontDartInnerLeg.x + frontDartOuterLeg.x) / 2,
     y: Math.min(frontDartInnerLeg.y, frontDartOuterLeg.y) - 0.35
@@ -87,7 +84,7 @@ export function calculateBodiceBlock(measurements, easeOptions = {}) {
 
   // Chest & Armhole Guide Points
   const frontChestPoint = { x: cf - ((chestWidth / 2) + 0.75), y: chestLineY };
-  const frontUnderarmPoint = { x: backUnderarmPoint.x, y: bustLineY }; // Shared side seam point
+  const frontUnderarmPoint = { x: backUnderarmPoint.x, y: bustLineY };
 
   const spCpMidpoint = {
     x: (frontShoulderPoint.x + frontChestPoint.x) / 2 - 0.375,
@@ -100,9 +97,11 @@ export function calculateBodiceBlock(measurements, easeOptions = {}) {
     y: dropIntersection.y + 0.5 * Math.sin(Math.PI / 4)
   };
 
-  // --- SEAM LENGTH TRUEING CHECKS (Images 2, 3, & 4) ---
-  
-  // Image 3 Check: Equal Shoulder Seams
+  // Waist & Side Seam Trueing
+  const frontWaistSideX = frontUnderarmPoint.x + 0.5;
+  const frontWaistCenterPoint = { x: cf, y: waistLineY + frontWaistDrop };
+
+  // --- SEAM LENGTH TRUEING CHECKS ---
   const netBackShoulderLength = Math.hypot(
     backShoulderPoint.x - backNeckPoint.x,
     backShoulderPoint.y - backNeckPoint.y
@@ -114,8 +113,6 @@ export function calculateBodiceBlock(measurements, easeOptions = {}) {
 
   const shoulderSeamsMatch = Math.abs(netBackShoulderLength - netFrontShoulderLength) < 0.05;
 
-  // Image 4 Check: Matching Side Seam Lengths & Blended Lower Armhole Curve
-  const frontWaistSideX = frontUnderarmPoint.x + 0.5;
   const backSideSeamLength = Math.hypot(backWaistSideX - backUnderarmPoint.x, waistLineY - bustLineY);
   const frontSideSeamLength = Math.hypot(frontWaistSideX - frontUnderarmPoint.x, waistLineY - bustLineY);
   const sideSeamDelta = Math.abs(backSideSeamLength - frontSideSeamLength);
@@ -157,7 +154,7 @@ export function calculateBodiceBlock(measurements, easeOptions = {}) {
       underarmPoint: frontUnderarmPoint,
       armhole45Point: frontArmhole45Point,
       trueBustPoint,
-      waistCenterPoint: { x: cf, y: waistLineY + frontWaistDrop },
+      waistCenterPoint: frontWaistCenterPoint,
       waistSideX: frontWaistSideX,
       hipPoint: { x: cf - ((hip / 4) + 1.25), y: hipLineY }
     }
