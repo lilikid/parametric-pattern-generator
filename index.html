@@ -11,7 +11,7 @@
     .form-group { margin-bottom: 12px; }
     label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
     input { width: 100%; padding: 6px; box-sizing: border-box; }
-    .viewer { flex: 1; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: auto; }
+    .viewer { flex: 1; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: auto; min-height: 600px; }
   </style>
 </head>
 <body>
@@ -63,20 +63,24 @@
     import { renderPatternSVG } from './svgRenderer.js';
 
     function updatePattern() {
-      const measurements = {
-        bust: parseFloat(document.getElementById('bust').value),
-        waist: parseFloat(document.getElementById('waist').value),
-        hip: parseFloat(document.getElementById('hip').value),
-        backWidth: parseFloat(document.getElementById('backWidth').value),
-        chestWidth: parseFloat(document.getElementById('chestWidth').value),
-        shoulderLength: parseFloat(document.getElementById('shoulderLength').value),
-        backNeckToWaist: parseFloat(document.getElementById('backNeckToWaist').value),
-        waistToHip: parseFloat(document.getElementById('waistToHip').value),
-      };
+      try {
+        const measurements = {
+          bust: parseFloat(document.getElementById('bust').value),
+          waist: parseFloat(document.getElementById('waist').value),
+          hip: parseFloat(document.getElementById('hip').value),
+          backWidth: parseFloat(document.getElementById('backWidth').value),
+          chestWidth: parseFloat(document.getElementById('chestWidth').value),
+          shoulderLength: parseFloat(document.getElementById('shoulderLength').value),
+          backNeckToWaist: parseFloat(document.getElementById('backNeckToWaist').value),
+          waistToHip: parseFloat(document.getElementById('waistToHip').value),
+        };
 
-      const draftData = calculateBodiceBlock(measurements);
-      const svg = renderPatternSVG(draftData);
-      document.getElementById('svgContainer').innerHTML = svg;
+        const draftData = calculateBodiceBlock(measurements);
+        const svg = renderPatternSVG(draftData);
+        document.getElementById('svgContainer').innerHTML = svg;
+      } catch (err) {
+        console.error("Pattern rendering error:", err);
+      }
     }
 
     document.querySelectorAll('input').forEach(input => {
