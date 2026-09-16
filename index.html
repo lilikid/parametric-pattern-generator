@@ -136,10 +136,14 @@
       // --- BACK POINTS ---
       const b_np = { x: neckW, y: topY };
       const b_shoulderDrop = topY + 1.25;
-      const b_sp = { x: neckW + m.shoulderLength + 0.5, y: b_shoulderDrop };
+      const totalBackShWidth = m.shoulderLength + 0.5; // including dart width allocation
+      const b_spTotalEnd = { x: neckW + totalBackShWidth, y: b_shoulderDrop };
 
-      const b_shDartInner = { x: neckW + (m.shoulderLength * 0.38), y: topY + 0.4 };
-      const b_shDartOuter = { x: b_shDartInner.x + 0.5, y: topY + 0.5 };
+      // Shoulder Dart always perfectly centered on back shoulder span
+      const b_dartW = 0.5;
+      const b_halfSh = totalBackShWidth / 2;
+      const b_shDartInner = { x: neckW + b_halfSh - (b_dartW / 2), y: topY + 0.4 };
+      const b_shDartOuter = { x: neckW + b_halfSh + (b_dartW / 2), y: topY + 0.5 };
       const b_shDartApex = { x: b_shDartInner.x + 0.1, y: topY + 2.75 };
 
       const b_waistDartX = backBustW * 0.45;
@@ -149,12 +153,16 @@
       // --- FRONT POINTS ---
       const f_cfX = totalWidth;
       const f_np = { x: f_cfX - neckW, y: topY };
-      const f_sp = { x: f_cfX - neckW - m.shoulderLength - 1.0, y: b_shoulderDrop + 0.2 };
+      const totalFrontShWidth = m.shoulderLength + 1.0;
+      const f_spTotalEnd = { x: f_cfX - neckW - totalFrontShWidth, y: b_shoulderDrop + 0.2 };
 
       const f_apex = { x: f_cfX - (m.bust / 10 + 0.75), y: trueBustY };
 
-      const f_shDartInner = { x: f_cfX - neckW - 1.0, y: topY + 0.3 };
-      const f_shDartOuter = { x: f_shDartInner.x - 1.0, y: topY + 0.6 };
+      // Shoulder Dart always perfectly centered on front shoulder span
+      const f_dartW = 1.0;
+      const f_halfSh = totalFrontShWidth / 2;
+      const f_shDartInner = { x: f_cfX - neckW - f_halfSh + (f_dartW / 2), y: topY + 0.3 };
+      const f_shDartOuter = { x: f_cfX - neckW - f_halfSh - (f_dartW / 2), y: topY + 0.6 };
 
       const f_waistDartTop = { x: f_apex.x, y: f_apex.y + 0.5 };
       const f_waistDartBottom = { x: f_apex.x, y: waistY + (m.waistToHip * 0.55) };
@@ -170,7 +178,7 @@
 
       return {
         showGrid,
-        totalW: totalWidth + 3.0, // extra margin on the right for test square
+        totalW: totalWidth + 3.0,
         totalH: hipY + 1.0,
         lines: { topY, bustY, trueBustY, waistY, hipY },
         cbX: 0,
@@ -178,12 +186,12 @@
         up: { x: upX, y: upY, leftW: sideWaistLeft, rightW: sideWaistRight, backBustW, frontBustX: backBustW + blockGap },
         hip: { backHipX, frontHipX },
         back: {
-          np: b_np, sp: b_sp, halfBackW: m.backWidth / 2,
+          np: b_np, sp: b_spTotalEnd, halfBackW: m.backWidth / 2,
           shDartInner: b_shDartInner, shDartOuter: b_shDartOuter, shDartApex: b_shDartApex,
           waistDartX: b_waistDartX, waistDartW: b_waistDartW, waistDartTop: b_waistDartTop, waistDartBottom: b_waistDartBottom
         },
         front: {
-          np: f_np, sp: f_sp, apex: f_apex, halfChestW: m.chestWidth / 2,
+          np: f_np, sp: f_spTotalEnd, apex: f_apex, halfChestW: m.chestWidth / 2,
           shDartInner: f_shDartInner, shDartOuter: f_shDartOuter,
           waistDartW: f_waistDartW, waistDartTop: f_waistDartTop, waistDartBottom: f_waistDartBottom
         }
@@ -192,7 +200,7 @@
 
     function renderSVG(d, scale = 20) {
       const padLeft = 40;
-      const padTop = 60; // extra top padding so test square sits cleanly above the frame
+      const padTop = 60;
       const s = (val) => val * scale;
       const totalW = s(d.totalW) + padLeft + 40;
       const totalH = s(d.totalH) + padTop + 40;
@@ -218,7 +226,7 @@
 
       svg += `<g transform="translate(${padLeft}, ${padTop})">`;
 
-      // 2" x 2" CALIBRATION TEST SQUARE (Placed cleanly in top-right margin, completely away from pattern)
+      // 2" x 2" CALIBRATION TEST SQUARE
       const testSqX = s(d.totalW - 2.5);
       const testSqY = s(l.topY) - 45;
       svg += `<rect class="calibration-box" x="${testSqX}" y="${testSqY}" width="${s(2)}" height="${s(2)}" />`;
@@ -268,13 +276,25 @@
       // BUST APEX MARKER ('x')
       svg += `<text font-family="system-ui" font-size="14" font-weight="bold" x="${s(f.apex.x) - 4}" y="${s(f.apex.y) + 5}">x</text>`;
 
-      // ARMHOLE SCYE CURVE (Matched to reference layout style)
+      // ARMHOLE SCYE CURVE
       svg += `<path class="scye" d="M ${s(b.sp.x)} ${s(b.sp.y)} C ${s(b.halfBackW)} ${s(l.bustY - 0.5)}, ${s(d.up.x - 0.8)} ${s(d.up.y)}, ${s(d.up.x)} ${s(d.up.y)} C ${s(d.up.x + 0.8)} ${s(d.up.y)}, ${s(d.cfX - f.halfChestW)} ${s(l.bustY - 0.5)}, ${s(f.sp.x)} ${s(f.sp.y)}" />`;
       svg += `<text class="lbl" x="${s(d.up.x) - 8}" y="${s(d.up.y) - 6}">UP</text>`;
 
-      // REFINED SIDE SEAMS (Concave waist shaping + convex hip flare)
-      svg += `<path class="outline" d="M ${s(d.up.x)} ${s(d.up.y)} Q ${s(d.up.backBustW + 0.2)} ${s(l.waistY - 1.5)}, ${s(d.up.leftW)} ${s(l.waistY)} Q ${s(d.up.leftW - 0.2)} ${s(l.waistY + (l.hipY - l.waistY)*0.4)}, ${s(d.hip.backHipX)} ${s(l.hipY)}" />`;
-      svg += `<path class="outline" d="M ${s(d.up.x)} ${s(d.up.y)} Q ${s(d.up.frontBustX - 0.2)} ${s(l.waistY - 1.5)}, ${s(d.up.rightW)} ${s(l.waistY)} Q ${s(d.up.rightW + 0.2)} ${s(l.waistY + (l.hipY - l.waistY)*0.4)}, ${s(d.hip.frontHipX)} ${s(l.hipY)}" />`;
+      // CONTINUOUS SMOOTH SIDE SEAMS (Passing precisely through UP, Waist Indentation, and Hip Points with smooth cubic curves)
+      const b_waistY_s = s(l.waistY);
+      const b_upY_s = s(d.up.y);
+      const b_hipY_s = s(l.hipY);
+      const upX_s = s(d.up.x);
+
+      // Back side seam: UP to Waist to Hip
+      const b_wX_s = s(d.up.leftW);
+      const b_hX_s = s(d.hip.backHipX);
+      svg += `<path class="outline" d="M ${upX_s} ${b_upY_s} C ${upX_s} ${b_upY_s + (b_waistY_s - b_upY_s)*0.5}, ${b_wX_s} ${b_waistY_s - (b_waistY_s - b_upY_s)*0.3}, ${b_wX_s} ${b_waistY_s} C ${b_wX_s} ${b_waistY_s + (b_hipY_s - b_waistY_s)*0.4}, ${b_hX_s} ${b_hipY_s - (b_hipY_s - b_waistY_s)*0.3}, ${b_hX_s} ${b_hipY_s}" />`;
+
+      // Front side seam: UP to Waist to Hip
+      const f_wX_s = s(d.up.rightW);
+      const f_hX_s = s(d.hip.frontHipX);
+      svg += `<path class="outline" d="M ${upX_s} ${b_upY_s} C ${upX_s} ${b_upY_s + (b_waistY_s - b_upY_s)*0.5}, ${f_wX_s} ${b_waistY_s - (b_waistY_s - b_upY_s)*0.3}, ${f_wX_s} ${b_waistY_s} C ${f_wX_s} ${b_waistY_s + (b_hipY_s - b_waistY_s)*0.4}, ${f_hX_s} ${b_hipY_s - (b_hipY_s - b_waistY_s)*0.3}, ${f_hX_s} ${b_hipY_s}" />`;
 
       // BACK WAIST DART
       const b_left = b.waistDartX - (b.waistDartW / 2);
@@ -284,7 +304,7 @@
       svg += `<line class="dart" x1="${s(b_left)}" y1="${s(l.waistY)}" x2="${s(b.waistDartBottom.x)}" y2="${s(b.waistDartBottom.y)}" />`;
       svg += `<line class="dart" x1="${s(b_right)}" y1="${s(l.waistY)}" x2="${s(b.waistDartBottom.x)}" y2="${s(b.waistDartBottom.y)}" />`;
 
-      // FRONT WAIST DART (Directly to Bust Apex)
+      // FRONT WAIST DART
       const f_left = f.apex.x - (f.waistDartW / 2);
       const f_right = f.apex.x + (f.waistDartW / 2);
       svg += `<line class="dart" x1="${s(f_left)}" y1="${s(l.waistY)}" x2="${s(f.apex.x)}" y2="${s(f.apex.y)}" />`;
