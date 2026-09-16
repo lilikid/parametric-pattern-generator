@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parametric Pattern Generator Engine</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; height: 100vh; background: #f3f4f6; color: #1f2937; }
+        
+        /* Sidebar Controls */
+        #sidebar { width: 340px; background: #ffffff; border-right: 1px solid #e5e7eb; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; box-shadow: 2px 0 8px rgba(0,0,0,0.05); }
+        h2 { font-size: 1.1rem; border-bottom: 2px solid #3b82f6; padding-bottom: 6px; margin-bottom: 8px; color: #1d4ed8; }
+        .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+        label { font-size: 0.82rem; font-weight: 600; color: #4b5563; }
+        input[type="number"], select { padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.9rem; }
+        .checkbox-group { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 500; cursor: pointer; }
+        
+        button { background: #2563eb; color: white; border: none; padding: 10px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+        button:hover { background: #1d4ed8; }
+        
+        /* SVG Workspace */
+        #workspace { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; background: #eef2ff; }
+        #canvas-container { flex: 1; overflow: auto; padding: 40px; display: flex; justify-content: center; align-items: center; }
+        svg { background: #ffffff; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border-radius: 4px; }
+        
+        /* SVG Styling Rules */
+        .grid-minor { stroke: #e5e7eb; stroke-width: 0.5; }
+        .grid-major { stroke: #cbd5e1; stroke-width: 1; }
+        .base-line { stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4,4; }
+        .pattern-net { stroke: #0f172a; stroke-width: 2; fill: none; stroke-linecap: round; }
+        .sewing-dart { stroke: #2563eb; stroke-width: 1.5; stroke-dasharray: 4,4; fill: none; }
+        .seam-allowance { stroke: #0284c7; stroke-width: 1; stroke-dasharray: 6,3; fill: none; }
+        .apex-marker { fill: #ef4444; stroke: #b91c1c; stroke-width: 1; }
+        .text-annotation { font-family: monospace; font-size: 10px; fill: #475569; }
+    </style>
+</head>
+<body>
+
+    <aside id="sidebar">
+        <h2>1. Anatomic Inputs</h2>
+        <div class="form-group">
+            <label>Unit System</label>
+            <select id="unit-system">
+                <option value="inch" selected>Inches (in)</option>
+                <option value="cm">Centimeters (cm)</option>
+            </select>
+        </div>
+        
+        <div id="measurements-inputs">
+            <!-- Inputs populated dynamically by measurements.js -->
+        </div>
+
+        <h2>2. Silhouette & Ease</h2>
+        <div class="form-group">
+            <label for="ease-preset">Silhouette Preset</label>
+            <select id="ease-preset">
+                <option value="-2.0">Corset / Compression (-2.0")</option>
+                <option value="0.5">Close-Fitting / Knit (+0.5")</option>
+                <option value="1.25" selected>Standard Fitted Block (+1.25")</option>
+                <option value="2.0">Semi-Fitted / Daywear (+2.0")</option>
+                <option value="3.5">Loose / Outerwear (+3.5")</option>
+            </select>
+        </div>
+
+        <h2>3. Display Options</h2>
+        <label class="checkbox-group"><input type="checkbox" id="toggle-grid" checked> Background Grid</label>
+        <label class="checkbox-group"><input type="checkbox" id="toggle-baselines" checked> Base Reference Lines</label>
+        <label class="checkbox-group"><input type="checkbox" id="toggle-sewing-darts" checked> Retracted Sewing Darts</label>
+        <label class="checkbox-group"><input type="checkbox" id="toggle-sa" checked> Seam Allowances (0.5")</label>
+
+        <button id="btn-render" style="margin-top: 10px;">Re-Generate Pattern</button>
+        <button id="btn-print" style="background: #059669;">Print / Save PDF</button>
+    </aside>
+
+    <main id="workspace">
+        <div id="canvas-container">
+            <svg id="pattern-canvas" width="1200" height="900" viewBox="0 0 1200 900" xmlns="http://www.w3.org/2000/svg">
+                <!-- Layers constructed by svgRenderer.js -->
+                <defs id="svg-defs"></defs>
+                <g id="layer-bg-grid"></g>
+                <g id="layer-baselines"></g>
+                <g id="layer-construction"></g>
+                <g id="layer-sewing-darts"></g>
+                <g id="layer-net-pattern"></g>
+                <g id="layer-seam-allowance"></g>
+                <g id="layer-markers"></g>
+                <g id="layer-annotations"></g>
+            </svg>
+        </div>
+    </main>
+
+    <!-- Script Pipeline -->
+    <script src="measurements.js"></script>
+    <script src="draftingEngine.js"></script>
+    <script src="svgRenderer.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
