@@ -1,5 +1,5 @@
 const SVGRenderer = {
-    SCALE: 22,
+    SCALE: 22, // 22 pixels per inch
 
     render(data, options) {
         if (!data || !data.back || !data.front) return;
@@ -7,11 +7,16 @@ const SVGRenderer = {
         this.clearLayers();
         const unit = (options && options.unit) ? options.unit : 'inch';
         
-        if (!options || options.showGrid !== false) this.drawBackgroundGrid(unit);
-        if (!options || options.showBaseLines !== false) this.drawBaseLines(data.depths);
+        if (!options || options.showGrid !== false) {
+            this.drawBackgroundGrid(unit, options.showSubdivisions !== false);
+        }
+        if (!options || options.showBaseLines !== false) {
+            this.drawBaseLines(data.depths);
+        }
         
         this.drawPatternOutlines(data);
         if (!options || options.showSewingDarts !== false) this.drawSewingDarts(data);
+        if (!options || options.showApex !== false) this.drawApexMarker(data.front.apex);
         if (options && options.showSA) this.drawSeamAllowances(data);
         
         this.drawAnnotationsAndMarkers(data);
@@ -26,21 +31,57 @@ const SVGRenderer = {
         });
     },
 
-    drawBackgroundGrid(unit) {
+    drawBackgroundGrid(unit, showSubdivisions) {
         const layer = document.getElementById('layer-bg-grid');
         if (!layer) return;
-        
-        const step = (unit === 'cm' ? 1.0 / 2.54 : 1.0) * this.SCALE;
-        let pathStr = '';
-        for (let x = 0; x < 1200; x += step) { pathStr += `M ${x} 0 V 850 `; }
-        for (let y = 0; y < 850; y += step) { pathStr += `M 0 ${y} H 1200 `; }
-        
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('d', pathStr);
-        path.setAttribute('stroke', '#e2e8f0');
-        path.setAttribute('stroke-width', '0.5');
-        path.setAttribute('fill', 'none');
-        layer.appendChild(path);
+
+        let minorStep, majorStep;
+        if (unit === 'cm') {
+            minorStep = (1.0 / 2.54) * this.SCALE; // 1 cm
+            majorStep = (5.0 / 2.54) * this.SCALE; // 5 cm
+        } else {
+            minorStep = (0.125) * this.SCALE;     // 1/8 inch
+            majorStep = (1.0) * this.SCALE;       // 1 inch
+        }
+
+        let minorPath = '';
+        let majorPath = '';
+
+        for (let x = 0; x <= 1200; x += minorStep) {
+            const isMajor = Math.abs(x % majorStep) < 0.1 || Math.abs(majorStep - (x % majorStep)) < 0.1;
+            if (isMajor) {
+                majorPath += `M ${x} 0 V 850 `;
+            } else if (showSubdivisions) {
+                minorPath += `M ${x} 0 V 850 `;
+            }
+        }
+
+        for (let y = 0; y <= 850; y += minorStep) {
+            const isMajor = Math.abs(y % majorStep) < 0.1 || Math.abs(majorStep - (y % majorStep)) < 0.1;
+            if (isMajor) {
+                majorPath += `M 0 ${y} H 1200 `;
+            } else if (showSubdivisions) {
+                minorPath += `M 0 ${y} H 1200 `;
+            }
+        }
+
+        if (showSubdivisions && minorPath !== '') {
+            const pathMinor = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            pathMinor.setAttribute('d', minorPath);
+            pathMinor.setAttribute('stroke', '#f1f5f9');
+            pathMinor.setAttribute('stroke-width', '0.5');
+            pathMinor.setAttribute('fill', 'none');
+            layer.appendChild(pathMinor);
+        }
+
+        if (majorPath !== '') {
+            const pathMajor = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            pathMajor.setAttribute('d', majorPath);
+            pathMajor.setAttribute('stroke', '#cbd5e1');
+            pathMajor.setAttribute('stroke-width', '1.0');
+            pathMajor.setAttribute('fill', 'none');
+            layer.appendChild(pathMajor);
+        }
     },
 
     drawBaseLines(depths) {
@@ -59,7 +100,7 @@ const SVGRenderer = {
             const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             line.setAttribute('x1', '20'); line.setAttribute('y1', yPx);
             line.setAttribute('x2', '1100'); line.setAttribute('y2', yPx);
-            line.setAttribute('stroke', '#cbd5e1');
+            line.setAttribute('stroke', '#94a3b8');
             line.setAttribute('stroke-dasharray', '4 4');
             layer.appendChild(line);
         });
@@ -109,19 +150,16 @@ const SVGRenderer = {
         const f = data.front;
         const b = data.back;
 
-        // Front Waist Dart
         const frontDartStr = `M ${(f.waistDart.x - f.waistDart.width / 2) * S} ${data.depths.dWaist * S} ` +
                              `L ${f.waistDart.x * S} ${f.waistDart.topY * S} ` +
                              `L ${(f.waistDart.x + f.waistDart.width / 2) * S} ${data.depths.dWaist * S} ` +
                              `L ${f.waistDart.x * S} ${f.waistDart.bottomY * S} Z`;
 
-        // Back Waist Dart
         const backWaistDartStr = `M ${(b.waistDart.x - b.waistDart.width / 2) * S} ${data.depths.dWaist * S} ` +
                                  `L ${b.waistDart.x * S} ${b.waistDart.topY * S} ` +
                                  `L ${(b.waistDart.x + b.waistDart.width / 2) * S} ${data.depths.dWaist * S} ` +
                                  `L ${b.waistDart.x * S} ${b.waistDart.bottomY * S} Z`;
 
-        // Back Shoulder Dart
         const sDart = b.shoulderDart;
         const halfW = sDart.width / 2;
         const backShoulderDartStr = `M ${(sDart.start.x - halfW) * S} ${sDart.start.y * S} ` +
@@ -137,17 +175,18 @@ const SVGRenderer = {
             path.setAttribute('fill', 'none');
             layer.appendChild(path);
         });
+    },
 
-        // Bust Apex Red Circle
+    drawApexMarker(apex) {
         const markerLayer = document.getElementById('layer-markers');
-        if (markerLayer) {
-            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            circle.setAttribute('cx', f.apex.x * S);
-            circle.setAttribute('cy', f.apex.y * S);
-            circle.setAttribute('r', 4);
-            circle.setAttribute('fill', '#ef4444');
-            markerLayer.appendChild(circle);
-        }
+        if (!markerLayer) return;
+        const S = this.SCALE;
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', apex.x * S);
+        circle.setAttribute('cy', apex.y * S);
+        circle.setAttribute('r', 4);
+        circle.setAttribute('fill', '#ef4444');
+        markerLayer.appendChild(circle);
     },
 
     drawSeamAllowances(data) {
@@ -155,11 +194,10 @@ const SVGRenderer = {
         if (!layer) return;
         
         const S = this.SCALE;
-        const sa = 0.5 * S; // 0.5" offset
+        const sa = 0.5 * S;
         const b = data.back;
         const f = data.front;
 
-        // Path-following offset outlines
         const backSA = `M ${(b.centerLine) * S - sa} ${(b.napePt.y) * S - sa} ` +
                        `L ${(b.centerLine) * S - sa} ${(data.depths.dHip) * S + sa} ` +
                        `L ${(b.hipPt.x) * S + sa} ${(data.depths.dHip) * S + sa} ` +
@@ -195,7 +233,6 @@ const SVGRenderer = {
         const f = data.front;
         const b = data.back;
 
-        // Grainline Arrows
         const backGrainX = (b.centerLine + 1.5) * S;
         const frontGrainX = (f.centerLine - 1.5) * S;
         const topY = (data.depths.dBustAdj + 0.5) * S;
@@ -210,7 +247,6 @@ const SVGRenderer = {
             layer.appendChild(line);
         });
 
-        // Center Front Fold Annotation
         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         text.setAttribute('x', f.centerLine * S + 8);
         text.setAttribute('y', (data.depths.dWaist) * S);
