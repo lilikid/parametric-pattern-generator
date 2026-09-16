@@ -24,8 +24,11 @@
 
         #main-view { flex: 1; display: flex; flex-direction: column; background: #f1f5f9; position: relative; }
         #toolbar { height: 50px; background: #ffffff; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
-        .btn { background: #2563eb; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
+        .btn-group { display: flex; gap: 10px; align-items: center; }
+        .btn { background: #2563eb; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.85rem; transition: background 0.2s; }
         .btn:hover { background: #1d4ed8; }
+        .btn-primary { background: #059669; }
+        .btn-primary:hover { background: #047857; }
 
         #svg-container { flex: 1; overflow: auto; display: flex; align-items: center; justify-content: center; padding: 20px; }
         svg { background: #ffffff; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border-radius: 4px; }
@@ -135,7 +138,11 @@
     <div id="main-view">
         <div id="toolbar">
             <span style="font-weight: 600; font-size: 0.9rem;">2D Pattern Workspace</span>
-            <button class="btn" id="btn-export-pdf">Export Multi-Page PDF</button>
+            <div class="btn-group">
+                <!-- Action Button Restored -->
+                <button class="btn btn-primary" id="btn-generate">Generate Pattern</button>
+                <button class="btn" id="btn-export-pdf">Export Multi-Page PDF</button>
+            </div>
         </div>
         <div id="svg-container">
             <svg id="pattern-svg" width="1200" height="850" viewBox="0 0 1200 850">
@@ -175,9 +182,7 @@
             const unitVal = document.getElementById('unit-select').value;
             syncUnitValues(unitVal);
 
-            // Convert to inches internally for mathematical stability
             const toInches = (val) => unitVal === 'cm' ? val / 2.54 : val;
-
             const rawEase = parseFloat(document.getElementById('ease-select').value);
             const easeValInches = unitVal === 'cm' ? rawEase / 2.54 : rawEase;
 
@@ -208,6 +213,7 @@
             SVGRenderer.render(patternData, options);
         }
 
+        document.getElementById('btn-generate').addEventListener('click', updateApp);
         document.querySelectorAll('input, select').forEach(element => {
             element.addEventListener('change', updateApp);
             element.addEventListener('input', updateApp);
