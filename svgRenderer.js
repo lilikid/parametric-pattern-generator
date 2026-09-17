@@ -40,16 +40,13 @@ export function renderPatternSVG(draftData, scale = 20) {
   svg += `<line class="pattern-line" x1="${px(lines.cf)}" y1="${py(lines.topLineY)}" x2="${px(lines.cf)}" y2="${py(front.waistCenterPoint.y)}" />`;
 
   // --- BACK SHOULDER SEAM & DART TRUEING ---
-  // Assuming back points 3, 4, 1, and 2 are provided in back data structure
   const p3 = back.shDartInner || { x: back.neckPoint.x + 1.5, y: back.neckPoint.y };
   const p4 = back.shDartOuter || { x: back.neckPoint.x + 2.2, y: back.neckPoint.y };
   const apex = back.shDartApex || { x: p3.x + 0.3, y: p3.y + 2.5 };
   
-  // Baseline points 1 and 2 across the dart opening base
   const pt1 = back.dartBasePoint1 || { x: p3.x, y: p3.y + 0.25 };
   const pt2 = back.dartBasePoint2 || { x: p4.x, y: p4.y + 0.25 };
 
-  // Back Shoulder Lines & Dart Legs
   svg += `<line class="trued-line" x1="${px(back.neckPoint.x)}" y1="${py(back.neckPoint.y)}" x2="${px(p3.x)}" y2="${py(p3.y)}" />`;
   svg += `<line class="trued-line" x1="${px(p3.x)}" y1="${py(p3.y)}" x2="${px(apex.x)}" y2="${py(apex.y)}" />`;
   svg += `<line class="trued-line" x1="${px(apex.x)}" y1="${py(apex.y)}" x2="${px(p4.x)}" y2="${py(p4.y)}" />`;
