@@ -227,7 +227,47 @@
       const f_spTotalEnd = { x: f_cfX - neckW - totalFrontShWidth, y: b_shoulderDrop + 0.2 };
 
       const f_apex = { x: f_cfX - (m.bust / 10 + 0.75), y: trueBustY };
-      function renderSVG(d) {
+      const f_dartW = 1.0;
+      const f_halfSh = totalFrontShWidth / 2;
+      const f_shDartInner = { x: f_cfX - neckW - f_halfSh + (f_dartW / 2), y: topY + 0.3 };
+      const f_shDartOuter = { x: f_cfX - neckW - f_halfSh - (f_dartW / 2), y: topY + 0.6 };
+
+      const f_waistDartTop = { x: f_apex.x, y: f_apex.y + 1.0 };
+      const f_waistDartBottom = { x: f_apex.x, y: waistY + (m.waistToHip * 0.55) };
+
+      const upX = backBustW + (blockGap / 2);
+      const upY = bustY + 0.5;
+
+      const sideWaistLeft = backBustW - sideWaistIntakeEach;
+      const sideWaistRight = backBustW + blockGap + sideWaistIntakeEach;
+
+      const backHipX = backHipW;
+      const frontHipX = f_cfX - frontHipW;
+
+      return {
+        showGrid,
+        totalW: totalWidth + 3.0,
+        totalH: hipY + 1.0,
+        lines: { topY, bustY, trueBustY, waistY, hipY },
+        cbX: 0,
+        cfX: f_cfX,
+        up: { x: upX, y: upY, leftW: sideWaistLeft, rightW: sideWaistRight, backBustW, frontBustX: backBustW + blockGap },
+        hip: { backHipX, frontHipX },
+        back: {
+          np: b_np, sp: b_spTotalEnd, halfBackW: m.backWidth / 2,
+          shDartInner: final_b_shDartInner,
+          shDartOuter: final_b_shDartOuter,
+          shDartApex: b_shDartApex,
+          waistDartX: b_waistDartX, waistDartW: b_waistDartW, waistDartTop: b_waistDartTop, waistDartBottom: b_waistDartBottom
+        },
+        front: {
+          np: f_np, sp: f_spTotalEnd, apex: f_apex, halfChestW: m.chestWidth / 2,
+          shDartInner: f_shDartInner, shDartOuter: f_shDartOuter,
+          waistDartW: f_waistDartW, waistDartTop: f_waistDartTop, waistDartBottom: f_waistDartBottom
+        }
+      };
+    }
+    function renderSVG(d) {
       const scale = 72; // 72 pixels per inch
       const wPx = d.totalW * scale;
       const hPx = d.totalH * scale;
@@ -355,4 +395,3 @@
   </script>
 </body>
 </html>
-      
