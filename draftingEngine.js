@@ -78,22 +78,25 @@ export function calculateBodiceBlock(measurements, easeOptions = {}) {
   const bustDartGuideX = cf - (chestWidth / 4);
   const trueBustPoint = { x: bustDartGuideX, y: trueBustLineY };
 
-  // Front Shoulder Construction with Dynamic Dart Width
+  // Front Shoulder Construction with Proportional Dynamic Dart Scaling
   const frontShoulderAngle = 18 * (Math.PI / 180);
   
+  const dartDistanceFromNeck = 2.0; 
   const frontDartInnerLeg = {
-    x: frontNeckPoint.x - 2.0 * Math.cos(frontShoulderAngle),
-    y: frontNeckPoint.y + 2.0 * Math.sin(frontShoulderAngle)
+    x: frontNeckPoint.x - dartDistanceFromNeck * Math.cos(frontShoulderAngle),
+    y: frontNeckPoint.y + dartDistanceFromNeck * Math.sin(frontShoulderAngle)
   };
 
+  const outerLegDistance = dartDistanceFromNeck + bustDartWidth;
   const frontDartOuterLeg = {
-    x: frontDartInnerLeg.x - bustDartWidth * Math.cos(frontShoulderAngle),
-    y: frontDartInnerLeg.y + bustDartWidth * Math.sin(frontShoulderAngle)
+    x: frontNeckPoint.x - outerLegDistance * Math.cos(frontShoulderAngle),
+    y: frontNeckPoint.y + outerLegDistance * Math.sin(frontShoulderAngle)
   };
 
+  const remainingShoulderLength = shoulderLength - dartDistanceFromNeck;
   const frontShoulderPoint = {
-    x: frontNeckPoint.x - (shoulderLength + bustDartWidth) * Math.cos(frontShoulderAngle),
-    y: frontNeckPoint.y + (shoulderLength + bustDartWidth) * Math.sin(frontShoulderAngle)
+    x: frontNeckPoint.x - (outerLegDistance + remainingShoulderLength) * Math.cos(frontShoulderAngle),
+    y: frontNeckPoint.y + (outerLegDistance + remainingShoulderLength) * Math.sin(frontShoulderAngle)
   };
 
   const dartFoldPeak = {
