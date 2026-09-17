@@ -188,16 +188,16 @@
         y: b_shoulderMid.y 
       };
       
-      // Force dart legs to equal length by adjusting from the neck side
+      // Force dart legs to equal length by adjusting from the neck side correctly
       const b_leg2Vec = { x: b_shDartApex.x - b_shDartOuter.x, y: b_shDartApex.y - b_shDartOuter.y };
       const b_leg2Len = Math.hypot(b_leg2Vec.x, b_leg2Vec.y);
       
-      const b_leg1Vec = { x: b_shDartApex.x - b_np.x, y: b_shDartApex.y - b_np.y };
+      const b_leg1Vec = { x: b_np.x - b_shDartApex.x, y: b_np.y - b_shDartApex.y };
       const b_leg1Len = Math.hypot(b_leg1Vec.x, b_leg1Vec.y);
 
       const b_shDartInner = {
-        x: b_shDartApex.x - (b_leg2Len / b_leg1Len) * b_leg1Vec.x,
-        y: b_shDartApex.y - (b_leg2Len / b_leg1Len) * b_leg1Vec.y
+        x: b_shDartApex.x + (b_leg2Len / b_leg1Len) * b_leg1Vec.x,
+        y: b_shDartApex.y + (b_leg2Len / b_leg1Len) * b_leg1Vec.y
       };
 
       const b_waistDartX = backBustW * 0.45;
