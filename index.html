@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lilinora | Precision Pattern Generator</title>
+    <title>Lilinora | Precision Atelier Pattern Generator</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -28,7 +28,7 @@
         }
 
         header {
-            max-width: 1450px;
+            max-width: 1500px;
             margin: 0 auto 24px auto;
             display: flex;
             justify-content: space-between;
@@ -97,19 +97,19 @@
         }
 
         .workspace {
-            max-width: 1450px;
+            max-width: 1500px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: 420px 1fr;
+            grid-template-columns: 440px 1fr;
             gap: 24px;
             align-items: start;
         }
 
-        @media (max-width: 950px) {
+        @media (max-width: 1000px) {
             .workspace { grid-template-columns: 1fr; }
         }
 
-        .panel {
+        .control-panel {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 12px;
@@ -119,20 +119,39 @@
             overflow-y: auto;
         }
 
-        .panel h2 {
+        /* Modular Section Accordions/Windows */
+        .garment-module {
+            background: #faf8f7;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 14px;
+            padding: 16px;
+        }
+
+        .garment-module-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .garment-module h3 {
             font-family: var(--heading-font);
-            font-size: 1.2rem;
-            margin-bottom: 18px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #f0ebe8;
+            font-size: 1.05rem;
             color: #1a1514;
         }
 
-        .input-section { margin-bottom: 16px; }
+        .garment-module-body {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .input-section { margin-bottom: 14px; }
 
         .input-section label {
             display: block;
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             font-weight: 600;
             margin-bottom: 5px;
             color: #4a3f3d;
@@ -140,8 +159,8 @@
 
         .dual-input {
             display: grid;
-            grid-template-columns: 1fr 90px;
-            gap: 10px;
+            grid-template-columns: 1fr 85px;
+            gap: 8px;
             align-items: center;
         }
 
@@ -149,23 +168,22 @@
 
         .input-label-tag {
             position: absolute;
-            top: -16px;
+            top: -15px;
             right: 0;
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             font-weight: 600;
             color: #8c7e7b;
         }
 
         input[type="number"], select {
             width: 100%;
-            padding: 9px 12px;
+            padding: 8px 10px;
             border: 1px solid var(--border-color);
             border-radius: 6px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-family: var(--body-font);
             background: #fff;
             color: var(--text-color);
-            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
         input[type="number"]:focus, select:focus {
@@ -174,19 +192,11 @@
             box-shadow: 0 0 0 3px rgba(194, 94, 111, 0.15);
         }
 
-        .conditional-group {
-            background: #faf8f7;
-            border: 1px dashed var(--border-color);
-            padding: 12px;
-            border-radius: 8px;
-            margin-top: 10px;
-        }
-
         .btn-container {
             display: flex;
             flex-direction: column;
             gap: 10px;
-            margin-top: 24px;
+            margin-top: 20px;
         }
 
         button.action-btn {
@@ -281,7 +291,7 @@
             </div>
             <div class="brand-titles">
                 <h1>Lilinora</h1>
-                <p>Precision Pattern Generator</p>
+                <p>Precision Atelier Pattern Generator</p>
             </div>
         </div>
         <div class="unit-selector">
@@ -291,116 +301,81 @@
     </header>
 
     <div class="workspace">
-        <!-- Left Panel -->
-        <div class="panel">
-            <h2>Measurements & Options</h2>
-            <form id="pattern-form">
-                
-                <!-- Standard Size Quick Fill -->
-                <div class="input-section">
-                    <label for="standardSize">Standard Size Quick Fill</label>
-                    <select id="standardSize" onchange="applyStandardSize()">
-                        <option value="">-- Custom Measurements --</option>
-                        <option value="uk8">UK 8 / US 4 (Bust 32, Waist 24, Hip 35)</option>
-                        <option value="uk10">UK 10 / US 6 (Bust 34, Waist 26, Hip 37)</option>
-                        <option value="uk12" selected>UK 12 / US 8 (Bust 36, Waist 28, Hip 39)</option>
-                        <option value="uk14">UK 14 / US 10 (Bust 38, Waist 30, Hip 41)</option>
-                        <option value="uk16">UK 16 / US 12 (Bust 40, Waist 32, Hip 43)</option>
-                    </select>
-                </div>
+        <!-- Control Panel with Modular Windows -->
+        <div class="control-panel">
+            <h2 style="font-family:var(--heading-font); font-size:1.15rem; margin-bottom:14px;">Pattern Modules</h2>
+            
+            <div class="input-section">
+                <label for="standardSize">Master Standard Size Selector</label>
+                <select id="standardSize" onchange="applyStandardSize()">
+                    <option value="">-- Custom Master Sizing --</option>
+                    <option value="uk8">UK 8 / US 4</option>
+                    <option value="uk10">UK 10 / US 6</option>
+                    <option value="uk12" selected>UK 12 / US 8</option>
+                    <option value="uk14">UK 14 / US 10</option>
+                    <option value="uk16">UK 16 / US 12</option>
+                </select>
+            </div>
 
-                <div class="input-section">
-                    <label for="blockPreset">Fit & Ease Preset</label>
-                    <select id="blockPreset" onchange="applyPreset()">
-                        <option value="standard">Standard Woven Block (+2.0" Bust, +1.5" Waist)</option>
-                        <option value="fitted">Fitted Block (+1.0" Bust, +0.5" Waist)</option>
-                        <option value="loose">Relaxed Fit (+3.0" Bust, +2.5" Waist)</option>
-                    </select>
+            <!-- 1. BODICE WINDOW -->
+            <div class="garment-module">
+                <div class="garment-module-header" onclick="toggleModule('bodiceBody')">
+                    <h3>1. Bodice Window</h3>
+                    <span style="font-size:0.8rem; font-weight:600; color:var(--primary);">Configure ▼</span>
                 </div>
-
-                <hr style="margin: 14px 0; border:0; border-top:1px solid #f0ebe8;">
-
-                <!-- Core Measurements -->
-                <div class="input-section">
-                    <label>Bust Measurement & Ease</label>
-                    <div class="dual-input">
-                        <input type="number" id="bust" value="36.0" step="0.25">
-                        <div class="input-with-label">
-                            <span class="input-label-tag">Ease</span>
-                            <input type="number" id="bustEase" value="2.0" step="0.25">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="input-section">
-                    <label>Waist Measurement & Ease</label>
-                    <div class="dual-input">
-                        <input type="number" id="waist" value="28.0" step="0.25">
-                        <div class="input-with-label">
-                            <span class="input-label-tag">Ease</span>
-                            <input type="number" id="waistEase" value="1.5" step="0.25">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="input-section">
-                    <label>Hip Measurement & Ease</label>
-                    <div class="dual-input">
-                        <input type="number" id="hip" value="39.0" step="0.25">
-                        <div class="input-with-label">
-                            <span class="input-label-tag">Ease</span>
-                            <input type="number" id="hipEase" value="2.0" step="0.25">
-                        </div>
-                    </div>
-                </div>
-
-                <hr style="margin: 14px 0; border:0; border-top:1px solid #f0ebe8;">
-
-                <div class="input-section">
-                    <label for="backWidth">Across Back Width</label>
-                    <input type="number" id="backWidth" value="14.0" step="0.25">
-                </div>
-                <div class="input-section">
-                    <label for="chestWidth">Across Chest Width</label>
-                    <input type="number" id="chestWidth" value="13.5" step="0.25">
-                </div>
-                <div class="input-section">
-                    <label for="shoulderLength">Shoulder Length</label>
-                    <input type="number" id="shoulderLength" value="5.25" step="0.25">
-                </div>
-                <div class="input-section">
-                    <label for="backNeckToWaist">Back Neck to Waist</label>
-                    <input type="number" id="backNeckToWaist" value="16.0" step="0.25">
-                </div>
-                <div class="input-section">
-                    <label for="waistToHip">Waist to Hip</label>
-                    <input type="number" id="waistToHip" value="8.0" step="0.25">
-                </div>
-
-                <hr style="margin: 14px 0; border:0; border-top:1px solid #f0ebe8;">
-
-                <!-- Sleeve Options -->
-                <div class="input-section">
-                    <label for="sleeveStyle">Sleeve Option</label>
-                    <select id="sleeveStyle" onchange="toggleSleeveInputs()">
-                        <option value="sleeveless">Sleeveless Bodice</option>
-                        <option value="with-sleeve" selected>With Fitted Sleeve</option>
-                    </select>
-                </div>
-
-                <div id="sleeveInputsGroup" class="conditional-group">
+                <div id="bodiceBody" class="garment-module-body">
                     <div class="input-section">
-                        <label for="armscyeDepth">Armscye Depth</label>
-                        <input type="number" id="armscyeDepth" value="7.5" step="0.25">
+                        <label for="blockPreset">Fit & Ease Preset</label>
+                        <select id="blockPreset" onchange="applyPreset()">
+                            <option value="standard">Standard Woven (+2.0" Bust, +1.5" Waist)</option>
+                            <option value="fitted">Fitted (+1.0" Bust, +0.5" Waist)</option>
+                            <option value="loose">Relaxed (+3.0" Bust, +2.5" Waist)</option>
+                        </select>
                     </div>
                     <div class="input-section">
-                        <label for="bicep">Bicep Circumference & Ease</label>
+                        <label>Bust & Ease</label>
+                        <div class="dual-input">
+                            <input type="number" id="bust" value="36.0" step="0.25">
+                            <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="bustEase" value="2.0" step="0.25"></div>
+                        </div>
+                    </div>
+                    <div class="input-section">
+                        <label>Waist & Ease</label>
+                        <div class="dual-input">
+                            <input type="number" id="waist" value="28.0" step="0.25">
+                            <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="waistEase" value="1.5" step="0.25"></div>
+                        </div>
+                    </div>
+                    <div class="input-section">
+                        <label for="backNeckToWaist">Back Neck to Waist</label>
+                        <input type="number" id="backNeckToWaist" value="16.0" step="0.25">
+                    </div>
+                    <div class="input-section">
+                        <label for="shoulderLength">Shoulder Length</label>
+                        <input type="number" id="shoulderLength" value="5.25" step="0.25">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. SLEEVE WINDOW -->
+            <div class="garment-module">
+                <div class="garment-module-header" onclick="toggleModule('sleeveBody')">
+                    <h3>2. Sleeve Window</h3>
+                    <span style="font-size:0.8rem; font-weight:600; color:var(--primary);">Configure ▼</span>
+                </div>
+                <div id="sleeveBody" class="garment-module-body" style="display:none;">
+                    <div class="input-section">
+                        <label for="includeSleeve">Enable Sleeve Draft</label>
+                        <select id="includeSleeve">
+                            <option value="yes" selected>Yes (Fitted Sleeve)</option>
+                            <option value="no">No (Sleeveless)</option>
+                        </select>
+                    </div>
+                    <div class="input-section">
+                        <label>Bicep Circumference & Ease</label>
                         <div class="dual-input">
                             <input type="number" id="bicep" value="12.5" step="0.25">
-                            <div class="input-with-label">
-                                <span class="input-label-tag">Ease</span>
-                                <input type="number" id="bicepEase" value="2.0" step="0.25">
-                            </div>
+                            <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="bicepEase" value="2.0" step="0.25"></div>
                         </div>
                     </div>
                     <div class="input-section">
@@ -408,31 +383,67 @@
                         <input type="number" id="sleeveLength" value="23.0" step="0.25">
                     </div>
                 </div>
+            </div>
 
-                <hr style="margin: 14px 0; border:0; border-top:1px solid #f0ebe8;">
-
-                <!-- Pant Option Inputs -->
-                <div class="input-section">
-                    <label for="includePant">Include Pant Drafting Block</label>
-                    <select id="includePant" onchange="togglePantInputs()">
-                        <option value="no" selected>Bodice Only</option>
-                        <option value="yes">Include Trousers / Pants</option>
-                    </select>
+            <!-- 3. SKIRT WINDOW -->
+            <div class="garment-module">
+                <div class="garment-module-header" onclick="toggleModule('skirtBody')">
+                    <h3>3. Skirt Window</h3>
+                    <span style="font-size:0.8rem; font-weight:600; color:var(--primary);">Configure ▼</span>
                 </div>
+                <div id="skirtBody" class="garment-module-body" style="display:none;">
+                    <div class="input-section">
+                        <label for="includeSkirt">Enable Skirt Draft</label>
+                        <select id="includeSkirt">
+                            <option value="yes" selected>Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
+                    <div class="input-section">
+                        <label for="skirtStyle">Skirt Silhouette Type</label>
+                        <select id="skirtStyle">
+                            <option value="pencil" selected>Pencil Skirt (Fitted)</option>
+                            <option value="full">Full / A-Line Skirt (Flared)</option>
+                            <option value="semi">Semi-Circle Circular Skirt</option>
+                        </select>
+                    </div>
+                    <div class="input-section">
+                        <label>Hip Measurement & Ease</label>
+                        <div class="dual-input">
+                            <input type="number" id="hip" value="39.0" step="0.25">
+                            <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="hipEase" value="2.0" step="0.25"></div>
+                        </div>
+                    </div>
+                    <div class="input-section">
+                        <label for="skirtLength">Skirt Length</label>
+                        <input type="number" id="skirtLength" value="24.0" step="0.25">
+                    </div>
+                </div>
+            </div>
 
-                <div id="pantInputsGroup" class="conditional-group" style="display:none;">
+            <!-- 4. PANTS WINDOW -->
+            <div class="garment-module">
+                <div class="garment-module-header" onclick="toggleModule('pantsBody')">
+                    <h3>4. Trousers / Pants Window</h3>
+                    <span style="font-size:0.8rem; font-weight:600; color:var(--primary);">Configure ▼</span>
+                </div>
+                <div id="pantsBody" class="garment-module-body" style="display:none;">
+                    <div class="input-section">
+                        <label for="includePant">Enable Trouser Draft</label>
+                        <select id="includePant">
+                            <option value="yes">Yes</option>
+                            <option value="no" selected>No</option>
+                        </select>
+                    </div>
                     <div class="input-section">
                         <label for="pantRise">Rise Depth</label>
                         <input type="number" id="pantRise" value="10.5" step="0.25">
                     </div>
                     <div class="input-section">
-                        <label for="thigh">Thigh Circumference & Ease</label>
+                        <label>Thigh Circumference & Ease</label>
                         <div class="dual-input">
                             <input type="number" id="thigh" value="23.0" step="0.25">
-                            <div class="input-with-label">
-                                <span class="input-label-tag">Ease</span>
-                                <input type="number" id="thighEase" value="2.0" step="0.25">
-                            </div>
+                            <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="thighEase" value="2.0" step="0.25"></div>
                         </div>
                     </div>
                     <div class="input-section">
@@ -440,15 +451,15 @@
                         <input type="number" id="inseam" value="30.0" step="0.25">
                     </div>
                 </div>
+            </div>
 
-                <div class="btn-container">
-                    <button type="button" class="action-btn btn-primary" onclick="generatePattern()">Generate Pattern</button>
-                    <button type="button" class="action-btn btn-secondary" onclick="downloadSVG()">Download SVG Pattern</button>
-                </div>
-            </form>
+            <div class="btn-container">
+                <button type="button" class="action-btn btn-primary" onclick="generatePattern()">Generate All Selected Patterns</button>
+                <button type="button" class="action-btn btn-secondary" onclick="downloadSVG()">Download Combined SVG</button>
+            </div>
         </div>
 
-        <!-- Right Panel Preview -->
+        <!-- Preview Canvas -->
         <div class="preview-container">
             <div class="preview-toolbar">
                 <span id="current-unit-label" style="font-size: 0.85rem; font-weight:600; color:#4a3f3d;">Grid Unit: 1 Inch</span>
@@ -461,11 +472,11 @@
             
             <div id="svg-scroll-viewport">
                 <div id="svg-canvas-wrapper">
-                    <svg id="pattern-svg" width="700" height="900" viewBox="0 0 700 900" xmlns="http://www.w3.org/2000/svg">
+                    <svg id="pattern-svg" width="800" height="950" viewBox="0 0 800 950" xmlns="http://www.w3.org/2000/svg">
                         <rect width="100%" height="100%" fill="#ffffff" />
                         <g id="grid-group"></g>
                         <g id="pattern-group">
-                            <text x="350" y="450" text-anchor="middle" fill="#8c7e7b" font-family="Montserrat" font-size="14">Drafting Workspace Ready — Click "Generate Pattern"</text>
+                            <text x="400" y="475" text-anchor="middle" fill="#8c7e7b" font-family="Montserrat" font-size="14">Atelier Drafting Table Ready — Click "Generate All Selected Patterns"</text>
                         </g>
                     </svg>
                 </div>
@@ -476,12 +487,12 @@
     <script>
         let currentUnit = 'in';
         let currentScale = 1.0;
-        const scaleFactor = 28;
+        const scaleFactor = 26;
 
         function initGrid() {
             const gridGroup = document.getElementById('grid-group');
             gridGroup.innerHTML = '';
-            const width = 700, height = 900;
+            const width = 800, height = 950;
             const step = currentUnit === 'in' ? scaleFactor : scaleFactor * 0.4;
 
             for (let x = 0; x <= width; x += step / 4) {
@@ -508,16 +519,21 @@
             initGrid();
         }
 
+        function toggleModule(id) {
+            const el = document.getElementById(id);
+            el.style.display = (el.style.display === 'none') ? 'block' : 'none';
+        }
+
         function applyStandardSize() {
             const size = document.getElementById('standardSize').value;
             if (!size) return;
 
             const sizes = {
-                'uk8':  { bust: 32, waist: 24, hip: 35, back: 13, chest: 12.5, shoulder: 5.0, bstToWst: 15.5 },
-                'uk10': { bust: 34, waist: 26, hip: 37, back: 13.5, chest: 13.0, shoulder: 5.125, bstToWst: 15.75 },
-                'uk12': { bust: 36, waist: 28, hip: 39, back: 14, chest: 13.5, shoulder: 5.25, bstToWst: 16.0 },
-                'uk14': { bust: 38, waist: 30, hip: 41, back: 14.5, chest: 14.0, shoulder: 5.375, bstToWst: 16.25 },
-                'uk16': { bust: 40, waist: 32, hip: 43, back: 15, chest: 14.5, shoulder: 5.5, bstToWst: 16.5 }
+                'uk8':  { bust: 32, waist: 24, hip: 35, shoulder: 5.0, bstToWst: 15.5 },
+                'uk10': { bust: 34, waist: 26, hip: 37, shoulder: 5.125, bstToWst: 15.75 },
+                'uk12': { bust: 36, waist: 28, hip: 39, shoulder: 5.25, bstToWst: 16.0 },
+                'uk14': { bust: 38, waist: 30, hip: 41, shoulder: 5.375, bstToWst: 16.25 },
+                'uk16': { bust: 40, waist: 32, hip: 43, shoulder: 5.5, bstToWst: 16.5 }
             };
 
             const data = sizes[size];
@@ -525,8 +541,6 @@
                 document.getElementById('bust').value = data.bust;
                 document.getElementById('waist').value = data.waist;
                 document.getElementById('hip').value = data.hip;
-                document.getElementById('backWidth').value = data.back;
-                document.getElementById('chestWidth').value = data.chest;
                 document.getElementById('shoulderLength').value = data.shoulder;
                 document.getElementById('backNeckToWaist').value = data.bstToWst;
             }
@@ -536,90 +550,103 @@
             const preset = document.getElementById('blockPreset').value;
             const bEase = document.getElementById('bustEase');
             const wEase = document.getElementById('waistEase');
-            const hEase = document.getElementById('hipEase');
 
-            if (preset === 'standard') { bEase.value = 2.0; wEase.value = 1.5; hEase.value = 2.0; }
-            else if (preset === 'fitted') { bEase.value = 1.0; wEase.value = 0.5; hEase.value = 1.0; }
-            else if (preset === 'loose') { bEase.value = 3.0; wEase.value = 2.5; hEase.value = 3.0; }
-        }
-
-        function toggleSleeveInputs() {
-            const style = document.getElementById('sleeveStyle').value;
-            document.getElementById('sleeveInputsGroup').style.display = (style === 'with-sleeve') ? 'block' : 'none';
-        }
-
-        function togglePantInputs() {
-            const include = document.getElementById('includePant').value;
-            document.getElementById('pantInputsGroup').style.display = (include === 'yes') ? 'block' : 'none';
+            if (preset === 'standard') { bEase.value = 2.0; wEase.value = 1.5; }
+            else if (preset === 'fitted') { bEase.value = 1.0; wEase.value = 0.5; }
+            else if (preset === 'loose') { bEase.value = 3.0; wEase.value = 2.5; }
         }
 
         function generatePattern() {
             const patternGroup = document.getElementById('pattern-group');
             patternGroup.innerHTML = '';
 
-            const bust = parseFloat(document.getElementById('bust').value) + parseFloat(document.getElementById('bustEase').value);
-            const waist = parseFloat(document.getElementById('waist').value) + parseFloat(document.getElementById('waistEase').value);
-            const backLength = parseFloat(document.getElementById('backNeckToWaist').value);
-            const hasSleeve = document.getElementById('sleeveStyle').value === 'with-sleeve';
-            const hasPant = document.getElementById('includePant').value === 'yes';
+            const startX = 50, startY = 50;
+            let cursorX = startX;
+            let cursorY = startY;
 
-            // 1. Draw Bodice Block
+            // 1. Bodice Block
+            const bust = parseFloat(document.getElementById('bust').value) + parseFloat(document.getElementById('bustEase').value);
+            const backLength = parseFloat(document.getElementById('backNeckToWaist').value);
             const bWidth = (bust / 4) * scaleFactor;
             const bHeight = backLength * scaleFactor;
-            const startX = 60;
-            const startY = 60;
 
             const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            bodiceRect.setAttribute('x', startX); bodiceRect.setAttribute('y', startY);
+            bodiceRect.setAttribute('x', cursorX); bodiceRect.setAttribute('y', cursorY);
             bodiceRect.setAttribute('width', bWidth); bodiceRect.setAttribute('height', bHeight);
             bodiceRect.setAttribute('fill', 'rgba(194, 94, 111, 0.06)');
             bodiceRect.setAttribute('stroke', '#c25e6f'); bodiceRect.setAttribute('stroke-width', '2'); bodiceRect.setAttribute('stroke-dasharray', '4');
             patternGroup.appendChild(bodiceRect);
 
             const bText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            bText.setAttribute('x', startX + 15); bText.setAttribute('y', startY + 25);
+            bText.setAttribute('x', cursorX + 15); bText.setAttribute('y', cursorY + 25);
             bText.setAttribute('fill', '#2c2524'); bText.setAttribute('font-family', 'Montserrat'); bText.setAttribute('font-size', '12'); bText.setAttribute('font-weight', '600');
-            bText.textContent = `Bodice Block (Bust: ${bust}${currentUnit})`;
+            bText.textContent = `Bodice Block`;
             patternGroup.appendChild(bText);
 
-            // 2. Draw Sleeve Block if selected
-            if (hasSleeve) {
+            // 2. Sleeve Block (if enabled)
+            if (document.getElementById('includeSleeve').value === 'yes') {
                 const sLen = parseFloat(document.getElementById('sleeveLength').value) * scaleFactor;
                 const bicepVal = (parseFloat(document.getElementById('bicep').value) + parseFloat(document.getElementById('bicepEase').value)) * scaleFactor;
-                const sStartX = startX + bWidth + 40;
+                const sStartX = cursorX + bWidth + 30;
 
                 const sleeveRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                sleeveRect.setAttribute('x', sStartX); sleeveRect.setAttribute('y', startY);
+                sleeveRect.setAttribute('x', sStartX); sleeveRect.setAttribute('y', cursorY);
                 sleeveRect.setAttribute('width', bicepVal); sleeveRect.setAttribute('height', sLen);
                 sleeveRect.setAttribute('fill', 'rgba(92, 82, 79, 0.05)');
                 sleeveRect.setAttribute('stroke', '#5c524f'); sleeveRect.setAttribute('stroke-width', '2'); sleeveRect.setAttribute('stroke-dasharray', '4');
                 patternGroup.appendChild(sleeveRect);
 
                 const sText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                sText.setAttribute('x', sStartX + 15); sText.setAttribute('y', startY + 25);
+                sText.setAttribute('x', sStartX + 15); sText.setAttribute('y', cursorY + 25);
                 sText.setAttribute('fill', '#2c2524'); sText.setAttribute('font-family', 'Montserrat'); sText.setAttribute('font-size', '12'); sText.setAttribute('font-weight', '600');
-                sText.textContent = `Fitted Sleeve Block`;
+                sText.textContent = `Fitted Sleeve`;
                 patternGroup.appendChild(sText);
             }
 
-            // 3. Draw Pant Block if selected
-            if (hasPant) {
+            cursorY += bHeight + 40;
+
+            // 3. Skirt Block (if enabled)
+            if (document.getElementById('includeSkirt').value === 'yes') {
+                const skirtStyle = document.getElementById('skirtStyle').value;
+                const sLenVal = parseFloat(document.getElementById('skirtLength').value) * scaleFactor;
+                const hipVal = (parseFloat(document.getElementById('hip').value) + parseFloat(document.getElementById('hipEase').value)) * scaleFactor;
+                
+                let sWidth = hipVal;
+                if (skirtStyle === 'full') sWidth = hipVal * 1.5;
+                if (skirtStyle === 'semi') sWidth = hipVal * 1.8;
+
+                const skirtRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                skirtRect.setAttribute('x', cursorX); skirtRect.setAttribute('y', cursorY);
+                skirtRect.setAttribute('width', sWidth); skirtRect.setAttribute('height', sLenVal);
+                skirtRect.setAttribute('fill', 'rgba(194, 94, 111, 0.04)');
+                skirtRect.setAttribute('stroke', '#c25e6f'); skirtRect.setAttribute('stroke-width', '2'); skirtRect.setAttribute('stroke-dasharray', '4');
+                patternGroup.appendChild(skirtRect);
+
+                const skText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                skText.setAttribute('x', cursorX + 15); skText.setAttribute('y', cursorY + 25);
+                skText.setAttribute('fill', '#2c2524'); skText.setAttribute('font-family', 'Montserrat'); skText.setAttribute('font-size', '12'); skText.setAttribute('font-weight', '600');
+                skText.textContent = `Skirt: ${skirtStyle.toUpperCase()} Silhouette`;
+                patternGroup.appendChild(skText);
+
+                cursorY += sLenVal + 40;
+            }
+
+            // 4. Pant Block (if enabled)
+            if (document.getElementById('includePant').value === 'yes') {
                 const rise = parseFloat(document.getElementById('pantRise').value);
                 const inseam = parseFloat(document.getElementById('inseam').value);
                 const thighVal = (parseFloat(document.getElementById('thigh').value) + parseFloat(document.getElementById('thighEase').value)) * scaleFactor;
                 const pHeight = (rise + inseam) * scaleFactor;
-                const pStartX = startX;
-                const pStartY = startY + bHeight + 40;
 
                 const pantRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                pantRect.setAttribute('x', pStartX); pantRect.setAttribute('y', pStartY);
+                pantRect.setAttribute('x', cursorX); pantRect.setAttribute('y', cursorY);
                 pantRect.setAttribute('width', thighVal); pantRect.setAttribute('height', pHeight);
-                pantRect.setAttribute('fill', 'rgba(194, 94, 111, 0.04)');
-                pantRect.setAttribute('stroke', '#c25e6f'); pantRect.setAttribute('stroke-width', '2'); pantRect.setAttribute('stroke-dasharray', '4');
+                pantRect.setAttribute('fill', 'rgba(92, 82, 79, 0.04)');
+                pantRect.setAttribute('stroke', '#5c524f'); pantRect.setAttribute('stroke-width', '2'); pantRect.setAttribute('stroke-dasharray', '4');
                 patternGroup.appendChild(pantRect);
 
                 const pText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                pText.setAttribute('x', pStartX + 15); pText.setAttribute('y', pStartY + 25);
+                pText.setAttribute('x', cursorX + 15); pText.setAttribute('y', cursorY + 25);
                 pText.setAttribute('fill', '#2c2524'); pText.setAttribute('font-family', 'Montserrat'); pText.setAttribute('font-size', '12'); pText.setAttribute('font-weight', '600');
                 pText.textContent = `Trouser / Pant Block`;
                 patternGroup.appendChild(pText);
@@ -656,7 +683,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'lilinora-complete-pattern.svg';
+            a.download = 'lilinora-multi-piece-pattern.svg';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -664,8 +691,6 @@
 
         window.onload = function() {
             initGrid();
-            toggleSleeveInputs();
-            togglePantInputs();
         };
     </script>
 </body>
