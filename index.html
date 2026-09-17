@@ -314,14 +314,14 @@
       svg += `<path class="scye" d="M ${s(b.sp.x)} ${s(b.sp.y)} C ${s(b.halfBackW)} ${s(l.bustY - 0.5)}, ${s(d.up.x - 0.8)} ${s(d.up.y)}, ${s(d.up.x)} ${s(d.up.y)} C ${s(d.up.x + 0.8)} ${s(d.up.y)}, ${s(d.cfX - f.halfChestW)} ${s(l.bustY - 0.5)}, ${s(f.sp.x)} ${s(f.sp.y)}" />`;
       svg += `<text class="lbl" x="${s(d.up.x) - 8}" y="${s(d.up.y) - 6}">UP</text>`;
 
-      // SIDE SEAMS WITH STRAIGHTER UP-POINT DESCENT & ARC-LENGTH BALANCING
+      // SIDE SEAMS (STRAIGHTER UPPER DESCENT & SMOOTH NATURAL HIP FLARE BELOW WAIST)
       const up_pt = { x: d.up.x, y: d.up.y };
       const waist_b_pt = { x: d.up.leftW, y: l.waistY };
       const waist_f_pt = { x: d.up.rightW, y: l.waistY };
       const hip_b_pt = { x: d.hip.backHipX, y: l.hipY };
       const hip_f_pt = { x: d.hip.frontHipX, y: l.hipY };
 
-      // Updated: Shortened upper control handle (25% down instead of 66%) for a straighter drop under UP
+      // Upper handle (straight drop from UP)
       const upperHandleOffset = (l.waistY - d.up.y) * 0.25;
       const b_c1_raw = { x: d.up.x, y: d.up.y + upperHandleOffset };
       const b_c2_raw = { x: d.up.leftW, y: l.waistY - upperHandleOffset };
@@ -329,18 +329,20 @@
       const f_c1_raw = { x: d.up.x, y: d.up.y + upperHandleOffset };
       const f_c2_raw = { x: d.up.rightW, y: l.waistY - upperHandleOffset };
 
-      // Measure back upper length and balance front upper length to match precisely
       const backUpperLen = getBezierLength(up_pt, b_c1_raw, b_c2_raw, waist_b_pt);
       const balancedFrontUpper = balanceCurveLengths(up_pt, f_c1_raw, f_c2_raw, waist_f_pt, f_c1_raw, f_c2_raw, backUpperLen);
 
+      // Lower side seam (smooth anatomical outward sweep immediately below waist line)
+      const b_c3 = { x: waist_b_pt.x + (hip_b_pt.x - waist_b_pt.x) * 0.35, y: waist_b_pt.y + (l.hipY - l.waistY) * 0.35 };
+      const b_c4 = { x: hip_b_pt.x, y: l.hipY - (l.hipY - l.waistY) * 0.2 };
+
+      const f_c3 = { x: waist_f_pt.x + (hip_f_pt.x - waist_f_pt.x) * 0.35, y: waist_f_pt.y + (l.hipY - l.waistY) * 0.35 };
+      const f_c4 = { x: hip_f_pt.x, y: l.hipY - (l.hipY - l.waistY) * 0.2 };
+
       // Render Back Upper & Lower Side Seam
-      const b_c3 = { x: waist_b_pt.x, y: waist_b_pt.y + (l.hipY - l.waistY) * 0.33 };
-      const b_c4 = { x: hip_b_pt.x, y: l.hipY - (l.hipY - l.waistY) * 0.25 };
       svg += `<path class="outline" d="M ${s(up_pt.x)} ${s(up_pt.y)} C ${s(b_c1_raw.x)} ${s(b_c1_raw.y)}, ${s(b_c2_raw.x)} ${s(b_c2_raw.y)}, ${s(waist_b_pt.x)} ${s(waist_b_pt.y)} C ${s(b_c3.x)} ${s(b_c3.y)}, ${s(b_c4.x)} ${s(b_c4.y)}, ${s(hip_b_pt.x)} ${s(hip_b_pt.y)}" />`;
 
       // Render Front Upper & Lower Side Seam (Balanced Length)
-      const f_c3 = { x: waist_f_pt.x, y: waist_f_pt.y + (l.hipY - l.waistY) * 0.33 };
-      const f_c4 = { x: hip_f_pt.x, y: l.hipY - (l.hipY - l.waistY) * 0.25 };
       svg += `<path class="outline" d="M ${s(up_pt.x)} ${s(up_pt.y)} C ${s(balancedFrontUpper.c1.x)} ${s(balancedFrontUpper.c1.y)}, ${s(balancedFrontUpper.c2.x)} ${s(balancedFrontUpper.c2.y)}, ${s(waist_f_pt.x)} ${s(waist_f_pt.y)} C ${s(f_c3.x)} ${s(f_c3.y)}, ${s(f_c4.x)} ${s(f_c4.y)}, ${s(hip_f_pt.x)} ${s(hip_f_pt.y)}" />`;
 
       // BACK WAIST DART
