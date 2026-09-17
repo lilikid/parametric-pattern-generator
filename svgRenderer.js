@@ -1,13 +1,14 @@
 /**
- * Dynamic SVG Render Engine with Fully Locked Test Square and ViewBox
+ * Dynamic SVG Render Engine with Fully Locked Canvas Frame & Test Square
  */
 
 export function renderPatternSVG(draftData, scale = 20) {
   const d = draftData;
   
-  // Locked Canvas Boundaries (Independent of individual body sizes)
-  const fixedCanvasWidth = 50; 
-  const fixedCanvasHeight = 36;
+  // FIXED CANVAS DIMENSIONS: Independent of bust or hip size changes.
+  // This guarantees the outer frame and test square never change size or scale.
+  const fixedCanvasWidth = 52;  // inches
+  const fixedCanvasHeight = 36; // inches
 
   const w = fixedCanvasWidth * scale;
   const h = fixedCanvasHeight * scale;
@@ -17,8 +18,8 @@ export function renderPatternSVG(draftData, scale = 20) {
   const px = (val) => ox + val * scale;
   const py = (val) => oy + val * scale;
 
-  // Explicit viewBox locks the coordinate system so the test square never scales or distorts
-  let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="100%" height="100%" style="background:#fff; max-width:900px; height:auto;">`;
+  // Static viewBox locks the coordinate space entirely
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="100%" height="100%" style="background:#fff; max-width:950px; height:auto;">`;
   
   svg += `
     <style>
