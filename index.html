@@ -292,8 +292,9 @@
             will-change: transform;
         }
 
-        .grid-line-minor { stroke: #e6dfdc; stroke-width: 0.75; vector-effect: non-scaling-stroke; }
-        .grid-line-major { stroke: #c8bbb6; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+        .grid-line-sub { stroke: #f0ecea; stroke-width: 0.5; vector-effect: non-scaling-stroke; }
+        .grid-line-half { stroke: #d5ccc8; stroke-width: 0.8; vector-effect: non-scaling-stroke; }
+        .grid-line-major { stroke: #b8aba5; stroke-width: 1.4; vector-effect: non-scaling-stroke; }
     </style>
 </head>
 <body>
@@ -648,25 +649,49 @@
             const gridGroup = document.getElementById('grid-group');
             gridGroup.innerHTML = '';
             const width = 1600, height = 1400;
-            // When cm is selected, step represents 1 cm (scaled appropriately)
-            const step = currentUnit === 'in' ? scaleFactor : scaleFactor / 2.54;
 
-            for (let x = 0; x <= width; x += step) {
+            // Unit base step (1 inch or 1 cm)
+            const baseStep = currentUnit === 'in' ? scaleFactor : scaleFactor / 2.54;
+            // Subdivisions: 0.5 unit intervals for half-unit clarity
+            const subStep = baseStep / 2;
+
+            // Draw vertical grid lines
+            for (let x = 0; x <= width; x += subStep) {
                 const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
                 line.setAttribute('x1', x); line.setAttribute('y1', 0);
                 line.setAttribute('x2', x); line.setAttribute('y2', height);
-                // In cm mode, every 5th line or 10th line can be major, or standard major every cm with minor subdivisions
-                // Let's make every 5th cm a major line when in cm mode, or every inch equivalent.
-                const isMajor = currentUnit === 'in' ? (x % (step * 4) === 0) : (Math.round(x / step) % 5 === 0);
-                line.setAttribute('class', isMajor ? 'grid-line-major' : 'grid-line-minor');
+
+                const ratio = x / baseStep;
+                const isMajor = Math.abs(ratio - Math.round(ratio)) < 0.001 && Math.round(ratio) % (currentUnit === 'in' ? 4 : 5) === 0;
+                const isHalf = Math.abs(ratio - Math.round(ratio)) < 0.001;
+
+                if (isMajor) {
+                    line.setAttribute('class', 'grid-line-major');
+                } else if (isHalf) {
+                    line.setAttribute('class', 'grid-line-half');
+                } else {
+                    line.setAttribute('class', 'grid-line-sub');
+                }
                 gridGroup.appendChild(line);
             }
-            for (let y = 0; y <= height; y += step) {
+
+            // Draw horizontal grid lines
+            for (let y = 0; y <= height; y += subStep) {
                 const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
                 line.setAttribute('x1', 0); line.setAttribute('y1', y);
                 line.setAttribute('x2', width); line.setAttribute('y2', y);
-                const isMajor = currentUnit === 'in' ? (y % (step * 4) === 0) : (Math.round(y / step) % 5 === 0);
-                line.setAttribute('class', isMajor ? 'grid-line-major' : 'grid-line-minor');
+
+                const ratio = y / baseStep;
+                const isMajor = Math.abs(ratio - Math.round(ratio)) < 0.001 && Math.round(ratio) % (currentUnit === 'in' ? 4 : 5) === 0;
+                const isHalf = Math.abs(ratio - Math.round(ratio)) < 0.001;
+
+                if (isMajor) {
+                    line.setAttribute('class', 'grid-line-major');
+                } else if (isHalf) {
+                    line.setAttribute('class', 'grid-line-half');
+                } else {
+                    line.setAttribute('class', 'grid-line-sub');
+                }
                 gridGroup.appendChild(line);
             }
         }
@@ -675,7 +700,7 @@
             currentUnit = unit;
             document.getElementById('unit-in').classList.toggle('active', unit === 'in');
             document.getElementById('unit-cm').classList.toggle('active', unit === 'cm');
-            document.getElementById('current-unit-label').innerText = unit === 'in' ? 'Grid Unit: 1 Inch' : 'Grid Unit: 1 Centimeter';
+            document.getElementById('current-unit-label').innerText = unit === 'in' ? 'Grid Unit: 1 Inch (0.5" Subdivisions)' : 'Grid Unit: 1 Centimeter (0.5cm Subdivisions)';
             initGrid();
         }
 
