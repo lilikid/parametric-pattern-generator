@@ -170,27 +170,53 @@
       const f_waistDartW = remainingIntake * 0.6;
 
       // --- BACK POINTS ---
+// --- BACK POINTS ---
       const b_np = { x: neckW, y: topY };
       const b_shoulderDrop = topY + 1.25;
       const totalBackShWidth = m.shoulderLength + 0.5;
       const b_spTotalEnd = { x: neckW + totalBackShWidth, y: b_shoulderDrop };
 
-      // Shoulder Mid Point & Back Shoulder Dart Positioning (per instructions)
+      // 1. Straight reference line from NP to SP (Closed dart line length)
+      const b_dx = b_spTotalEnd.x - b_np.x;
+      const b_dy = b_spTotalEnd.y - b_np.y;
+      const b_straightShLen = Math.hypot(b_dx, b_dy);
+
+      // Shoulder Mid Point & Back Shoulder Dart Positioning
       const b_shoulderMid = {
         x: (b_np.x + b_spTotalEnd.x) / 2,
         y: (b_np.y + b_spTotalEnd.y) / 2
       };
 
       const b_dartW = 0.5;
-      const b_shDartInner = { x: b_shoulderMid.x - (b_dartW / 2), y: b_shoulderMid.y };
-      const b_shDartOuter = { x: b_shoulderMid.x + (b_dartW / 2), y: b_shoulderMid.y };
-      
-      // Apex: 2.5" straight down and 3/8" (0.375") towards Centre Back from the shoulder mid point
       const b_shDartApex = { x: b_shoulderMid.x - 0.375, y: b_shoulderMid.y + 2.5 };
 
-      const b_waistDartX = backBustW * 0.45;
-      const b_waistDartTop = { x: b_waistDartX, y: bustY + 0.5 };
-      const b_waistDartBottom = { x: b_waistDartX, y: waistY + (m.waistToHip * 0.6) };
+      // 2. Calculate individual dart leg lengths to the apex
+      const b_leg1Unadjusted = Math.hypot(b_shDartApex.x - b_np.x, b_shDartApex.y - b_np.y); 
+      // We position the dart split around the center
+      const b_shDartInner = { 
+        x: b_shoulderMid.x - (b_dartW / 2), 
+        y: b_np.y + (b_shoulderMid.y - b_np.y) * ((b_shoulderMid.x - (b_dartW/2) - b_np.x) / (b_spTotalEnd.x - b_np.x)) 
+      };
+      // Anchor SP and adjust length from the neck side: 
+      // Re-open dart such that the outer leg from SP to apex matches the target straight line segment, 
+      // absorbing the dart intake adjustment toward the neck.
+      const b_shDartOuter = { 
+        x: b_shoulderMid.x + (b_dartW / 2), 
+        y: b_shoulderMid.y 
+      };
+      
+      // Force dart legs to equal the true side geometry when opened
+      const b_leg2Vec = { x: b_shDartApex.x - b_shDartOuter.x, y: b_shDartApex.y - b_shDartOuter.y };
+      const b_leg2Len = Math.hypot(b_leg2Vec.x, b_leg2Vec.y);
+      
+      // Adjust inner leg point dynamically so both opened dart legs match perfectly 
+      // while preserving the outer shoulder endpoint at SP.
+      const b_leg1Vec = { x: b_shDartApex.x - b_np.x, y: b_shDartApex.y - b_np.y };
+      // We align the total span along the straight shoulder vector
+      const b_shDartInnerAdjusted = {
+        x: b_shDartApex.x - (b_leg2Len / Math.hypot(b_leg1Vec.x, b_leg1Vec.y)) * b_leg1Vec.x,
+        y: b_shDartApex.y - (b_leg2Len / Math.hypot(b_leg1Vec.x, b_leg1Vec.y)) * b_leg1Vec.y
+      };
 
       // --- FRONT POINTS ---
       const f_cfX = totalWidth;
