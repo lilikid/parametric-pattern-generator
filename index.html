@@ -440,7 +440,7 @@
                 </div>
                 
                 <div class="input-section">
-                    <label for="lowerStandardSize">Lower Body Standard Size Preset</label>
+                    <label for="lowerStandardSize">Lower Body Standard Size Preset (UK Size 12 Spec)</label>
                     <select id="lowerStandardSize" onchange="applyLowerStandardSize()">
                         <option value="">-- Custom Lower Sizing --</option>
                         <option value="uk8">UK 8 / US 4</option>
@@ -475,16 +475,46 @@
                                 </select>
                             </div>
                             <div class="input-section">
-                                <label for="skirtLength">Length (Waist to Hem)</label>
-                                <input type="number" id="skirtLength" value="27.0" step="0.25">
+                                <label>Waist & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="skirtWaist" value="26.0" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="skirtWaistEase" value="1.0" step="0.25"></div>
+                                </div>
                             </div>
                             <div class="input-section">
-                                <label for="skirtWaistToKnee">Waist to Knee</label>
-                                <input type="number" id="skirtWaistToKnee" value="23.0" step="0.25">
+                                <label>Hips & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="skirtHips" value="36.0" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="skirtHipsEase" value="1.75" step="0.25"></div>
+                                </div>
                             </div>
                             <div class="input-section">
-                                <label for="skirtHipLine">Hip Line (Below Waist)</label>
-                                <input type="number" id="skirtHipLine" value="8.75" step="0.25">
+                                <label>Length (Waist to Hem) & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="skirtLength" value="38.5" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="skirtLengthEase" value="0.0" step="0.25"></div>
+                                </div>
+                            </div>
+                            <div class="input-section">
+                                <label>Waist to Knee & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="skirtWaistToKnee" value="23.0" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="skirtWaistToKneeEase" value="0.0" step="0.25"></div>
+                                </div>
+                            </div>
+                            <div class="input-section">
+                                <label>Hip Line Depth & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="skirtHipLine" value="8.75" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="skirtHipLineEase" value="0.0" step="0.25"></div>
+                                </div>
+                            </div>
+                            <div class="input-section">
+                                <label>Yoke Line Depth & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="skirtYokeLine" value="6.0" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="skirtYokeLineEase" value="0.0" step="0.25"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -506,8 +536,25 @@
                         </div>
                         <div id="pantsBody" class="garment-module-body" style="display:none;">
                             <div class="input-section">
-                                <label for="pantRise">Body Rise (Rise Depth)</label>
-                                <input type="number" id="pantRise" value="11.5" step="0.25">
+                                <label>Waist & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="pantWaist" value="26.0" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="pantWaistEase" value="1.0" step="0.25"></div>
+                                </div>
+                            </div>
+                            <div class="input-section">
+                                <label>Hips & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="pantHips" value="36.0" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="pantHipsEase" value="2.0" step="0.25"></div>
+                                </div>
+                            </div>
+                            <div class="input-section">
+                                <label>Body Rise Depth & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="pantRise" value="11.5" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="pantRiseEase" value="0.5" step="0.25"></div>
+                                </div>
                             </div>
                             <div class="input-section">
                                 <label>Thigh Circumference & Ease</label>
@@ -517,12 +564,18 @@
                                 </div>
                             </div>
                             <div class="input-section">
-                                <label for="kneeCirc">Knee Circumference</label>
-                                <input type="number" id="kneeCirc" value="13.5" step="0.25">
+                                <label>Knee Circumference & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="kneeCirc" value="13.5" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="kneeCircEase" value="1.0" step="0.25"></div>
+                                </div>
                             </div>
                             <div class="input-section">
-                                <label for="inseam">Inseam / Total Pant Length</label>
-                                <input type="number" id="inseam" value="30.0" step="0.25">
+                                <label>Inseam / Total Pant Length & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="inseam" value="30.0" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="inseamEase" value="0.0" step="0.25"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -642,19 +695,24 @@
             if (!size) return;
 
             const sizes = {
-                'uk8':  { hip: 35.0, skirtLen: 26.0, kneeToWst: 22.0, hipLine: 8.25, rise: 10.75, thigh: 21.5, knee: 12.5, inseam: 29.0 },
-                'uk10': { hip: 36.0, skirtLen: 26.5, kneeToWst: 22.5, hipLine: 8.5, rise: 11.0, thigh: 22.25, knee: 13.0, inseam: 29.5 },
-                'uk12': { hip: 37.0, skirtLen: 27.0, kneeToWst: 23.0, hipLine: 8.75, rise: 11.5, thigh: 23.0, knee: 13.5, inseam: 30.0 },
-                'uk14': { hip: 40.0, skirtLen: 27.5, kneeToWst: 23.5, hipLine: 9.0, rise: 12.0, thigh: 24.5, knee: 14.25, inseam: 30.5 },
-                'uk16': { hip: 42.0, skirtLen: 28.0, kneeToWst: 24.0, hipLine: 9.25, rise: 12.5, thigh: 26.0, knee: 15.0, inseam: 31.0 }
+                'uk8':  { waist: 24.0, hips: 35.0, skirtLen: 37.0, kneeToWst: 22.0, hipLine: 8.25, yoke: 5.5, rise: 10.75, thigh: 21.5, knee: 12.5, inseam: 29.0 },
+                'uk10': { waist: 24.75, hips: 36.0, skirtLen: 37.5, kneeToWst: 22.5, hipLine: 8.5, yoke: 5.75, rise: 11.0, thigh: 22.25, knee: 13.0, inseam: 29.5 },
+                'uk12': { waist: 26.0, hips: 36.0, skirtLen: 38.5, kneeToWst: 23.0, hipLine: 8.75, yoke: 6.0, rise: 11.5, thigh: 23.0, knee: 13.5, inseam: 30.0 },
+                'uk14': { waist: 28.5, hips: 40.0, skirtLen: 39.0, kneeToWst: 23.5, hipLine: 9.0, yoke: 6.25, rise: 12.0, thigh: 24.5, knee: 14.25, inseam: 30.5 },
+                'uk16': { waist: 30.5, hips: 42.0, skirtLen: 39.5, kneeToWst: 24.0, hipLine: 9.25, yoke: 6.5, rise: 12.5, thigh: 26.0, knee: 15.0, inseam: 31.0 }
             };
 
             const data = sizes[size];
             if (data) {
-                document.getElementById('hip').value = data.hip;
+                document.getElementById('skirtWaist').value = data.waist;
+                document.getElementById('skirtHips').value = data.hips;
                 document.getElementById('skirtLength').value = data.skirtLen;
                 document.getElementById('skirtWaistToKnee').value = data.kneeToWst;
                 document.getElementById('skirtHipLine').value = data.hipLine;
+                document.getElementById('skirtYokeLine').value = data.yoke;
+
+                document.getElementById('pantWaist').value = data.waist;
+                document.getElementById('pantHips').value = data.hips;
                 document.getElementById('pantRise').value = data.rise;
                 document.getElementById('thigh').value = data.thigh;
                 document.getElementById('kneeCirc').value = data.knee;
@@ -679,7 +737,7 @@
 
             const pieces = [];
 
-            // 1. Bodice (Always generated as core upper foundation)
+            // 1. Bodice
             const bust = parseFloat(document.getElementById('bust').value) + parseFloat(document.getElementById('bustEase').value);
             const backLength = parseFloat(document.getElementById('backNeckToWaist').value);
             pieces.push({
@@ -690,7 +748,7 @@
                 fill: 'rgba(194, 94, 111, 0.06)'
             });
 
-            // 2. Sleeve (Conditional)
+            // 2. Sleeve
             if (document.getElementById('includeSleeve').value === 'yes') {
                 const sLen = parseFloat(document.getElementById('sleeveLength').value) * scaleFactor;
                 const bicepVal = (parseFloat(document.getElementById('bicep').value) + parseFloat(document.getElementById('bicepEase').value)) * scaleFactor;
@@ -703,31 +761,33 @@
                 });
             }
 
-            // 3. Skirt (Conditional)
+            // 3. Skirt
             if (document.getElementById('includeSkirt').value === 'yes') {
-                const hipVal = (parseFloat(document.getElementById('hip').value) + parseFloat(document.getElementById('hipEase').value));
+                const skirtHips = parseFloat(document.getElementById('skirtHips').value) + parseFloat(document.getElementById('skirtHipsEase').value);
+                const skirtLen = parseFloat(document.getElementById('skirtLength').value) + parseFloat(document.getElementById('skirtLengthEase').value);
                 pieces.push({
-                    name: `Skirt: ${document.getElementById('skirtStyle').value.toUpperCase()} (Hip: ${document.getElementById('hip').value}")`,
-                    width: (hipVal / 4) * scaleFactor,
-                    height: parseFloat(document.getElementById('skirtLength').value) * scaleFactor,
+                    name: `Skirt: ${document.getElementById('skirtStyle').value.toUpperCase()} (Hips: ${document.getElementById('skirtHips').value}")`,
+                    width: (skirtHips / 4) * scaleFactor,
+                    height: skirtLen * scaleFactor,
                     stroke: '#c25e6f',
                     fill: 'rgba(194, 94, 111, 0.04)'
                 });
             }
 
-            // 4. Trouser (Conditional)
+            // 4. Trouser
             if (document.getElementById('includePant').value === 'yes') {
-                const thighVal = (parseFloat(document.getElementById('thigh').value) + parseFloat(document.getElementById('thighEase').value));
+                const thighVal = parseFloat(document.getElementById('thigh').value) + parseFloat(document.getElementById('thighEase').value);
+                const inseamVal = parseFloat(document.getElementById('inseam').value) + parseFloat(document.getElementById('inseamEase').value);
                 pieces.push({
                     name: `Trouser Block (Rise: ${document.getElementById('pantRise').value}")`,
                     width: (thighVal / 2) * scaleFactor,
-                    height: parseFloat(document.getElementById('inseam').value) * scaleFactor,
+                    height: inseamVal * scaleFactor,
                     stroke: '#5c524f',
                     fill: 'rgba(92, 82, 79, 0.04)'
                 });
             }
 
-            // Non-overlapping Grid Flow Layout
+            // Grid Flow Layout
             const originX = 50;
             const originY = 50;
             const gapX = 60;
@@ -740,7 +800,6 @@
             let colIndex = 0;
 
             pieces.forEach((piece) => {
-                // Check if we need to wrap to the next row
                 if (colIndex >= maxPerRow) {
                     currentX = originX;
                     currentY += rowMaxHeight + gapY;
@@ -748,7 +807,6 @@
                     colIndex = 0;
                 }
 
-                // Draw rectangle
                 const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
                 rect.setAttribute('x', currentX);
                 rect.setAttribute('y', currentY);
@@ -760,7 +818,6 @@
                 rect.setAttribute('stroke-dasharray', '4');
                 patternGroup.appendChild(rect);
 
-                // Draw text label inside block
                 const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                 text.setAttribute('x', currentX + 15);
                 text.setAttribute('y', currentY + 25);
@@ -771,12 +828,10 @@
                 text.textContent = piece.name;
                 patternGroup.appendChild(text);
 
-                // Track max height of current row
                 if (piece.height > rowMaxHeight) {
                     rowMaxHeight = piece.height;
                 }
 
-                // Advance X for next column
                 currentX += piece.width + gapX;
                 colIndex++;
             });
