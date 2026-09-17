@@ -1,6 +1,6 @@
 /**
  * Dynamic Pattern Drafting Engine for Bodice Block
- * Fully integrated front bust dart variations and back shoulder dart geometry.
+ * Fully integrated front bust dart variations with responsive sizing and back shoulder dart geometry.
  */
 
 export function calculateBodiceBlock(measurements, easeOptions = {}) {
@@ -36,9 +36,9 @@ export function calculateBodiceBlock(measurements, easeOptions = {}) {
   const chestLineY = bustLineY - ((bustLineY - baseOfNeckY) / 3);
   const trueBustLineY = bustLineY + 1.0; // 1" below bust line per reference
 
-  // Dynamic Bust Dart Width Calculation (scales with size & cup fullness)
-  let bustDartWidth = 3.0 + ((bust - 36) / 2) * 0.25;
-  bustDartWidth = Math.max(2.25, Math.min(4.0, bustDartWidth));
+  // Dynamic Bust Dart Width Calculation (scales cleanly with bust variations)
+  let bustDartWidth = 2.375 + ((bust - 36) / 4) * 0.25;
+  bustDartWidth = Math.max(2.125, Math.min(4.0, bustDartWidth));
 
   // 3. Point Constructions
 
@@ -62,7 +62,7 @@ export function calculateBodiceBlock(measurements, easeOptions = {}) {
   const backDartInner = { x: backShoulderMid.x - (backDartW / 2), y: backShoulderMid.y };
   const backDartOuter = { x: backShoulderMid.x + (backDartW / 2), y: backShoulderMid.y };
 
-  // Points 1 and 2 defining the base line across the back shoulder dart opening
+  // Points 1 and 2 defining the baseline across the back shoulder dart opening
   const dartBaseDrop = 0.15;
   const dartBasePoint1 = { x: backDartInner.x, y: backDartInner.y + dartBaseDrop };
   const dartBasePoint2 = { x: backDartOuter.x, y: backDartOuter.y + dartBaseDrop };
