@@ -8,10 +8,10 @@
         :root {
             --primary: #0275d8;
             --primary-hover: #025aa5;
-            --bg-color: #f8f9fa;
+            --bg-color: #f4f6f9;
             --card-bg: #ffffff;
-            --border-color: #ced4da;
-            --text-color: #333333;
+            --border-color: #cbd5e1;
+            --text-color: #1e293b;
         }
 
         * {
@@ -24,56 +24,63 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            line-height: 1.5;
+            line-height: 1.4;
             padding: 20px;
         }
 
         header {
-            max-width: 1400px;
+            max-width: 1450px;
             margin: 0 auto 20px auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: var(--card-bg);
+            padding: 15px 24px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         header h1 {
-            font-size: 1.5rem;
-            color: #111;
+            font-size: 1.35rem;
+            color: #0f172a;
         }
 
         .unit-selector {
             display: flex;
-            background: #e9ecef;
-            border-radius: 4px;
-            padding: 2px;
+            background: #e2e8f0;
+            border-radius: 6px;
+            padding: 3px;
         }
 
         .unit-btn {
             background: transparent;
             border: none;
-            padding: 6px 12px;
+            padding: 6px 14px;
             font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
-            border-radius: 3px;
+            border-radius: 4px;
+            color: #475569;
+            transition: all 0.2s;
         }
 
         .unit-btn.active {
             background: white;
             color: var(--primary);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
         .workspace {
-            max-width: 1400px;
+            max-width: 1450px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: 420px 1fr;
+            grid-template-columns: 400px 1fr;
             gap: 24px;
             align-items: start;
         }
 
-        @media (max-width: 900px) {
+        @media (max-width: 950px) {
             .workspace {
                 grid-template-columns: 1fr;
             }
@@ -84,74 +91,79 @@
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .panel h2 {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             margin-bottom: 16px;
             padding-bottom: 8px;
-            border-bottom: 2px solid var(--bg-color);
+            border-bottom: 2px solid #f1f5f9;
+            color: #0f172a;
         }
 
-        .input-row {
-            display: grid;
-            grid-template-columns: 1fr 110px;
-            gap: 10px;
-            margin-bottom: 14px;
-            align-items: center;
+        .input-section {
+            margin-bottom: 16px;
         }
 
-        .input-group label {
+        .input-section label {
             display: block;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: 600;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
+            color: #334155;
         }
 
-        .measurement-with-ease {
+        /* Clean Side-by-Side Measurement & Ease Layout */
+        .dual-input {
             display: grid;
             grid-template-columns: 1fr 90px;
-            gap: 8px;
+            gap: 10px;
             align-items: center;
         }
 
-        .input-group input, .input-group select {
+        .input-with-label {
+            position: relative;
+        }
+
+        .input-label-tag {
+            position: absolute;
+            top: -16px;
+            right: 0;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        input[type="number"], select {
             width: 100%;
             padding: 8px 10px;
             border: 1px solid var(--border-color);
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 0.9rem;
+            background: #fff;
+            color: #0f172a;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
-        .input-group input:focus, .input-group select:focus {
+        input[type="number"]:focus, select:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(2, 117, 216, 0.1);
-        }
-
-        .ease-input-label {
-            font-size: 0.75rem;
-            color: #6c757d;
-            font-weight: 500;
-        }
-
-        .standard-input-group {
-            margin-bottom: 14px;
+            box-shadow: 0 0 0 3px rgba(2, 117, 216, 0.15);
         }
 
         .btn-container {
             display: flex;
             flex-direction: column;
             gap: 10px;
-            margin-top: 20px;
+            margin-top: 24px;
         }
 
         button.action-btn {
             width: 100%;
             padding: 10px 16px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
@@ -168,24 +180,24 @@
         }
 
         .btn-secondary {
-            background-color: #6c757d;
+            background-color: #475569;
             color: white;
         }
 
         .btn-secondary:hover {
-            background-color: #5a6268;
+            background-color: #334155;
         }
 
+        /* Preview Container with Scrollable Viewport */
         .preview-container {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 20px;
-            min-height: 700px;
+            height: 780px;
             display: flex;
             flex-direction: column;
-            position: relative;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .preview-toolbar {
@@ -194,37 +206,54 @@
             align-items: center;
             margin-bottom: 12px;
             padding-bottom: 8px;
-            border-bottom: 1px solid var(--bg-color);
+            border-bottom: 1px solid #f1f5f9;
         }
 
         .zoom-controls {
             display: flex;
             gap: 6px;
+            align-items: center;
         }
 
         .zoom-btn {
-            background: #e9ecef;
+            background: #f1f5f9;
             border: 1px solid var(--border-color);
-            padding: 4px 10px;
+            width: 30px;
+            height: 30px;
             border-radius: 4px;
             font-weight: bold;
             cursor: pointer;
-        }
-
-        .zoom-btn:hover {
-            background: #dde2e6;
-        }
-
-        #svg-preview-box {
-            width: 100%;
-            flex-grow: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: auto;
+            color: #334155;
+        }
+
+        .zoom-btn:hover {
+            background: #e2e8f0;
+        }
+
+        /* Scrollable Canvas Box with Scrollbars */
+        #svg-scroll-viewport {
+            width: 100%;
+            flex-grow: 1;
+            overflow: auto; /* Enables vertical and horizontal scrollbars */
             position: relative;
-            background: #fff;
-            border: 1px dashed #dee2e6;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #svg-canvas-wrapper {
+            transform-origin: center center;
+            transition: transform 0.05s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
         }
     </style>
 </head>
@@ -245,7 +274,7 @@
             <form id="pattern-form">
                 
                 <!-- Block Preset Selector -->
-                <div class="standard-input-group">
+                <div class="input-section">
                     <label for="blockPreset">Block Type & Ease Preset</label>
                     <select id="blockPreset" onchange="applyPreset()">
                         <option value="standard">Standard Woven Block (+2.0" Bust, +1.5" Waist)</option>
@@ -255,62 +284,64 @@
                     </select>
                 </div>
 
-                <hr style="margin: 14px 0; border:0; border-top:1px solid var(--border-color);">
+                <hr style="margin: 16px 0; border:0; border-top:1px solid #e2e8f0;">
 
                 <!-- Bust with Ease -->
-                <div class="standard-input-group">
+                <div class="input-section">
                     <label>Bust Measurement & Ease</label>
-                    <div class="measurement-with-ease">
+                    <div class="dual-input">
                         <input type="number" id="bust" value="36.0" step="0.25">
-                        <div>
-                            <span class="ease-input-label">Ease</span>
+                        <div class="input-with-label">
+                            <span class="input-label-tag">Ease</span>
                             <input type="number" id="bustEase" value="2.0" step="0.25">
                         </div>
                     </div>
                 </div>
 
                 <!-- Waist with Ease -->
-                <div class="standard-input-group">
+                <div class="input-section">
                     <label>Waist Measurement & Ease</label>
-                    <div class="measurement-with-ease">
+                    <div class="dual-input">
                         <input type="number" id="waist" value="28.0" step="0.25">
-                        <div>
-                            <span class="ease-input-label">Ease</span>
+                        <div class="input-with-label">
+                            <span class="input-label-tag">Ease</span>
                             <input type="number" id="waistEase" value="1.5" step="0.25">
                         </div>
                     </div>
                 </div>
 
                 <!-- Hip with Ease -->
-                <div class="standard-input-group">
+                <div class="input-section">
                     <label>Hip Measurement & Ease</label>
-                    <div class="measurement-with-ease">
+                    <div class="dual-input">
                         <input type="number" id="hip" value="38.0" step="0.25">
-                        <div>
-                            <span class="ease-input-label">Ease</span>
+                        <div class="input-with-label">
+                            <span class="input-label-tag">Ease</span>
                             <input type="number" id="hipEase" value="2.0" step="0.25">
                         </div>
                     </div>
                 </div>
 
+                <hr style="margin: 16px 0; border:0; border-top:1px solid #e2e8f0;">
+
                 <!-- Other Standard Measurements -->
-                <div class="standard-input-group">
+                <div class="input-section">
                     <label for="backWidth">Across Back Width</label>
                     <input type="number" id="backWidth" value="14.0" step="0.25">
                 </div>
-                <div class="standard-input-group">
+                <div class="input-section">
                     <label for="chestWidth">Across Chest Width</label>
                     <input type="number" id="chestWidth" value="13.5" step="0.25">
                 </div>
-                <div class="standard-input-group">
+                <div class="input-section">
                     <label for="shoulderLength">Shoulder Length</label>
                     <input type="number" id="shoulderLength" value="5.25" step="0.25">
                 </div>
-                <div class="standard-input-group">
+                <div class="input-section">
                     <label for="backNeckToWaist">Back Neck to Waist</label>
                     <input type="number" id="backNeckToWaist" value="16.0" step="0.25">
                 </div>
-                <div class="standard-input-group">
+                <div class="input-section">
                     <label for="waistToHip">Waist to Hip</label>
                     <input type="number" id="waistToHip" value="8.0" step="0.25">
                 </div>
@@ -322,25 +353,29 @@
             </form>
         </div>
 
-        <!-- Right Panel: Live SVG Preview Canvas with Zoom & Grid Options -->
+        <!-- Right Panel: Scrollable & Zoomable Preview Canvas -->
         <div class="preview-container">
             <div class="preview-toolbar">
-                <span id="current-unit-label" style="font-size: 0.85rem; font-weight:600; color:#555;">Grid Unit: 1 Inch</span>
+                <span id="current-unit-label" style="font-size: 0.85rem; font-weight:600; color:#334155;">Grid Unit: 1 Inch</span>
                 <div class="zoom-controls">
-                    <button class="zoom-btn" onclick="adjustZoom(-0.1)" title="Zoom Out">-</button>
-                    <button class="zoom-btn" onclick="resetZoom()" title="Reset Zoom">1:1</button>
-                    <button class="zoom-btn" onclick="adjustZoom(0.1)" title="Zoom In">+</button>
+                    <button class="zoom-btn" onclick="adjustZoom(-0.15)" title="Zoom Out">-</button>
+                    <button class="zoom-btn" onclick="resetZoom()" style="width: 45px; font-size: 0.8rem;" title="Reset Zoom">1:1</button>
+                    <button class="zoom-btn" onclick="adjustZoom(0.15)" title="Zoom In">+</button>
                 </div>
             </div>
-            <div id="svg-preview-box">
-                <p style="color: #6c757d;">Click "Generate Pattern" to render block.</p>
+            
+            <div id="svg-scroll-viewport">
+                <div id="svg-canvas-wrapper">
+                    <!-- Pattern SVG renders inside here -->
+                    <p style="color: #64748b; font-size: 0.9rem;">Click "Generate Pattern" to render block.</p>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         let currentUnit = 'in';
-        let currentZoom = 1.0;
+        let currentScale = 1.0;
 
         function setUnit(unit) {
             currentUnit = unit;
@@ -371,13 +406,34 @@
         }
 
         function adjustZoom(amount) {
-            currentZoom = Math.max(0.5, Math.min(2.5, currentZoom + amount));
-            // Hook up to SVG scaling container
+            currentScale = Math.max(0.4, Math.min(3.0, currentScale + amount));
+            applyZoomTransform();
         }
 
         function resetZoom() {
-            currentZoom = 1.0;
+            currentScale = 1.0;
+            applyZoomTransform();
         }
+
+        function applyZoomTransform() {
+            const wrapper = document.getElementById('svg-canvas-wrapper');
+            wrapper.style.transform = `scale(${currentScale})`;
+        }
+
+        // Mouse Wheel Zoom Listener inside viewport
+        const viewport = document.getElementById('svg-scroll-viewport');
+        viewport.addEventListener('wheel', function(e) {
+            if (e.ctrlKey || e.metaKey || true) { // Allows smooth wheel zoom
+                e.preventDefault();
+                const zoomIntensity = 0.1;
+                if (e.deltaY < 0) {
+                    currentScale = Math.min(3.0, currentScale + zoomIntensity);
+                } else {
+                    currentScale = Math.max(0.4, currentScale - zoomIntensity);
+                }
+                applyZoomTransform();
+            }
+        }, { passive: false });
     </script>
 </body>
 </html>
