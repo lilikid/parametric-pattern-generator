@@ -119,7 +119,6 @@
             overflow-y: auto;
         }
 
-        /* Modular Section Accordions/Windows */
         .garment-module {
             background: #faf8f7;
             border: 1px solid var(--border-color);
@@ -311,13 +310,13 @@
                     <option value="">-- Custom Master Sizing --</option>
                     <option value="uk8">UK 8 / US 4</option>
                     <option value="uk10">UK 10 / US 6</option>
-                    <option value="uk12" selected>UK 12 / US 8</option>
+                    <option value="uk12" selected>UK 12 / US 8 (Draft Spec)</option>
                     <option value="uk14">UK 14 / US 10</option>
                     <option value="uk16">UK 16 / US 12</option>
                 </select>
             </div>
 
-            <!-- 1. BODICE WINDOW -->
+            <!-- 1. BODICE WINDOW (Updated with full reference measurements) -->
             <div class="garment-module">
                 <div class="garment-module-header" onclick="toggleModule('bodiceBody')">
                     <h3>1. Bodice Window</h3>
@@ -335,24 +334,43 @@
                     <div class="input-section">
                         <label>Bust & Ease</label>
                         <div class="dual-input">
-                            <input type="number" id="bust" value="36.0" step="0.25">
+                            <input type="number" id="bust" value="34.5" step="0.25">
                             <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="bustEase" value="2.0" step="0.25"></div>
                         </div>
                     </div>
                     <div class="input-section">
                         <label>Waist & Ease</label>
                         <div class="dual-input">
-                            <input type="number" id="waist" value="28.0" step="0.25">
+                            <input type="number" id="waist" value="25.5" step="0.25">
                             <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="waistEase" value="1.5" step="0.25"></div>
                         </div>
                     </div>
                     <div class="input-section">
-                        <label for="backNeckToWaist">Back Neck to Waist</label>
-                        <input type="number" id="backNeckToWaist" value="16.0" step="0.25">
+                        <label>Hips & Ease</label>
+                        <div class="dual-input">
+                            <input type="number" id="hip" value="37.0" step="0.25">
+                            <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="hipEase" value="2.0" step="0.25"></div>
+                        </div>
+                    </div>
+                    <div class="input-section">
+                        <label for="chestWidth">Chest Width (Front)</label>
+                        <input type="number" id="chestWidth" value="13.0" step="0.25">
+                    </div>
+                    <div class="input-section">
+                        <label for="backWidth">Back Width</label>
+                        <input type="number" id="backWidth" value="14.0" step="0.25">
                     </div>
                     <div class="input-section">
                         <label for="shoulderLength">Shoulder Length</label>
-                        <input type="number" id="shoulderLength" value="5.25" step="0.25">
+                        <input type="number" id="shoulderLength" value="5.0" step="0.25">
+                    </div>
+                    <div class="input-section">
+                        <label for="backNeckToWaist">Back Waist Length</label>
+                        <input type="number" id="backNeckToWaist" value="15.5" step="0.25">
+                    </div>
+                    <div class="input-section">
+                        <label for="waistToHip">Waist to Hip</label>
+                        <input type="number" id="waistToHip" value="8.0" step="0.25">
                     </div>
                 </div>
             </div>
@@ -406,13 +424,6 @@
                             <option value="full">Full / A-Line Skirt (Flared)</option>
                             <option value="semi">Semi-Circle Circular Skirt</option>
                         </select>
-                    </div>
-                    <div class="input-section">
-                        <label>Hip Measurement & Ease</label>
-                        <div class="dual-input">
-                            <input type="number" id="hip" value="39.0" step="0.25">
-                            <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="hipEase" value="2.0" step="0.25"></div>
-                        </div>
                     </div>
                     <div class="input-section">
                         <label for="skirtLength">Skirt Length</label>
@@ -529,11 +540,11 @@
             if (!size) return;
 
             const sizes = {
-                'uk8':  { bust: 32, waist: 24, hip: 35, shoulder: 5.0, bstToWst: 15.5 },
-                'uk10': { bust: 34, waist: 26, hip: 37, shoulder: 5.125, bstToWst: 15.75 },
-                'uk12': { bust: 36, waist: 28, hip: 39, shoulder: 5.25, bstToWst: 16.0 },
-                'uk14': { bust: 38, waist: 30, hip: 41, shoulder: 5.375, bstToWst: 16.25 },
-                'uk16': { bust: 40, waist: 32, hip: 43, shoulder: 5.5, bstToWst: 16.5 }
+                'uk8':  { bust: 32.0, waist: 24.0, hip: 35.0, chest: 12.5, back: 13.5, shoulder: 4.875, bstToWst: 15.0, wstToHip: 7.75 },
+                'uk10': { bust: 33.25, waist: 24.75, hip: 36.0, chest: 12.75, back: 13.75, shoulder: 4.875, bstToWst: 15.25, wstToHip: 7.75 },
+                'uk12': { bust: 34.5, waist: 25.5, hip: 37.0, chest: 13.0, back: 14.0, shoulder: 5.0, bstToWst: 15.5, wstToHip: 8.0 },
+                'uk14': { bust: 37.5, waist: 28.5, hip: 40.0, chest: 13.75, back: 14.75, shoulder: 5.25, bstToWst: 16.0, wstToHip: 8.25 },
+                'uk16': { bust: 39.5, waist: 30.5, hip: 42.0, chest: 14.25, back: 15.25, shoulder: 5.375, bstToWst: 16.25, wstToHip: 8.5 }
             };
 
             const data = sizes[size];
@@ -541,8 +552,11 @@
                 document.getElementById('bust').value = data.bust;
                 document.getElementById('waist').value = data.waist;
                 document.getElementById('hip').value = data.hip;
+                document.getElementById('chestWidth').value = data.chest;
+                document.getElementById('backWidth').value = data.back;
                 document.getElementById('shoulderLength').value = data.shoulder;
                 document.getElementById('backNeckToWaist').value = data.bstToWst;
+                document.getElementById('waistToHip').value = data.wstToHip;
             }
         }
 
@@ -550,10 +564,11 @@
             const preset = document.getElementById('blockPreset').value;
             const bEase = document.getElementById('bustEase');
             const wEase = document.getElementById('waistEase');
+            const hEase = document.getElementById('hipEase');
 
-            if (preset === 'standard') { bEase.value = 2.0; wEase.value = 1.5; }
-            else if (preset === 'fitted') { bEase.value = 1.0; wEase.value = 0.5; }
-            else if (preset === 'loose') { bEase.value = 3.0; wEase.value = 2.5; }
+            if (preset === 'standard') { bEase.value = 2.0; wEase.value = 1.5; hEase.value = 2.0; }
+            else if (preset === 'fitted') { bEase.value = 1.0; wEase.value = 0.5; hEase.value = 1.0; }
+            else if (preset === 'loose') { bEase.value = 3.0; wEase.value = 2.5; hEase.value = 3.0; }
         }
 
         function generatePattern() {
@@ -564,7 +579,7 @@
             let cursorX = startX;
             let cursorY = startY;
 
-            // 1. Bodice Block
+            // 1. Bodice Block (Using comprehensive width and length specs)
             const bust = parseFloat(document.getElementById('bust').value) + parseFloat(document.getElementById('bustEase').value);
             const backLength = parseFloat(document.getElementById('backNeckToWaist').value);
             const bWidth = (bust / 4) * scaleFactor;
@@ -580,7 +595,7 @@
             const bText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             bText.setAttribute('x', cursorX + 15); bText.setAttribute('y', cursorY + 25);
             bText.setAttribute('fill', '#2c2524'); bText.setAttribute('font-family', 'Montserrat'); bText.setAttribute('font-size', '12'); bText.setAttribute('font-weight', '600');
-            bText.textContent = `Bodice Block`;
+            bText.textContent = `Bodice Block (Chest: ${document.getElementById('chestWidth').value}", Back: ${document.getElementById('backWidth').value}")`;
             patternGroup.appendChild(bText);
 
             // 2. Sleeve Block (if enabled)
