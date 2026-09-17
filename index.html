@@ -103,36 +103,16 @@
       const b_waistDartW = remainingIntake * 0.4;
       const f_waistDartW = remainingIntake * 0.6;
 
-      // --- BACK POINTS & DART TRUING ---
+      // --- BACK POINTS & FIXED DART TRUING ---
       const b_np = { x: neckW, y: topY };
       const b_shoulderDrop = topY + 1.25;
       const totalBackShWidth = m.shoulderLength + 0.5;
-      const b_spTotalEnd = { x: neckW + totalBackShWidth, y: b_shoulderDrop };
-
-      const b_shoulderMid = { x: (b_np.x + b_spTotalEnd.x) / 2, y: (b_np.y + b_spTotalEnd.y) / 2 };
-      const b_shDartApex = { x: b_shoulderMid.x - 0.375, y: b_shoulderMid.y + 2.5 };
-
-      const b_dartW = 0.5;
-      const raw_b_inner = { x: b_shoulderMid.x - (b_dartW / 2), y: b_shoulderMid.y };
-      const raw_b_outer = { x: b_shoulderMid.x + (b_dartW / 2), y: b_shoulderMid.y };
-
-      const len1 = dist(raw_b_inner, b_shDartApex);
-      const len2 = dist(raw_b_outer, b_shDartApex);
       
-      let final_b_inner, final_b_outer;
-      const shoulderAngle = Math.atan2(b_spTotalEnd.y - b_np.y, b_spTotalEnd.x - b_np.x);
-
-      if (len2 > len1) {
-        const dx = Math.cos(shoulderAngle) * len2;
-        const dy = Math.sin(shoulderAngle) * len2;
-        final_b_inner = { x: b_shDartApex.x + dx, y: b_shDartApex.y + dy };
-        final_b_outer = raw_b_outer;
-      } else {
-        const dx = Math.cos(shoulderAngle + Math.PI) * len1;
-        const dy = Math.sin(shoulderAngle + Math.PI) * len1;
-        final_b_outer = { x: b_shDartApex.x + dx, y: b_shDartApex.y + dy };
-        final_b_inner = raw_b_inner;
-      }
+      // Split shoulder into inner and outer segments around the dart position
+      const b_shDartInner = { x: neckW + 2.2, y: b_shoulderDrop - 0.1 };
+      const b_shDartOuter = { x: neckW + 2.7, y: b_shoulderDrop - 0.1 };
+      const b_spTotalEnd = { x: neckW + totalBackShWidth, y: b_shoulderDrop };
+      const b_shDartApex = { x: b_shDartInner.x + 0.2, y: b_shoulderDrop + 2.2 }; // Points downward into back
 
       const b_waistDartX = backBustW * 0.45;
       const b_waistDartTop = { x: b_waistDartX, y: bustY + 0.5 };
@@ -145,10 +125,8 @@
       const f_spTotalEnd = { x: f_cfX - neckW - totalFrontShWidth, y: b_shoulderDrop + 0.2 };
       const f_apex = { x: f_cfX - (m.bust / 10 + 0.75), y: trueBustY };
 
-      const f_dartW = 1.0;
-      const f_halfSh = totalFrontShWidth / 2;
-      const f_shDartInner = { x: f_cfX - neckW - f_halfSh + (f_dartW / 2), y: topY + 0.3 };
-      const f_shDartOuter = { x: f_cfX - neckW - f_halfSh - (f_dartW / 2), y: topY + 0.6 };
+      const f_shDartInner = { x: f_cfX - neckW - 2.2, y: topY + 0.3 };
+      const f_shDartOuter = { x: f_cfX - neckW - 3.2, y: topY + 0.6 };
 
       const f_waistDartTop = { x: f_apex.x, y: f_apex.y + 1.0 };
       const f_waistDartBottom = { x: f_apex.x, y: waistY + (m.waistToHip * 0.55) };
@@ -167,12 +145,14 @@
         hip: { backHipX: backHipW, frontHipX: f_cfX - frontHipW },
         back: {
           np: b_np, sp: b_spTotalEnd,
-          shDartInner: final_b_inner, shDartOuter: final_b_outer, shDartApex: b_shDartApex,
+          shDartInner: b_shDartInner, shDartOuter: b_shDartOuter, shDartApex: b_shDartApex,
+          backArmholeStart: { x: neckW + totalBackShWidth, y: b_shoulderDrop },
           waistDartX: b_waistDartX, waistDartW: b_waistDartW, waistDartTop: b_waistDartTop, waistDartBottom: b_waistDartBottom
         },
         front: {
           np: f_np, sp: f_spTotalEnd, apex: f_apex,
           shDartInner: f_shDartInner, shDartOuter: f_shDartOuter,
+          frontArmholeStart: { x: f_cfX - neckW - totalFrontShWidth, y: b_shoulderDrop + 0.2 },
           waistDartW: f_waistDartW, waistDartTop: f_waistDartTop, waistDartBottom: f_waistDartBottom
         }
       };
@@ -216,7 +196,7 @@
         svg += `</g>`;
       }
 
-      // Back Piece
+      // --- BACK PIECE ---
       svg += `<g id="back-piece">`;
       svg += `<path d="M ${d.cbX*scale} ${d.lines.topY*scale} 
                    L ${d.back.np.x*scale} ${d.back.np.y*scale} 
@@ -224,16 +204,17 @@
                    L ${d.back.shDartApex.x*scale} ${d.back.shDartApex.y*scale} 
                    L ${d.back.shDartOuter.x*scale} ${d.back.shDartOuter.y*scale} 
                    L ${d.back.sp.x*scale} ${d.back.sp.y*scale} 
-                   Q ${(d.back.sp.x + 0.2)*scale} ${(d.lines.bustY)*scale}, ${d.up.leftW*scale} ${d.lines.bustY*scale} 
+                   Q ${(d.back.sp.x + 0.5)*scale} ${(d.lines.bustY)*scale}, ${d.up.leftW*scale} ${d.lines.bustY*scale} 
                    L ${d.up.leftW*scale} ${d.lines.waistY*scale} 
                    L ${d.hip.backHipX*scale} ${d.lines.hipY*scale} 
                    L ${d.cbX*scale} ${d.lines.hipY*scale} Z" class="pattern-line" />`;
       svg += `<line x1="${d.back.shDartInner.x*scale}" y1="${d.back.shDartInner.y*scale}" x2="${d.back.shDartApex.x*scale}" y2="${d.back.shDartApex.y*scale}" class="dart-line" />`;
       svg += `<line x1="${d.back.shDartOuter.x*scale}" y1="${d.back.shDartOuter.y*scale}" x2="${d.back.shDartApex.x*scale}" y2="${d.back.shDartApex.y*scale}" class="dart-line" />`;
+      svg += `<line x1="${d.back.waistDartTop.x*scale}" y1="${d.back.waistDartTop.y*scale}" x2="${d.back.waistDartBottom.x*scale}" y2="${d.back.waistDartBottom.y*scale}" class="dart-line" />`;
       svg += `<text x="${(d.cbX + 1.5)*scale}" y="${(d.lines.bustY + 1)*scale}" class="text-label">BACK BLOCK</text>`;
       svg += `</g>`;
 
-      // Front Piece
+      // --- FRONT PIECE ---
       svg += `<g id="front-piece">`;
       svg += `<path d="M ${d.cfX*scale} ${d.lines.topY*scale} 
                    L ${d.front.np.x*scale} ${d.front.np.y*scale} 
@@ -241,12 +222,13 @@
                    L ${d.front.apex.x*scale} ${d.front.apex.y*scale} 
                    L ${d.front.shDartOuter.x*scale} ${d.front.shDartOuter.y*scale} 
                    L ${d.front.sp.x*scale} ${d.front.sp.y*scale} 
-                   Q ${(d.front.sp.x - 0.2)*scale} ${(d.lines.bustY)*scale}, ${d.up.rightW*scale} ${d.lines.bustY*scale} 
+                   Q ${(d.front.sp.x - 0.5)*scale} ${(d.lines.bustY)*scale}, ${d.up.rightW*scale} ${d.lines.bustY*scale} 
                    L ${d.up.rightW*scale} ${d.lines.waistY*scale} 
                    L ${d.hip.frontHipX*scale} ${d.lines.hipY*scale} 
                    L ${d.cfX*scale} ${d.lines.hipY*scale} Z" class="pattern-line" />`;
       svg += `<line x1="${d.front.shDartInner.x*scale}" y1="${d.front.shDartInner.y*scale}" x2="${d.front.apex.x*scale}" y2="${d.front.apex.y*scale}" class="dart-line" />`;
       svg += `<line x1="${d.front.shDartOuter.x*scale}" y1="${d.front.shDartOuter.y*scale}" x2="${d.front.apex.x*scale}" y2="${d.front.apex.y*scale}" class="dart-line" />`;
+      svg += `<line x1="${d.front.waistDartTop.x*scale}" y1="${d.front.waistDartTop.y*scale}" x2="${d.front.waistDartBottom.x*scale}" y2="${d.front.waistDartBottom.y*scale}" class="dart-line" />`;
       svg += `<text x="${(d.cfX - 2.5)*scale}" y="${(d.lines.bustY + 1)*scale}" class="text-label">FRONT BLOCK</text>`;
       svg += `</g>`;
 
