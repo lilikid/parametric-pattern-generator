@@ -1,197 +1,94 @@
-/**
- * Dynamic Pattern Drafting Engine for Bodice Block
- * Enforces strictly constant vertical length independent of bust size.
- */
+// --- LILINORA DRAFTING ENGINE: POINT-BY-POINT SEQUENCING ---
 
-export function calculateBodiceBlock(measurements, easeOptions = {}) {
-  // 1. Extract Measurements & Apply Ease Settings
-  const bustEase = easeOptions.bustEase ?? 2.0; // inches
-  const waistEase = easeOptions.waistEase ?? 1.0;
-  const hipEase = easeOptions.hipEase ?? 2.0;
+// Global execution function linked to your existing UI button or workflow
+function generatePattern() {
+    const patternGroup = document.getElementById('pattern-group');
+    if (!patternGroup) return;
+    patternGroup.innerHTML = '';
 
-  const bust = measurements.bust + bustEase;
-  const waist = measurements.waist + waistEase;
-  const hip = measurements.hip + hipEase;
-  const backWidth = measurements.backWidth;
-  const chestWidth = measurements.chestWidth;
-  const shoulderLength = measurements.shoulderLength;
-  
-  // Strict length measurements (completely isolated from bust)
-  const backNeckToWaist = measurements.backNeckToWaist;
-  const waistToHip = measurements.waistToHip;
+    const scaleFactor = 26; // Standard grid scale factor
 
-  // 2. Fixed Rectangle Dimensions 
-  // Width = 1/2 hip + 1.25" + 2" overlap prevention buffer
-  const totalWidth = (hip / 2) + 3.25; 
-  
-  // STRICTLY CONSTANT HEIGHT: Depends ONLY on Back Waist + Waist to Hip + 1" 
-  const totalHeight = backNeckToWaist + waistToHip + 1.0;
+    // ==========================================
+    // BODICE DRAFTING SEQUENCE
+    // ==========================================
+    
+    // Point 1: Center Back (CB) Top Anchor Origin (Independent)
+    const CB_Top = {
+        label: "CB",
+        description: "Center Back Top Corner (Anchor Origin)",
+        x: 50,
+        y: 50,
+        isIndependent: true
+    };
 
-  const cb = 0;
-  const cf = totalWidth;
+    // Read input values from existing HTML elements safely
+    const bustInput = document.getElementById('bust');
+    const bustEaseInput = document.getElementById('bustEase');
+    const backWaistInput = document.getElementById('backNeckToWaist');
+    const backWaistEaseInput = document.getElementById('backNeckToWaistEase');
 
-  const topLineY = 0;
-  const waistLineY = backNeckToWaist;
-  const hipLineY = waistLineY + waistToHip;
-  
-  // Bust line placed proportionally from top line using back-waist length only
-  const bustLineY = backNeckToWaist * 0.5;
+    const bustVal = (bustInput ? parseFloat(bustInput.value) : 34.5) + (bustEaseInput ? parseFloat(bustEaseInput.value) : 2.0);
+    const backLengthVal = (backWaistInput ? parseFloat(backWaistInput.value) : 15.5) + (backWaistEaseInput ? parseFloat(backWaistEaseInput.value) : 0);
 
-  const neckWidth = 2.75; // Constant standard neckline width block reference
-  const baseOfNeckDepth = 3.0; 
-  const frontWaistDrop = 0.5;
+    const bodiceWidth = (bustVal / 4) * scaleFactor;
+    const bodiceHeight = backLengthVal * scaleFactor;
 
-  const baseOfNeckY = topLineY + baseOfNeckDepth;
-  const chestLineY = bustLineY - ((bustLineY - baseOfNeckY) / 3);
-  const trueBustLineY = bustLineY + 1.0;
+    // Render Bodice Block with Point 1 label integration
+    drawPatternBlock(patternGroup, {
+        name: `Bodice Block [${CB_Top.label}] (Bust: ${bustVal}")`,
+        x: CB_Top.x,
+        y: CB_Top.y,
+        width: bodiceWidth,
+        height: bodiceHeight,
+        stroke: '#c25e6f',
+        fill: 'rgba(194, 94, 111, 0.06)'
+    });
 
-  // Dynamic Bust Dart Width Calculation (Only affects dart opening, never height/length)
-  let bustDartWidth = 2.375 + ((bust - 36) / 4) * 0.35;
-  bustDartWidth = Math.max(2.125, Math.min(4.5, bustDartWidth));
+    // ==========================================
+    // OPTIONAL PIECES (Sleeve, Skirt, Trousers)
+    // ==========================================
+    const includeSleeve = document.getElementById('includeSleeve');
+    if (includeSleeve && includeSleeve.value === 'yes') {
+        const bicepInput = document.getElementById('bicep');
+        const bicepEaseInput = document.getElementById('bicepEase');
+        const sleeveLenInput = document.getElementById('sleeveLength');
+        const sleeveLenEaseInput = document.getElementById('sleeveLengthEase');
 
-  // 3. Point Constructions
+        const bicepVal = (bicepInput ? parseFloat(bicepInput.value) : 11.5) + (bicepEaseInput ? parseFloat(bicepEaseInput.value) : 2.0);
+        const sLenVal = (sleeveLenInput ? parseFloat(sleeveLenInput.value) : 23.0) + (sleeveLenEaseInput ? parseFloat(sleeveLenEaseInput.value) : 0);
 
-  // --- BACK BLOCK POINTS & SHOULDER DART ---
-  const backNeckPoint = { x: cb + neckWidth, y: topLineY };
-  const backShoulderDropAngle = 15 * (Math.PI / 180);
-  const totalBackShWidth = shoulderLength + 0.5; 
-  
-  const backSpTotalEnd = {
-    x: backNeckPoint.x + totalBackShWidth * Math.cos(backShoulderDropAngle),
-    y: backNeckPoint.y + totalBackShWidth * Math.sin(backShoulderDropAngle)
-  };
-
-  const backShoulderMid = {
-    x: (backNeckPoint.x + backSpTotalEnd.x) / 2,
-    y: (backNeckPoint.y + backSpTotalEnd.y) / 2
-  };
-
-  const backDartW = 0.5;
-  const backDartApex = { x: backShoulderMid.x - 0.375, y: backShoulderMid.y + 2.5 };
-  const backDartInner = { x: backShoulderMid.x - (backDartW / 2), y: backShoulderMid.y };
-  const backDartOuter = { x: backShoulderMid.x + (backDartW / 2), y: backShoulderMid.y };
-
-  const dartBaseDrop = 0.15;
-  const dartBasePoint1 = { x: backDartInner.x, y: backDartInner.y + dartBaseDrop };
-  const dartBasePoint2 = { x: backDartOuter.x, y: backDartOuter.y + dartBaseDrop };
-
-  const backUnderarmPoint = { x: cb + (backWidth / 2) + 0.25, y: bustLineY };
-  const backWaistSideX = backUnderarmPoint.x - 0.75;
-  const backHipPoint = { x: cb + (hip / 4), y: hipLineY };
-
-// --- FRONT BLOCK POINTS (Stabilized Vertical Drop) ---
-  const frontNeckPoint = { x: cf - neckWidth, y: topLineY };
-  const baseOfNeckPoint = { x: cf, y: baseOfNeckY };
-
-  const bustDartGuideX = cf - (chestWidth / 4);
-  const trueBustPoint = { x: bustDartGuideX, y: trueBustLineY };
-
-  const frontShoulderAngle = 18 * (Math.PI / 180);
-  const dartDistanceFromNeck = 2.125; 
-
-  const frontDartInnerLeg = {
-    x: frontNeckPoint.x - dartDistanceFromNeck * Math.cos(frontShoulderAngle),
-    y: frontNeckPoint.y + dartDistanceFromNeck * Math.sin(frontShoulderAngle)
-  };
-
-  const remainingShAfterInner = shoulderLength - dartDistanceFromNeck;
-  const outerLegDistanceFromNeck = dartDistanceFromNeck + bustDartWidth;
-  
-  // STABILIZED: Removed the rotational offsets so height stays locked
-  const frontDartOuterLeg = {
-    x: frontNeckPoint.x - outerLegDistanceFromNeck * Math.cos(frontShoulderAngle),
-    y: frontNeckPoint.y + outerLegDistanceFromNeck * Math.sin(frontShoulderAngle)
-  };
-
-  const frontShoulderPoint = {
-    x: frontDartOuterLeg.x - remainingShAfterInner * Math.cos(frontShoulderAngle),
-    y: frontDartOuterLeg.y + remainingShAfterInner * Math.sin(frontShoulderAngle)
-  };
-
-  const dartFoldPeak = {
-    x: (frontDartInnerLeg.x + frontDartOuterLeg.x) / 2,
-    y: Math.min(frontDartInnerLeg.y, frontDartOuterLeg.y) - 0.4
-  };
-
-  const frontChestPoint = { x: cf - ((chestWidth / 2) + 0.75), y: chestLineY };
-  const frontUnderarmPoint = { x: backUnderarmPoint.x, y: bustLineY };
-
-  const spCpMidpoint = {
-    x: (frontShoulderPoint.x + frontChestPoint.x) / 2 - 0.375,
-    y: (frontShoulderPoint.y + frontChestPoint.y) / 2
-  };
-
-  const dropIntersection = { x: frontChestPoint.x, y: bustLineY };
-  const frontArmhole45Point = {
-    x: dropIntersection.x - 0.5 * Math.cos(Math.PI / 4),
-    y: dropIntersection.y + 0.5 * Math.sin(Math.PI / 4)
-  };
-
-  const frontWaistSideX = frontUnderarmPoint.x + 0.5;
-  const frontWaistCenterPoint = { x: cf, y: waistLineY + frontWaistDrop };
-
-  // --- SEAM LENGTH TRUEING CHECKS ---
-  const netBackShoulderLength = Math.hypot(
-    backSpTotalEnd.x - backNeckPoint.x,
-    backSpTotalEnd.y - backNeckPoint.y
-  ) - backDartW;
-
-  const netFrontShoulderLength = (
-    Math.hypot(frontDartInnerLeg.x - frontNeckPoint.x, frontDartInnerLeg.y - frontNeckPoint.y) +
-    Math.hypot(frontShoulderPoint.x - frontDartOuterLeg.x, frontShoulderPoint.y - frontDartOuterLeg.y)
-  );
-
-  const shoulderSeamsMatch = Math.abs(netBackShoulderLength - netFrontShoulderLength) < 0.08;
-
-  const backSideSeamLength = Math.hypot(backWaistSideX - backUnderarmPoint.x, waistLineY - bustLineY);
-  const frontSideSeamLength = Math.hypot(frontWaistSideX - frontUnderarmPoint.x, waistLineY - bustLineY);
-  const sideSeamDelta = Math.abs(backSideSeamLength - frontSideSeamLength);
-
-  return {
-    dimensions: { totalWidth, totalHeight },
-    lines: {
-      topLineY,
-      chestLineY,
-      bustLineY,
-      trueBustLineY,
-      waistLineY,
-      hipLineY,
-      cb,
-      cf
-    },
-    qualityChecks: {
-      shoulderSeamsMatch,
-      netBackShoulderLength: netBackShoulderLength.toFixed(2),
-      netFrontShoulderLength: netFrontShoulderLength.toFixed(2),
-      sideSeamDelta: sideSeamDelta.toFixed(2)
-    },
-    back: {
-      neckPoint: backNeckPoint,
-      shoulderPoint: backSpTotalEnd,
-      shDartInner: backDartInner,
-      shDartOuter: backDartOuter,
-      shDartApex: backDartApex,
-      dartBasePoint1,
-      dartBasePoint2,
-      underarmPoint: backUnderarmPoint,
-      waistSideX: backWaistSideX,
-      hipPoint: backHipPoint
-    },
-    front: {
-      neckPoint: frontNeckPoint,
-      baseOfNeck: baseOfNeckPoint,
-      shoulderPoint: frontShoulderPoint,
-      dartInnerLeg: frontDartInnerLeg,
-      dartOuterLeg: frontDartOuterLeg,
-      dartFoldPeak,
-      chestPoint: frontChestPoint,
-      spCpMidpoint,
-      underarmPoint: frontUnderarmPoint,
-      armhole45Point: frontArmhole45Point,
-      trueBustPoint,
-      waistCenterPoint: frontWaistCenterPoint,
-      waistSideX: frontWaistSideX,
-      hipPoint: { x: cf - ((hip / 4) + 1.25), y: hipLineY }
+        drawPatternBlock(patternGroup, {
+            name: `Fitted Sleeve (Bicep: ${bicepVal}")`,
+            x: CB_Top.x + bodiceWidth + 60,
+            y: CB_Top.y,
+            width: bicepVal * scaleFactor,
+            height: sLenVal * scaleFactor,
+            stroke: '#5c524f',
+            fill: 'rgba(92, 82, 79, 0.05)'
+        });
     }
-  };
+}
+
+// Helper function to render pattern blocks onto the SVG canvas
+function drawPatternBlock(container, piece) {
+    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('x', piece.x);
+    rect.setAttribute('y', piece.y);
+    rect.setAttribute('width', piece.width);
+    rect.setAttribute('height', piece.height);
+    rect.setAttribute('fill', piece.fill);
+    rect.setAttribute('stroke', piece.stroke);
+    rect.setAttribute('stroke-width', '2');
+    rect.setAttribute('stroke-dasharray', '4');
+    container.appendChild(rect);
+
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', piece.x + 15);
+    text.setAttribute('y', piece.y + 25);
+    text.setAttribute('fill', '#2c2524');
+    text.setAttribute('font-family', 'Montserrat');
+    text.setAttribute('font-size', '12');
+    text.setAttribute('font-weight', '600');
+    text.textContent = piece.name;
+    container.appendChild(text);
 }
