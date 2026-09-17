@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bodice Pattern Generator - Technical Block</title>
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; margin: 20px; background: #f4f6f8; }
+    body { font-family: system-ui, sans-serif; margin: 20px; background: #f4f6f8; }
     h1 { margin-bottom: 20px; font-size: 20px; color: #1a1a1a; }
     .container { display: flex; gap: 20px; align-items: flex-start; }
     .controls { width: 340px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
@@ -26,66 +26,38 @@
   </style>
 </head>
 <body>
-
   <h1>Bodice Pattern Generator (Technical Woven Block)</h1>
-  
   <div class="container">
     <div class="controls">
       <h3>Measurements (Inches)</h3>
-      <div class="form-group">
-        <label for="bust">Bust</label>
-        <input type="number" id="bust" value="38.5" step="0.25">
-      </div>
-      <div class="form-group">
-        <label for="waist">Waist</label>
-        <input type="number" id="waist" value="28.75" step="0.25">
-      </div>
-      <div class="form-group">
-        <label for="hip">Hip</label>
-        <input type="number" id="hip" value="42" step="0.25">
-      </div>
-      <div class="form-group">
-        <label for="backWidth">Across Back Width</label>
-        <input type="number" id="backWidth" value="14.0" step="0.25">
-      </div>
-      <div class="form-group">
-        <label for="chestWidth">Across Chest Width</label>
-        <input type="number" id="chestWidth" value="13.5" step="0.25">
-      </div>
-      <div class="form-group">
-        <label for="shoulderLength">Shoulder Length</label>
-        <input type="number" id="shoulderLength" value="6.25" step="0.25">
-      </div>
-      <div class="form-group">
-        <label for="backNeckToWaist">Back Neck to Waist</label>
-        <input type="number" id="backNeckToWaist" value="18.5" step="0.25">
-      </div>
-      <div class="form-group">
-        <label for="waistToHip">Waist to Hip</label>
-        <input type="number" id="waistToHip" value="9.0" step="0.25">
-      </div>
+      <div class="form-group"><label>Bust</label><input type="number" id="bust" value="38.5" step="0.25"></div>
+      <div class="form-group"><label>Waist</label><input type="number" id="waist" value="28.75" step="0.25"></div>
+      <div class="form-group"><label>Hip</label><input type="number" id="hip" value="42" step="0.25"></div>
+      <div class="form-group"><label>Across Back Width</label><input type="number" id="backWidth" value="14.0" step="0.25"></div>
+      <div class="form-group"><label>Across Chest Width</label><input type="number" id="chestWidth" value="13.5" step="0.25"></div>
+      <div class="form-group"><label>Shoulder Length</label><input type="number" id="shoulderLength" value="6.25" step="0.25"></div>
+      <div class="form-group"><label>Back Neck to Waist</label><input type="number" id="backNeckToWaist" value="18.5" step="0.25"></div>
+      <div class="form-group"><label>Waist to Hip</label><input type="number" id="waistToHip" value="9.0" step="0.25"></div>
 
       <h3>Drafting Options</h3>
       <div class="form-group">
-        <label for="easeProfile">Block Type &amp; Ease Allowance</label>
+        <label>Block Type &amp; Ease Allowance</label>
         <select id="easeProfile">
-          <option value="corset">Corset / Foundation Block (Bust: 0", Waist: -1.0", Hip: 0")</option>
-          <option value="close">Close-Fitting Bodice Block (Bust: +1.5", Waist: +1.0", Hip: +1.5")</option>
-          <option value="standard" selected>Standard Bodice Block (Bust: +2.0", Waist: +1.5", Hip: +2.0")</option>
-          <option value="loose">Loose-Fitting / Outerwear Block (Bust: +4.0", Waist: +2.5", Hip: +3.0")</option>
+          <option value="corset">Corset / Foundation Block (Bust: 0", Waist: -1.0")</option>
+          <option value="close">Close-Fitting Bodice Block (Bust: +1.5", Waist: +1.0")</option>
+          <option value="standard" selected>Standard Bodice Block (Bust: +2.0", Waist: +1.5")</option>
+          <option value="loose">Loose-Fitting / Outerwear Block (Bust: +4.0", Waist: +2.5")</option>
         </select>
       </div>
       <div class="checkbox-group">
         <input type="checkbox" id="showGrid" checked>
         <label for="showGrid">Show Construction Grid &amp; Labels</label>
       </div>
-
       <div class="btn-container">
         <button class="btn-primary" id="generateBtn" type="button">Generate Pattern</button>
         <button class="btn-secondary" id="downloadBtn" type="button">Download SVG Pattern</button>
       </div>
     </div>
-
     <div class="viewer" id="svgContainer"></div>
   </div>
 
@@ -97,57 +69,18 @@
       loose:    { bust: 4.0, waist: 2.5, hip: 3.0 }
     };
 
-    // Helper: Calculate exact arc length of a cubic Bézier curve segment
-    function getBezierLength(p0, c1, c2, p3, steps = 100) {
-      let length = 0;
-      let prev = p0;
-      for (let i = 1; i <= steps; i++) {
-        let t = i / steps;
-        let nt = 1 - t;
-        let x = nt*nt*nt*p0.x + 3*nt*nt*t*c1.x + 3*nt*t*t*c2.x + t*t*t*p3.x;
-        let y = nt*nt*nt*p0.y + 3*nt*nt*t*c1.y + 3*nt*t*t*c2.y + t*t*t*p3.y;
-        let curr = { x, y };
-        length += Math.hypot(curr.x - prev.x, curr.y - prev.y);
-        prev = curr;
-      }
-      return length;
-    }
-
-    // Helper: Match curve lengths by iteratively adjusting control point weights
-    function balanceCurveLengths(p0, c1_a, c2_a, p3, c1_b, c2_b, targetLen) {
-      let scale = 1.0;
-      let bestC1 = { ...c1_b };
-      let bestC2 = { ...c2_b };
-      
-      for (let iter = 0; iter < 10; iter++) {
-        let currentLen = getBezierLength(p0, bestC1, bestC2, p3);
-        if (Math.abs(currentLen - targetLen) < 0.001) break;
-        let ratio = targetLen / (currentLen || 1);
-        scale *= Math.sqrt(ratio);
-        
-        bestC1.x = p0.x + (c1_b.x - p0.x) * scale;
-        bestC1.y = p0.y + (c1_b.y - p0.y) * scale;
-        bestC2.x = p3.x + (c2_b.x - p3.x) * scale;
-        bestC2.y = p3.y + (c2_b.y - p3.y) * scale;
-      }
-      return { c1: bestC1, c2: bestC2 };
-    }
-
-    // Helper: Calculate distance between two points
     function dist(p1, p2) {
       return Math.sqrt((p1.x - p2.x)**2 + (p1.y - p2.y)**2);
     }
 
     function calculateBodice(m, profileKey, showGrid) {
       const ease = EASE_PROFILES[profileKey] || EASE_PROFILES.standard;
-
       const easeBust = m.bust + ease.bust;
       const easeWaist = m.waist + ease.waist;
       const easeHip = m.hip + ease.hip;
 
       const backBustW = easeBust / 4 - 0.25;
       const frontBustW = easeBust / 4 + 0.25;
-
       const backHipW = easeHip / 4 - 0.25;
       const frontHipW = easeHip / 4 + 0.25;
 
@@ -162,59 +95,44 @@
       const hipY = topY + totalHeight;
 
       const neckW = (m.bust / 8 + 1.25) / 2;
-
       const totalBustWidth = backBustW + frontBustW;
-      const totalWaistWidthNeeded = easeWaist / 2;
-      const totalWaistIntake = Math.max(0, totalBustWidth - totalWaistWidthNeeded);
-
+      const totalWaistIntake = Math.max(0, totalBustWidth - (easeWaist / 2));
       const maxSideSeamIntake = totalWaistIntake * 0.35;
       const remainingIntake = totalWaistIntake - maxSideSeamIntake;
-
       const sideWaistIntakeEach = maxSideSeamIntake / 2;
       const b_waistDartW = remainingIntake * 0.4;
       const f_waistDartW = remainingIntake * 0.6;
 
-      // --- BACK POINTS ---
+      // --- BACK POINTS & DART TRUING ---
       const b_np = { x: neckW, y: topY };
       const b_shoulderDrop = topY + 1.25;
       const totalBackShWidth = m.shoulderLength + 0.5;
       const b_spTotalEnd = { x: neckW + totalBackShWidth, y: b_shoulderDrop };
 
-      // Shoulder Mid Point & Apex positioning (per instructions)
-      const b_shoulderMid = {
-        x: (b_np.x + b_spTotalEnd.x) / 2,
-        y: (b_np.y + b_spTotalEnd.y) / 2
-      };
+      const b_shoulderMid = { x: (b_np.x + b_spTotalEnd.x) / 2, y: (b_np.y + b_spTotalEnd.y) / 2 };
       const b_shDartApex = { x: b_shoulderMid.x - 0.375, y: b_shoulderMid.y + 2.5 };
 
-      // --- DART TRUING LOGIC (Ensuring equal leg lengths) ---
       const b_dartW = 0.5;
-      const raw_b_shDartInner = { x: b_shoulderMid.x - (b_dartW / 2), y: b_shoulderMid.y };
-      const raw_b_shDartOuter = { x: b_shoulderMid.x + (b_dartW / 2), y: b_shoulderMid.y };
+      const raw_b_inner = { x: b_shoulderMid.x - (b_dartW / 2), y: b_shoulderMid.y };
+      const raw_b_outer = { x: b_shoulderMid.x + (b_dartW / 2), y: b_shoulderMid.y };
 
-      const len1 = dist(raw_b_shDartInner, b_shDartApex);
-      const len2 = dist(raw_b_shDartOuter, b_shDartApex);
+      const len1 = dist(raw_b_inner, b_shDartApex);
+      const len2 = dist(raw_b_outer, b_shDartApex);
       
-      let final_b_shDartInner, final_b_shDartOuter;
-      // Calculate the angle of the shoulder line to adjust points along it
+      let final_b_inner, final_b_outer;
       const shoulderAngle = Math.atan2(b_spTotalEnd.y - b_np.y, b_spTotalEnd.x - b_np.x);
 
       if (len2 > len1) {
-        const targetLen = len2; // Outer leg is longer, so use its length
-        const dx = Math.cos(shoulderAngle) * targetLen;
-        const dy = Math.sin(shoulderAngle) * targetLen;
-        // Recalculate inner point position to maintain length
-        final_b_shDartInner = { x: b_shDartApex.x + dx, y: b_shDartApex.y + dy };
-        final_b_shDartOuter = raw_b_shDartOuter;
+        const dx = Math.cos(shoulderAngle) * len2;
+        const dy = Math.sin(shoulderAngle) * len2;
+        final_b_inner = { x: b_shDartApex.x + dx, y: b_shDartApex.y + dy };
+        final_b_outer = raw_b_outer;
       } else {
-        const targetLen = len1; // Inner leg is longer (less likely)
-        const dx = Math.cos(shoulderAngle + Math.PI) * targetLen;
-        const dy = Math.sin(shoulderAngle + Math.PI) * targetLen;
-        // Recalculate outer point position to maintain length
-        final_b_shDartOuter = { x: b_shDartApex.x + dx, y: b_shDartApex.y + dy };
-        final_b_shDartInner = raw_b_shDartInner;
+        const dx = Math.cos(shoulderAngle + Math.PI) * len1;
+        const dy = Math.sin(shoulderAngle + Math.PI) * len1;
+        final_b_outer = { x: b_shDartApex.x + dx, y: b_shDartApex.y + dy };
+        final_b_inner = raw_b_inner;
       }
-      // --- END DART TRUING ---
 
       const b_waistDartX = backBustW * 0.45;
       const b_waistDartTop = { x: b_waistDartX, y: bustY + 0.5 };
@@ -225,8 +143,8 @@
       const f_np = { x: f_cfX - neckW, y: topY };
       const totalFrontShWidth = m.shoulderLength + 1.0;
       const f_spTotalEnd = { x: f_cfX - neckW - totalFrontShWidth, y: b_shoulderDrop + 0.2 };
-
       const f_apex = { x: f_cfX - (m.bust / 10 + 0.75), y: trueBustY };
+
       const f_dartW = 1.0;
       const f_halfSh = totalFrontShWidth / 2;
       const f_shDartInner = { x: f_cfX - neckW - f_halfSh + (f_dartW / 2), y: topY + 0.3 };
@@ -238,12 +156,6 @@
       const upX = backBustW + (blockGap / 2);
       const upY = bustY + 0.5;
 
-      const sideWaistLeft = backBustW - sideWaistIntakeEach;
-      const sideWaistRight = backBustW + blockGap + sideWaistIntakeEach;
-
-      const backHipX = backHipW;
-      const frontHipX = f_cfX - frontHipW;
-
       return {
         showGrid,
         totalW: totalWidth + 3.0,
@@ -251,39 +163,35 @@
         lines: { topY, bustY, trueBustY, waistY, hipY },
         cbX: 0,
         cfX: f_cfX,
-        up: { x: upX, y: upY, leftW: sideWaistLeft, rightW: sideWaistRight, backBustW, frontBustX: backBustW + blockGap },
-        hip: { backHipX, frontHipX },
+        up: { x: upX, y: upY, leftW: backBustW - sideWaistIntakeEach, rightW: backBustW + blockGap + sideWaistIntakeEach },
+        hip: { backHipX: backHipW, frontHipX: f_cfX - frontHipW },
         back: {
-          np: b_np, sp: b_spTotalEnd, halfBackW: m.backWidth / 2,
-          shDartInner: final_b_shDartInner,
-          shDartOuter: final_b_shDartOuter,
-          shDartApex: b_shDartApex,
+          np: b_np, sp: b_spTotalEnd,
+          shDartInner: final_b_inner, shDartOuter: final_b_outer, shDartApex: b_shDartApex,
           waistDartX: b_waistDartX, waistDartW: b_waistDartW, waistDartTop: b_waistDartTop, waistDartBottom: b_waistDartBottom
         },
         front: {
-          np: f_np, sp: f_spTotalEnd, apex: f_apex, halfChestW: m.chestWidth / 2,
+          np: f_np, sp: f_spTotalEnd, apex: f_apex,
           shDartInner: f_shDartInner, shDartOuter: f_shDartOuter,
           waistDartW: f_waistDartW, waistDartTop: f_waistDartTop, waistDartBottom: f_waistDartBottom
         }
       };
     }
+
     function renderSVG(d) {
-      const scale = 72; // 72 pixels per inch
+      const scale = 72;
       const wPx = d.totalW * scale;
       const hPx = d.totalH * scale;
 
       let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${wPx} ${hPx}" width="100%" height="100%">`;
-      svg += `<defs>
-        <style>
-          .grid { stroke: #e2e8f0; stroke-width: 0.5; stroke-dasharray: 4 4; }
-          .axis-label { font-size: 10px; fill: #718096; font-family: sans-serif; }
-          .pattern-line { stroke: #1a202c; stroke-width: 2; fill: none; }
-          .construction-line { stroke: #cbd5e0; stroke-width: 1; fill: none; stroke-dasharray: 2 2; }
-          .dart-line { stroke: #e53e3e; stroke-width: 1.5; fill: none; }
-          .grainline { stroke: #3182ce; stroke-width: 1; stroke-dasharray: 6 3; }
-          .text-label { font-size: 11px; fill: #2d3748; font-family: sans-serif; font-weight: 600; }
-        </style>
-      </defs>`;
+      svg += `<defs><style>
+        .grid { stroke: #e2e8f0; stroke-width: 0.5; stroke-dasharray: 4 4; }
+        .axis-label { font-size: 10px; fill: #718096; font-family: sans-serif; }
+        .pattern-line { stroke: #1a202c; stroke-width: 2; fill: none; }
+        .construction-line { stroke: #cbd5e0; stroke-width: 1; fill: none; stroke-dasharray: 2 2; }
+        .dart-line { stroke: #e53e3e; stroke-width: 1.5; fill: none; }
+        .text-label { font-size: 11px; fill: #2d3748; font-family: sans-serif; font-weight: 600; }
+      </style></defs>`;
 
       svg += `<rect width="100%" height="100%" fill="#ffffff" rx="6"/>`;
 
@@ -308,7 +216,7 @@
         svg += `</g>`;
       }
 
-      // --- BACK PIECE RENDER ---
+      // Back Piece
       svg += `<g id="back-piece">`;
       svg += `<path d="M ${d.cbX*scale} ${d.lines.topY*scale} 
                    L ${d.back.np.x*scale} ${d.back.np.y*scale} 
@@ -320,17 +228,12 @@
                    L ${d.up.leftW*scale} ${d.lines.waistY*scale} 
                    L ${d.hip.backHipX*scale} ${d.lines.hipY*scale} 
                    L ${d.cbX*scale} ${d.lines.hipY*scale} Z" class="pattern-line" />`;
-
       svg += `<line x1="${d.back.shDartInner.x*scale}" y1="${d.back.shDartInner.y*scale}" x2="${d.back.shDartApex.x*scale}" y2="${d.back.shDartApex.y*scale}" class="dart-line" />`;
       svg += `<line x1="${d.back.shDartOuter.x*scale}" y1="${d.back.shDartOuter.y*scale}" x2="${d.back.shDartApex.x*scale}" y2="${d.back.shDartApex.y*scale}" class="dart-line" />`;
-      
-      svg += `<line x1="${d.back.waistDartTop.x*scale}" y1="${d.back.waistDartTop.y*scale}" x2="${d.back.waistDartBottom.x*scale}" y2="${d.back.waistDartBottom.y*scale}" class="dart-line" />`;
-      svg += `<line x1="${(d.back.waistDartX - d.back.waistDartW/2)*scale}" y1="${d.lines.waistY*scale}" x2="${d.back.waistDartApex ? d.back.waistDartApex.x*scale : d.back.waistDartBottom.x*scale}" y2="${d.back.waistDartBottom.y*scale}" class="dart-line" />`;
-      
       svg += `<text x="${(d.cbX + 1.5)*scale}" y="${(d.lines.bustY + 1)*scale}" class="text-label">BACK BLOCK</text>`;
       svg += `</g>`;
 
-      // --- FRONT PIECE RENDER ---
+      // Front Piece
       svg += `<g id="front-piece">`;
       svg += `<path d="M ${d.cfX*scale} ${d.lines.topY*scale} 
                    L ${d.front.np.x*scale} ${d.front.np.y*scale} 
@@ -342,10 +245,8 @@
                    L ${d.up.rightW*scale} ${d.lines.waistY*scale} 
                    L ${d.hip.frontHipX*scale} ${d.lines.hipY*scale} 
                    L ${d.cfX*scale} ${d.lines.hipY*scale} Z" class="pattern-line" />`;
-
       svg += `<line x1="${d.front.shDartInner.x*scale}" y1="${d.front.shDartInner.y*scale}" x2="${d.front.apex.x*scale}" y2="${d.front.apex.y*scale}" class="dart-line" />`;
       svg += `<line x1="${d.front.shDartOuter.x*scale}" y1="${d.front.shDartOuter.y*scale}" x2="${d.front.apex.x*scale}" y2="${d.front.apex.y*scale}" class="dart-line" />`;
-
       svg += `<text x="${(d.cfX - 2.5)*scale}" y="${(d.lines.bustY + 1)*scale}" class="text-label">FRONT BLOCK</text>`;
       svg += `</g>`;
 
@@ -354,7 +255,7 @@
     }
 
     function updatePattern() {
-      const measurements = {
+      const m = {
         bust: parseFloat(document.getElementById('bust').value),
         waist: parseFloat(document.getElementById('waist').value),
         hip: parseFloat(document.getElementById('hip').value),
@@ -364,33 +265,23 @@
         backNeckToWaist: parseFloat(document.getElementById('backNeckToWaist').value),
         waistToHip: parseFloat(document.getElementById('waistToHip').value)
       };
-
-      const profileKey = document.getElementById('easeProfile').value;
-      const showGrid = document.getElementById('showGrid').checked;
-
-      const data = calculateBodice(measurements, profileKey, showGrid);
-      const svgString = renderSVG(data);
-      document.getElementById('svgContainer').innerHTML = svgString;
+      const data = calculateBodice(m, document.getElementById('easeProfile').value, document.getElementById('showGrid').checked);
+      document.getElementById('svgContainer').innerHTML = renderSVG(data);
     }
 
     document.getElementById('generateBtn').addEventListener('click', updatePattern);
     document.getElementById('easeProfile').addEventListener('change', updatePattern);
     document.getElementById('showGrid').addEventListener('change', updatePattern);
-
+    
     document.getElementById('downloadBtn').addEventListener('click', () => {
-      const svgContent = document.getElementById('svgContainer').innerHTML;
-      const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+      const blob = new Blob([document.getElementById('svgContainer').innerHTML], { type: 'image/svg+xml' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url;
-      a.download = 'bodice_technical_block.svg';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      a.href = url; a.download = 'bodice_technical_block.svg';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
       URL.revokeObjectURL(url);
     });
 
-    // Initial render on load
     window.onload = updatePattern;
   </script>
 </body>
