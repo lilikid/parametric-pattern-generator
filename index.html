@@ -278,24 +278,26 @@
       svg += `<path class="scye" d="M ${s(b.sp.x)} ${s(b.sp.y)} C ${s(b.halfBackW)} ${s(l.bustY - 0.5)}, ${s(d.up.x - 0.8)} ${s(d.up.y)}, ${s(d.up.x)} ${s(d.up.y)} C ${s(d.up.x + 0.8)} ${s(d.up.y)}, ${s(d.cfX - f.halfChestW)} ${s(l.bustY - 0.5)}, ${s(f.sp.x)} ${s(f.sp.y)}" />`;
       svg += `<text class="lbl" x="${s(d.up.x) - 8}" y="${s(d.up.y) - 6}">UP</text>`;
 
-      // SIDE SEAMS: Straight down from UP for 2/3 of the distance, smooth inward curve to waist, then straight to hip
+      // SIDE SEAMS USING MATHEMATICALLY DEFINED G1 CONTINUOUS CUBIC BÉZIER CURVES
       const upY_s = s(d.up.y);
       const waistY_s = s(l.waistY);
       const hipY_s = s(l.hipY);
       const upX_s = s(d.up.x);
 
-      // Calculate the 2/3 down point between UP and Waist
-      const twoThirdsY_s = upY_s + (waistY_s - upY_s) * (2 / 3);
+      const twoThirdsDrop = (waistY_s - upY_s) / 3;
+      const waistUpOffset = (waistY_s - upY_s) / 4;
+      const waistDownOffset = (hipY_s - waistY_s) / 3;
+      const hipUpOffset = (hipY_s - waistY_s) / 4;
 
       // Back Side Seam
       const b_wX_s = s(d.up.leftW);
       const b_hX_s = s(d.hip.backHipX);
-      svg += `<path class="outline" d="M ${upX_s} ${upY_s} L ${upX_s} ${twoThirdsY_s} Q ${upX_s} ${waistY_s}, ${b_wX_s} ${waistY_s} L ${b_hX_s} ${hipY_s}" />`;
+      svg += `<path class="outline" d="M ${upX_s} ${upY_s} C ${upX_s} ${upY_s + twoThirdsDrop}, ${b_wX_s} ${waistY_s - waistUpOffset}, ${b_wX_s} ${waistY_s} C ${b_wX_s} ${waistY_s + waistDownOffset}, ${b_hX_s} ${hipY_s - hipUpOffset}, ${b_hX_s} ${hipY_s}" />`;
 
       // Front Side Seam
       const f_wX_s = s(d.up.rightW);
       const f_hX_s = s(d.hip.frontHipX);
-      svg += `<path class="outline" d="M ${upX_s} ${upY_s} L ${upX_s} ${twoThirdsY_s} Q ${upX_s} ${waistY_s}, ${f_wX_s} ${waistY_s} L ${f_hX_s} ${hipY_s}" />`;
+      svg += `<path class="outline" d="M ${upX_s} ${upY_s} C ${upX_s} ${upY_s + twoThirdsDrop}, ${f_wX_s} ${waistY_s - waistUpOffset}, ${f_wX_s} ${waistY_s} C ${f_wX_s} ${waistY_s + waistDownOffset}, ${f_hX_s} ${hipY_s - hipUpOffset}, ${f_hX_s} ${hipY_s}" />`;
 
       // BACK WAIST DART
       const b_left = b.waistDartX - (b.waistDartW / 2);
