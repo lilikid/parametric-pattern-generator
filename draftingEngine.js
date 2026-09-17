@@ -79,7 +79,7 @@ export function calculateBodiceBlock(measurements, easeOptions = {}) {
   const backWaistSideX = backUnderarmPoint.x - 0.75;
   const backHipPoint = { x: cb + (hip / 4), y: hipLineY };
 
-  // --- FRONT BLOCK POINTS ---
+// --- FRONT BLOCK POINTS (Stabilized Vertical Drop) ---
   const frontNeckPoint = { x: cf - neckWidth, y: topLineY };
   const baseOfNeckPoint = { x: cf, y: baseOfNeckY };
 
@@ -97,14 +97,15 @@ export function calculateBodiceBlock(measurements, easeOptions = {}) {
   const remainingShAfterInner = shoulderLength - dartDistanceFromNeck;
   const outerLegDistanceFromNeck = dartDistanceFromNeck + bustDartWidth;
   
+  // STABILIZED: Removed the rotational offsets so height stays locked
   const frontDartOuterLeg = {
-    x: frontNeckPoint.x - outerLegDistanceFromNeck * Math.cos(frontShoulderAngle + 0.05),
-    y: frontNeckPoint.y + outerLegDistanceFromNeck * Math.sin(frontShoulderAngle + 0.05)
+    x: frontNeckPoint.x - outerLegDistanceFromNeck * Math.cos(frontShoulderAngle),
+    y: frontNeckPoint.y + outerLegDistanceFromNeck * Math.sin(frontShoulderAngle)
   };
 
   const frontShoulderPoint = {
-    x: frontDartOuterLeg.x - remainingShAfterInner * Math.cos(frontShoulderAngle - 0.08),
-    y: frontDartOuterLeg.y + remainingShAfterInner * Math.sin(frontShoulderAngle - 0.08)
+    x: frontDartOuterLeg.x - remainingShAfterInner * Math.cos(frontShoulderAngle),
+    y: frontDartOuterLeg.y + remainingShAfterInner * Math.sin(frontShoulderAngle)
   };
 
   const dartFoldPeak = {
