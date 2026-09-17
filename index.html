@@ -119,12 +119,32 @@
             overflow-y: auto;
         }
 
-        .garment-module {
+        .section-bracket {
             background: #faf8f7;
+            border: 1px solid #dcd3ce;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .section-bracket-title {
+            font-family: var(--heading-font);
+            font-size: 1.1rem;
+            color: #1a1514;
+            margin-bottom: 12px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .garment-module {
+            background: #ffffff;
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            margin-bottom: 14px;
-            padding: 16px;
+            margin-bottom: 12px;
+            padding: 14px;
         }
 
         .garment-module-header {
@@ -136,17 +156,17 @@
 
         .garment-module h3 {
             font-family: var(--heading-font);
-            font-size: 1.05rem;
-            color: #1a1514;
+            font-size: 0.95rem;
+            color: #2c2524;
         }
 
         .garment-module-body {
-            margin-top: 14px;
-            padding-top: 14px;
+            margin-top: 12px;
+            padding-top: 12px;
             border-top: 1px dashed var(--border-color);
         }
 
-        .input-section { margin-bottom: 14px; }
+        .input-section { margin-bottom: 12px; }
 
         .input-section label {
             display: block;
@@ -264,9 +284,7 @@
             cursor: grab;
         }
 
-        #svg-scroll-viewport:active {
-            cursor: grabbing;
-        }
+        #svg-scroll-viewport:active { cursor: grabbing; }
 
         #svg-canvas-wrapper {
             position: absolute;
@@ -303,197 +321,204 @@
         <div class="control-panel">
             <h2 style="font-family:var(--heading-font); font-size:1.15rem; margin-bottom:14px;">Pattern Modules</h2>
             
-            <!-- Separate Standard Sizers -->
-            <div class="input-section" style="background:#f4eee9; padding:12px; border-radius:8px; border:1px solid #e0d5d0;">
-                <label for="upperStandardSize" style="color:#2c2524; font-weight:700;">Upper Body Standard Size Selector</label>
-                <select id="upperStandardSize" onchange="applyUpperStandardSize()" style="margin-bottom:10px;">
-                    <option value="">-- Custom Upper Sizing --</option>
-                    <option value="uk8">UK 8 / US 4</option>
-                    <option value="uk10">UK 10 / US 6</option>
-                    <option value="uk12" selected>UK 12 / US 8 (Draft Spec)</option>
-                    <option value="uk14">UK 14 / US 10</option>
-                    <option value="uk16">UK 16 / US 12</option>
-                </select>
-
-                <label for="lowerStandardSize" style="color:#2c2524; font-weight:700;">Lower Body Standard Size Selector</label>
-                <select id="lowerStandardSize" onchange="applyLowerStandardSize()">
-                    <option value="">-- Custom Lower Sizing --</option>
-                    <option value="uk8">UK 8 / US 4</option>
-                    <option value="uk10">UK 10 / US 6</option>
-                    <option value="uk12" selected>UK 12 / US 8 (Draft Spec)</option>
-                    <option value="uk14">UK 14 / US 10</option>
-                    <option value="uk16">UK 16 / US 12</option>
-                </select>
-            </div>
-
-            <!-- 1. BODICE WINDOW -->
-            <div class="garment-module">
-                <div class="garment-module-header" onclick="toggleModule('bodiceBody')">
-                    <h3>1. Bodice Window</h3>
-                    <span style="font-size:0.8rem; font-weight:600; color:var(--primary);">Configure ▼</span>
+            <!-- BRACKET 1: UPPER BODY -->
+            <div class="section-bracket">
+                <div class="section-bracket-title">
+                    <span>[ Upper Body: Bodice & Sleeve ]</span>
                 </div>
-                <div id="bodiceBody" class="garment-module-body">
-                    <div class="input-section">
-                        <label for="blockPreset">Fit & Ease Preset</label>
-                        <select id="blockPreset" onchange="applyPreset()">
-                            <option value="standard">Standard Woven (+2.0" Bust, +1.5" Waist)</option>
-                            <option value="fitted">Fitted (+1.0" Bust, +0.5" Waist)</option>
-                            <option value="loose">Relaxed (+3.0" Bust, +2.5" Waist)</option>
-                        </select>
+                
+                <div class="input-section">
+                    <label for="upperStandardSize">Upper Body Standard Size Preset</label>
+                    <select id="upperStandardSize" onchange="applyUpperStandardSize()">
+                        <option value="">-- Custom Upper Sizing --</option>
+                        <option value="uk8">UK 8 / US 4</option>
+                        <option value="uk10">UK 10 / US 6</option>
+                        <option value="uk12" selected>UK 12 / US 8 (Draft Spec)</option>
+                        <option value="uk14">UK 14 / US 10</option>
+                        <option value="uk16">UK 16 / US 12</option>
+                    </select>
+                </div>
+
+                <!-- 1. BODICE WINDOW -->
+                <div class="garment-module">
+                    <div class="garment-module-header" onclick="toggleModule('bodiceBody')">
+                        <h3>1. Bodice Window</h3>
+                        <span style="font-size:0.75rem; font-weight:600; color:var(--primary);">Configure ▼</span>
                     </div>
-                    <div class="input-section">
-                        <label>Bust & Ease</label>
-                        <div class="dual-input">
-                            <input type="number" id="bust" value="34.5" step="0.25">
-                            <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="bustEase" value="2.0" step="0.25"></div>
+                    <div id="bodiceBody" class="garment-module-body" style="display:none;">
+                        <div class="input-section">
+                            <label for="blockPreset">Fit & Ease Preset</label>
+                            <select id="blockPreset" onchange="applyPreset()">
+                                <option value="standard">Standard Woven (+2.0" Bust, +1.5" Waist)</option>
+                                <option value="fitted">Fitted (+1.0" Bust, +0.5" Waist)</option>
+                                <option value="loose">Relaxed (+3.0" Bust, +2.5" Waist)</option>
+                            </select>
                         </div>
-                    </div>
-                    <div class="input-section">
-                        <label>Waist & Ease</label>
-                        <div class="dual-input">
-                            <input type="number" id="waist" value="25.5" step="0.25">
-                            <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="waistEase" value="1.5" step="0.25"></div>
+                        <div class="input-section">
+                            <label>Bust & Ease</label>
+                            <div class="dual-input">
+                                <input type="number" id="bust" value="34.5" step="0.25">
+                                <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="bustEase" value="2.0" step="0.25"></div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="input-section">
-                        <label>Hips & Ease</label>
-                        <div class="dual-input">
-                            <input type="number" id="hip" value="37.0" step="0.25">
-                            <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="hipEase" value="2.0" step="0.25"></div>
+                        <div class="input-section">
+                            <label>Waist & Ease</label>
+                            <div class="dual-input">
+                                <input type="number" id="waist" value="25.5" step="0.25">
+                                <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="waistEase" value="1.5" step="0.25"></div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="input-section">
-                        <label for="chestWidth">Chest Width (Front)</label>
-                        <input type="number" id="chestWidth" value="13.0" step="0.25">
-                    </div>
-                    <div class="input-section">
-                        <label for="backWidth">Back Width</label>
-                        <input type="number" id="backWidth" value="14.0" step="0.25">
-                    </div>
-                    <div class="input-section">
-                        <label for="shoulderLength">Shoulder Length</label>
-                        <input type="number" id="shoulderLength" value="5.0" step="0.25">
-                    </div>
-                    <div class="input-section">
-                        <label for="backNeckToWaist">Back Waist Length</label>
-                        <input type="number" id="backNeckToWaist" value="15.5" step="0.25">
-                    </div>
-                    <div class="input-section">
-                        <label for="waistToHip">Waist to Hip</label>
-                        <input type="number" id="waistToHip" value="8.0" step="0.25">
+                        <div class="input-section">
+                            <label>Hips & Ease</label>
+                            <div class="dual-input">
+                                <input type="number" id="hip" value="37.0" step="0.25">
+                                <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="hipEase" value="2.0" step="0.25"></div>
+                            </div>
+                        </div>
+                        <div class="input-section">
+                            <label for="chestWidth">Chest Width (Front)</label>
+                            <input type="number" id="chestWidth" value="13.0" step="0.25">
+                        </div>
+                        <div class="input-section">
+                            <label for="backWidth">Back Width</label>
+                            <input type="number" id="backWidth" value="14.0" step="0.25">
+                        </div>
+                        <div class="input-section">
+                            <label for="shoulderLength">Shoulder Length</label>
+                            <input type="number" id="shoulderLength" value="5.0" step="0.25">
+                        </div>
+                        <div class="input-section">
+                            <label for="backNeckToWaist">Back Waist Length</label>
+                            <input type="number" id="backNeckToWaist" value="15.5" step="0.25">
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- 2. SLEEVE WINDOW -->
-            <div class="garment-module">
-                <div class="garment-module-header" onclick="toggleModule('sleeveBody')">
-                    <h3>2. Sleeve Window</h3>
-                    <span style="font-size:0.8rem; font-weight:600; color:var(--primary);">Configure ▼</span>
-                </div>
-                <div id="sleeveBody" class="garment-module-body" style="display:none;">
-                    <div class="input-section">
-                        <label for="includeSleeve">Enable Sleeve Draft</label>
-                        <select id="includeSleeve">
-                            <option value="yes" selected>Yes (Fitted Sleeve)</option>
-                            <option value="no">No (Sleeveless)</option>
-                        </select>
+                <!-- 2. SLEEVE WINDOW -->
+                <div class="garment-module" style="margin-bottom:0;">
+                    <div class="garment-module-header" onclick="toggleModule('sleeveBody')">
+                        <h3>2. Sleeve Window</h3>
+                        <span style="font-size:0.75rem; font-weight:600; color:var(--primary);">Configure ▼</span>
                     </div>
-                    <div class="input-section">
-                        <label>Top Arm (Bicep) & Ease</label>
-                        <div class="dual-input">
-                            <input type="number" id="bicep" value="11.5" step="0.25">
-                            <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="bicepEase" value="2.0" step="0.25"></div>
+                    <div id="sleeveBody" class="garment-module-body" style="display:none;">
+                        <div class="input-section">
+                            <label for="includeSleeve">Enable Sleeve Draft</label>
+                            <select id="includeSleeve">
+                                <option value="yes" selected>Yes (Fitted Sleeve)</option>
+                                <option value="no">No (Sleeveless)</option>
+                            </select>
                         </div>
-                    </div>
-                    <div class="input-section">
-                        <label for="sleeveLength">Length of Arm (Sleeve Length)</label>
-                        <input type="number" id="sleeveLength" value="23.0" step="0.25">
-                    </div>
-                    <div class="input-section">
-                        <label for="shoulderToElbow">Shoulder to Elbow</label>
-                        <input type="number" id="shoulderToElbow" value="12.5" step="0.25">
-                    </div>
-                    <div class="input-section">
-                        <label for="wristCirc">Wrist Circumference</label>
-                        <input type="number" id="wristCirc" value="6.25" step="0.25">
+                        <div class="input-section">
+                            <label>Top Arm (Bicep) & Ease</label>
+                            <div class="dual-input">
+                                <input type="number" id="bicep" value="11.5" step="0.25">
+                                <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="bicepEase" value="2.0" step="0.25"></div>
+                            </div>
+                        </div>
+                        <div class="input-section">
+                            <label for="sleeveLength">Length of Arm (Sleeve Length)</label>
+                            <input type="number" id="sleeveLength" value="23.0" step="0.25">
+                        </div>
+                        <div class="input-section">
+                            <label for="shoulderToElbow">Shoulder to Elbow</label>
+                            <input type="number" id="shoulderToElbow" value="12.5" step="0.25">
+                        </div>
+                        <div class="input-section">
+                            <label for="wristCirc">Wrist Circumference</label>
+                            <input type="number" id="wristCirc" value="6.25" step="0.25">
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 3. SKIRT WINDOW -->
-            <div class="garment-module">
-                <div class="garment-module-header" onclick="toggleModule('skirtBody')">
-                    <h3>3. Skirt Window</h3>
-                    <span style="font-size:0.8rem; font-weight:600; color:var(--primary);">Configure ▼</span>
+            <!-- BRACKET 2: LOWER BODY -->
+            <div class="section-bracket">
+                <div class="section-bracket-title">
+                    <span>[ Lower Body: Skirt & Trousers ]</span>
                 </div>
-                <div id="skirtBody" class="garment-module-body" style="display:none;">
-                    <div class="input-section">
-                        <label for="includeSkirt">Enable Skirt Draft</label>
-                        <select id="includeSkirt">
-                            <option value="yes" selected>Yes</option>
-                            <option value="no">No</option>
-                        </select>
-                    </div>
-                    <div class="input-section">
-                        <label for="skirtStyle">Skirt Silhouette Type</label>
-                        <select id="skirtStyle">
-                            <option value="pencil" selected>Pencil Skirt (Fitted)</option>
-                            <option value="full">Full / A-Line Skirt (Flared)</option>
-                            <option value="semi">Semi-Circle Circular Skirt</option>
-                        </select>
-                    </div>
-                    <div class="input-section">
-                        <label for="skirtLength">Length (Waist to Hem)</label>
-                        <input type="number" id="skirtLength" value="27.0" step="0.25">
-                    </div>
-                    <div class="input-section">
-                        <label for="skirtWaistToKnee">Waist to Knee</label>
-                        <input type="number" id="skirtWaistToKnee" value="23.0" step="0.25">
-                    </div>
-                    <div class="input-section">
-                        <label for="skirtHipLine">Hip Line (Below Waist)</label>
-                        <input type="number" id="skirtHipLine" value="8.75" step="0.25">
-                    </div>
-                    <div class="input-section">
-                        <label for="skirtYokeLine">Yoke Line (Below Waist)</label>
-                        <input type="number" id="skirtYokeLine" value="6.0" step="0.25">
-                    </div>
+                
+                <div class="input-section">
+                    <label for="lowerStandardSize">Lower Body Standard Size Preset</label>
+                    <select id="lowerStandardSize" onchange="applyLowerStandardSize()">
+                        <option value="">-- Custom Lower Sizing --</option>
+                        <option value="uk8">UK 8 / US 4</option>
+                        <option value="uk10">UK 10 / US 6</option>
+                        <option value="uk12" selected>UK 12 / US 8 (Draft Spec)</option>
+                        <option value="uk14">UK 14 / US 10</option>
+                        <option value="uk16">UK 16 / US 12</option>
+                    </select>
                 </div>
-            </div>
 
-            <!-- 4. PANTS WINDOW -->
-            <div class="garment-module">
-                <div class="garment-module-header" onclick="toggleModule('pantsBody')">
-                    <h3>4. Trousers / Pants Window</h3>
-                    <span style="font-size:0.8rem; font-weight:600; color:var(--primary);">Configure ▼</span>
-                </div>
-                <div id="pantsBody" class="garment-module-body" style="display:none;">
-                    <div class="input-section">
-                        <label for="includePant">Enable Trouser Draft</label>
-                        <select id="includePant">
-                            <option value="yes" selected>Yes</option>
-                            <option value="no">No</option>
-                        </select>
+                <!-- 3. SKIRT WINDOW -->
+                <div class="garment-module">
+                    <div class="garment-module-header" onclick="toggleModule('skirtBody')">
+                        <h3>3. Skirt Window</h3>
+                        <span style="font-size:0.75rem; font-weight:600; color:var(--primary);">Configure ▼</span>
                     </div>
-                    <div class="input-section">
-                        <label for="pantRise">Body Rise (Rise Depth)</label>
-                        <input type="number" id="pantRise" value="11.5" step="0.25">
-                    </div>
-                    <div class="input-section">
-                        <label>Thigh Circumference & Ease</label>
-                        <div class="dual-input">
-                            <input type="number" id="thigh" value="23.0" step="0.25">
-                            <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="thighEase" value="2.75" step="0.25"></div>
+                    <div id="skirtBody" class="garment-module-body" style="display:none;">
+                        <div class="input-section">
+                            <label for="includeSkirt">Enable Skirt Draft</label>
+                            <select id="includeSkirt">
+                                <option value="yes" selected>Yes</option>
+                                <option value="no">No</option>
+                            </select>
+                        </div>
+                        <div class="input-section">
+                            <label for="skirtStyle">Skirt Silhouette Type</label>
+                            <select id="skirtStyle">
+                                <option value="pencil" selected>Pencil Skirt (Fitted)</option>
+                                <option value="full">Full / A-Line Skirt (Flared)</option>
+                                <option value="semi">Semi-Circle Circular Skirt</option>
+                            </select>
+                        </div>
+                        <div class="input-section">
+                            <label for="skirtLength">Length (Waist to Hem)</label>
+                            <input type="number" id="skirtLength" value="27.0" step="0.25">
+                        </div>
+                        <div class="input-section">
+                            <label for="skirtWaistToKnee">Waist to Knee</label>
+                            <input type="number" id="skirtWaistToKnee" value="23.0" step="0.25">
+                        </div>
+                        <div class="input-section">
+                            <label for="skirtHipLine">Hip Line (Below Waist)</label>
+                            <input type="number" id="skirtHipLine" value="8.75" step="0.25">
                         </div>
                     </div>
-                    <div class="input-section">
-                        <label for="kneeCirc">Knee Circumference</label>
-                        <input type="number" id="kneeCirc" value="13.5" step="0.25">
+                </div>
+
+                <!-- 4. PANTS WINDOW -->
+                <div class="garment-module" style="margin-bottom:0;">
+                    <div class="garment-module-header" onclick="toggleModule('pantsBody')">
+                        <h3>4. Trousers / Pants Window</h3>
+                        <span style="font-size:0.75rem; font-weight:600; color:var(--primary);">Configure ▼</span>
                     </div>
-                    <div class="input-section">
-                        <label for="inseam">Inseam / Total Pant Length</label>
-                        <input type="number" id="inseam" value="30.0" step="0.25">
+                    <div id="pantsBody" class="garment-module-body" style="display:none;">
+                        <div class="input-section">
+                            <label for="includePant">Enable Trouser Draft</label>
+                            <select id="includePant">
+                                <option value="yes" selected>Yes</option>
+                                <option value="no">No</option>
+                            </select>
+                        </div>
+                        <div class="input-section">
+                            <label for="pantRise">Body Rise (Rise Depth)</label>
+                            <input type="number" id="pantRise" value="11.5" step="0.25">
+                        </div>
+                        <div class="input-section">
+                            <label>Thigh Circumference & Ease</label>
+                            <div class="dual-input">
+                                <input type="number" id="thigh" value="23.0" step="0.25">
+                                <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="thighEase" value="2.75" step="0.25"></div>
+                            </div>
+                        </div>
+                        <div class="input-section">
+                            <label for="kneeCirc">Knee Circumference</label>
+                            <input type="number" id="kneeCirc" value="13.5" step="0.25">
+                        </div>
+                        <div class="input-section">
+                            <label for="inseam">Inseam / Total Pant Length</label>
+                            <input type="number" id="inseam" value="30.0" step="0.25">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -606,11 +631,11 @@
             if (!size) return;
 
             const sizes = {
-                'uk8':  { hip: 35.0, skirtLen: 26.0, kneeToWst: 22.0, hipLine: 8.25, yoke: 5.5, rise: 10.75, thigh: 21.5, knee: 12.5, inseam: 29.0 },
-                'uk10': { hip: 36.0, skirtLen: 26.5, kneeToWst: 22.5, hipLine: 8.5, yoke: 5.75, rise: 11.0, thigh: 22.25, knee: 13.0, inseam: 29.5 },
-                'uk12': { hip: 37.0, skirtLen: 27.0, kneeToWst: 23.0, hipLine: 8.75, yoke: 6.0, rise: 11.5, thigh: 23.0, knee: 13.5, inseam: 30.0 },
-                'uk14': { hip: 40.0, skirtLen: 27.5, kneeToWst: 23.5, hipLine: 9.0, yoke: 6.25, rise: 12.0, thigh: 24.5, knee: 14.25, inseam: 30.5 },
-                'uk16': { hip: 42.0, skirtLen: 28.0, kneeToWst: 24.0, hipLine: 9.25, yoke: 6.5, rise: 12.5, thigh: 26.0, knee: 15.0, inseam: 31.0 }
+                'uk8':  { hip: 35.0, skirtLen: 26.0, kneeToWst: 22.0, hipLine: 8.25, rise: 10.75, thigh: 21.5, knee: 12.5, inseam: 29.0 },
+                'uk10': { hip: 36.0, skirtLen: 26.5, kneeToWst: 22.5, hipLine: 8.5, rise: 11.0, thigh: 22.25, knee: 13.0, inseam: 29.5 },
+                'uk12': { hip: 37.0, skirtLen: 27.0, kneeToWst: 23.0, hipLine: 8.75, rise: 11.5, thigh: 23.0, knee: 13.5, inseam: 30.0 },
+                'uk14': { hip: 40.0, skirtLen: 27.5, kneeToWst: 23.5, hipLine: 9.0, rise: 12.0, thigh: 24.5, knee: 14.25, inseam: 30.5 },
+                'uk16': { hip: 42.0, skirtLen: 28.0, kneeToWst: 24.0, hipLine: 9.25, rise: 12.5, thigh: 26.0, knee: 15.0, inseam: 31.0 }
             };
 
             const data = sizes[size];
@@ -619,7 +644,6 @@
                 document.getElementById('skirtLength').value = data.skirtLen;
                 document.getElementById('skirtWaistToKnee').value = data.kneeToWst;
                 document.getElementById('skirtHipLine').value = data.hipLine;
-                document.getElementById('skirtYokeLine').value = data.yoke;
                 document.getElementById('pantRise').value = data.rise;
                 document.getElementById('thigh').value = data.thigh;
                 document.getElementById('kneeCirc').value = data.knee;
@@ -685,109 +709,57 @@
                 patternGroup.appendChild(sText);
             }
 
-            cursorY += bHeight + 40;
-
             // 3. Skirt Block (if enabled)
             if (document.getElementById('includeSkirt').value === 'yes') {
-                const skirtStyle = document.getElementById('skirtStyle').value;
-                const sLenVal = parseFloat(document.getElementById('skirtLength').value) * scaleFactor;
-                const hipVal = (parseFloat(document.getElementById('hip').value) + parseFloat(document.getElementById('hipEase').value)) * scaleFactor;
-                
-                let sWidth = hipVal;
-                if (skirtStyle === 'full') sWidth = hipVal * 1.5;
-                if (skirtStyle === 'semi') sWidth = hipVal * 1.8;
+                const hipVal = (parseFloat(document.getElementById('hip').value) + parseFloat(document.getElementById('hipEase').value));
+                const skWidth = (hipVal / 4) * scaleFactor;
+                const skLen = parseFloat(document.getElementById('skirtLength').value) * scaleFactor;
+                const skStartY = cursorY + bHeight + 40;
 
                 const skirtRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                skirtRect.setAttribute('x', cursorX); skirtRect.setAttribute('y', cursorY);
-                skirtRect.setAttribute('width', sWidth); skirtRect.setAttribute('height', sLenVal);
+                skirtRect.setAttribute('x', cursorX); skirtRect.setAttribute('y', skStartY);
+                skirtRect.setAttribute('width', skWidth); skirtRect.setAttribute('height', skLen);
                 skirtRect.setAttribute('fill', 'rgba(194, 94, 111, 0.04)');
                 skirtRect.setAttribute('stroke', '#c25e6f'); skirtRect.setAttribute('stroke-width', '2'); skirtRect.setAttribute('stroke-dasharray', '4');
                 patternGroup.appendChild(skirtRect);
 
                 const skText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                skText.setAttribute('x', cursorX + 15); skText.setAttribute('y', cursorY + 25);
+                skText.setAttribute('x', cursorX + 15); skText.setAttribute('y', skStartY + 25);
                 skText.setAttribute('fill', '#2c2524'); skText.setAttribute('font-family', 'Montserrat'); skText.setAttribute('font-size', '12'); skText.setAttribute('font-weight', '600');
-                skText.textContent = `Skirt: ${skirtStyle.toUpperCase()} (Hip: ${document.getElementById('hip').value}")`;
+                skText.textContent = `Skirt Block (${document.getElementById('skirtStyle').value.toUpperCase()} - Hip: ${document.getElementById('hip').value}")`;
                 patternGroup.appendChild(skText);
-
-                cursorY += sLenVal + 40;
             }
 
-            // 4. Pant Block (if enabled)
+            // 4. Trouser Block (if enabled)
             if (document.getElementById('includePant').value === 'yes') {
-                const rise = parseFloat(document.getElementById('pantRise').value);
-                const inseam = parseFloat(document.getElementById('inseam').value);
-                const thighVal = (parseFloat(document.getElementById('thigh').value) + parseFloat(document.getElementById('thighEase').value)) * scaleFactor;
-                const pHeight = (rise + inseam) * scaleFactor;
+                const thighVal = (parseFloat(document.getElementById('thigh').value) + parseFloat(document.getElementById('thighEase').value));
+                const pWidth = (thighVal / 2) * scaleFactor;
+                const pLen = parseFloat(document.getElementById('inseam').value) * scaleFactor;
+                const pStartX = cursorX + bWidth + 30;
+                const pStartY = cursorY + (parseFloat(document.getElementById('sleeveLength').value) * scaleFactor) + 40;
 
                 const pantRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                pantRect.setAttribute('x', cursorX); pantRect.setAttribute('y', cursorY);
-                pantRect.setAttribute('width', thighVal); pantRect.setAttribute('height', pHeight);
+                pantRect.setAttribute('x', pStartX); pantRect.setAttribute('y', pStartY);
+                pantRect.setAttribute('width', pWidth); pantRect.setAttribute('height', pLen);
                 pantRect.setAttribute('fill', 'rgba(92, 82, 79, 0.04)');
                 pantRect.setAttribute('stroke', '#5c524f'); pantRect.setAttribute('stroke-width', '2'); pantRect.setAttribute('stroke-dasharray', '4');
                 patternGroup.appendChild(pantRect);
 
                 const pText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                pText.setAttribute('x', cursorX + 15); pText.setAttribute('y', cursorY + 25);
+                pText.setAttribute('x', pStartX + 15); pText.setAttribute('y', pStartY + 25);
                 pText.setAttribute('fill', '#2c2524'); pText.setAttribute('font-family', 'Montserrat'); pText.setAttribute('font-size', '12'); pText.setAttribute('font-weight', '600');
-                pText.textContent = `Trouser Block (Rise: ${rise}", Inseam: ${inseam}")`;
+                pText.textContent = `Trouser Block (Rise: ${document.getElementById('pantRise').value}")`;
                 patternGroup.appendChild(pText);
             }
         }
 
-        // Advanced Viewport Interactions (Cursor Zoom & Right-Click/Drag Pan)
-        const viewport = document.getElementById('svg-scroll-viewport');
-        const wrapper = document.getElementById('svg-canvas-wrapper');
-
         function updateTransform() {
+            const wrapper = document.getElementById('svg-canvas-wrapper');
             wrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${currentScale})`;
         }
 
-        viewport.addEventListener('wheel', function(e) {
-            e.preventDefault();
-            const rect = viewport.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
-
-            const zoomFactor = 1.15;
-            let newScale = e.deltaY < 0 ? currentScale * zoomFactor : currentScale / zoomFactor;
-            newScale = Math.max(0.3, Math.min(4.0, newScale));
-
-            // Zoom around mouse cursor position
-            panX = mouseX - (mouseX - panX) * (newScale / currentScale);
-            panY = mouseY - (mouseY - panY) * (newScale / currentScale);
-            currentScale = newScale;
-
-            updateTransform();
-        }, { passive: false });
-
-        viewport.addEventListener('mousedown', function(e) {
-            if (e.button === 2 || e.button === 0) { // Support right click (2) or left click drag (0)
-                isDragging = true;
-                startMouseX = e.clientX - panX;
-                startMouseY = e.clientY - panY;
-                if (e.button === 2) e.preventDefault();
-            }
-        });
-
-        window.addEventListener('mousemove', function(e) {
-            if (!isDragging) return;
-            panX = e.clientX - startMouseX;
-            panY = e.clientY - startMouseY;
-            updateTransform();
-        });
-
-        window.addEventListener('mouseup', function() {
-            isDragging = false;
-        });
-
-        // Prevent context menu on right click dragging
-        viewport.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-        });
-
         function adjustZoom(amount) {
-            currentScale = Math.max(0.3, Math.min(4.0, currentScale + amount));
+            currentScale = Math.max(0.3, Math.min(3.0, currentScale + amount));
             updateTransform();
         }
 
@@ -800,18 +772,37 @@
 
         function downloadSVG() {
             const svgEl = document.getElementById('pattern-svg');
-            const svgData = new XMLSerializer().serializeToString(svgEl);
-            const blob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
+            const serializer = new XMLSerializer();
+            let source = serializer.serializeToString(svgEl);
+            if(!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
+                source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+            }
+            const blob = new Blob([source], {type: "image/svg+xml;charset=utf-8"});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'lilinora-multi-piece-pattern.svg';
+            a.download = "Lilinora_Atelier_Pattern.svg";
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
         }
 
-        window.onload = function() {
+        const viewport = document.getElementById('svg-scroll-viewport');
+        viewport.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startMouseX = e.clientX - panX;
+            startMouseY = e.clientY - panY;
+        });
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            panX = e.clientX - startMouseX;
+            panY = e.clientY - startMouseY;
+            updateTransform();
+        });
+        window.open = () => {};
+        window.addEventListener('mouseup', () => { isDragging = false; });
+
+        window.onload = () => {
             initGrid();
             updateTransform();
         };
