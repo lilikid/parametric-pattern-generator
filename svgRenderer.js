@@ -39,6 +39,25 @@ export function renderPatternSVG(draftData, scale = 20) {
   svg += `<line class="pattern-line" x1="${px(lines.cb)}" y1="${py(lines.topLineY)}" x2="${px(lines.cb)}" y2="${py(lines.hipLineY)}" />`;
   svg += `<line class="pattern-line" x1="${px(lines.cf)}" y1="${py(lines.topLineY)}" x2="${px(lines.cf)}" y2="${py(front.waistCenterPoint.y)}" />`;
 
+  // --- BACK SHOULDER SEAM & DART TRUEING ---
+  // Assuming back points 3, 4, 1, and 2 are provided in back data structure
+  const p3 = back.shDartInner || { x: back.neckPoint.x + 1.5, y: back.neckPoint.y };
+  const p4 = back.shDartOuter || { x: back.neckPoint.x + 2.2, y: back.neckPoint.y };
+  const apex = back.shDartApex || { x: p3.x + 0.3, y: p3.y + 2.5 };
+  
+  // Baseline points 1 and 2 across the dart opening base
+  const pt1 = back.dartBasePoint1 || { x: p3.x, y: p3.y + 0.25 };
+  const pt2 = back.dartBasePoint2 || { x: p4.x, y: p4.y + 0.25 };
+
+  // Back Shoulder Lines & Dart Legs
+  svg += `<line class="trued-line" x1="${px(back.neckPoint.x)}" y1="${py(back.neckPoint.y)}" x2="${px(p3.x)}" y2="${py(p3.y)}" />`;
+  svg += `<line class="trued-line" x1="${px(p3.x)}" y1="${py(p3.y)}" x2="${px(apex.x)}" y2="${py(apex.y)}" />`;
+  svg += `<line class="trued-line" x1="${px(apex.x)}" y1="${py(apex.y)}" x2="${px(p4.x)}" y2="${py(p4.y)}" />`;
+  svg += `<line class="trued-line" x1="${px(p4.x)}" y1="${py(p4.y)}" x2="${px(back.shoulderPoint.x)}" y2="${py(back.shoulderPoint.y)}" />`;
+
+  // VISIBLE RED LINE 1-2 ACROSS DART BASE
+  svg += `<line class="guide-line" x1="${px(pt1.x)}" y1="${py(pt1.y)}" x2="${px(pt2.x)}" y2="${py(pt2.y)}" />`;
+
   // --- FRONT SHOULDER SEAM & DART TRUEING ---
   svg += `<line class="trued-line" x1="${px(front.neckPoint.x)}" y1="${py(front.neckPoint.y)}" x2="${px(front.dartInnerLeg.x)}" y2="${py(front.dartInnerLeg.y)}" />`;
   svg += `<line class="trued-line" x1="${px(front.dartInnerLeg.x)}" y1="${py(front.dartInnerLeg.y)}" x2="${px(front.dartFoldPeak.x)}" y2="${py(front.dartFoldPeak.y)}" />`;
@@ -55,7 +74,6 @@ export function renderPatternSVG(draftData, scale = 20) {
   // --- NECKLINES ---
   const backNeck = `M ${px(lines.cb)} ${py(lines.topLineY)} Q ${px(back.neckPoint.x - 0.5)} ${py(lines.topLineY + 0.5)}, ${px(back.neckPoint.x)} ${py(back.neckPoint.y)}`;
   svg += `<path class="pattern-line" d="${backNeck}" />`;
-  svg += `<line class="trued-line" x1="${px(back.neckPoint.x)}" y1="${py(back.neckPoint.y)}" x2="${px(back.shoulderPoint.x)}" y2="${py(back.shoulderPoint.y)}" />`;
 
   const frontNeck = `M ${px(front.neckPoint.x)} ${py(front.neckPoint.y)} Q ${px(front.neckPoint.x)} ${py(front.baseOfNeck.y)}, ${px(front.baseOfNeck.x)} ${py(front.baseOfNeck.y)}`;
   svg += `<path class="pattern-line" d="${frontNeck}" />`;
