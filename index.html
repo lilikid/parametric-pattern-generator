@@ -182,12 +182,21 @@
 
       const b_dartW = 0.5;
       const b_shDartApex = { x: b_shoulderMid.x - 0.375, y: b_shoulderMid.y + 2.5 };
+      
+      // Point 3 (Inner dart tip near NP) and Point 4 (Outer dart tip near SP)
       const b_shDartInner = { x: b_shoulderMid.x - (b_dartW / 2), y: b_shoulderMid.y };
       const b_shDartOuter = { x: b_shoulderMid.x + (b_dartW / 2), y: b_shoulderMid.y };
 
+      // Points 1 and 2 defining the base line across the dart opening (slightly below the shoulder line)
+      const dartBaseDrop = 0.35;
+      const point1 = { x: b_shDartInner.x, y: b_shDartInner.y + dartBaseDrop };
+      const point2 = { x: b_shDartOuter.x, y: b_shDartOuter.y + dartBaseDrop };
+
       const b_waistDartX = backBustW * 0.45;
       const b_waistDartTop = { x: b_waistDartX, y: bustY + 0.5 };
-      const b_waistDartBottom = { x: b_waistDartX, y: waistY + (m.waistToHip * 0.6) };
+      const b_waistDartBottom = { x: b_waistDartX, y: waistY + (m.waistToHip * 0.6) };,
+
+      
       // --- FRONT POINTS ---
       const f_cfX = totalWidth;
       const f_np = { x: f_cfX - neckW, y: topY };
