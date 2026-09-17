@@ -376,20 +376,32 @@
                             </div>
                         </div>
                         <div class="input-section">
-                            <label for="chestWidth">Chest Width (Front)</label>
-                            <input type="number" id="chestWidth" value="13.0" step="0.25">
+                            <label>Chest Width (Front) & Ease</label>
+                            <div class="dual-input">
+                                <input type="number" id="chestWidth" value="13.0" step="0.25">
+                                <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="chestWidthEase" value="0" step="0.25"></div>
+                            </div>
                         </div>
                         <div class="input-section">
-                            <label for="backWidth">Back Width</label>
-                            <input type="number" id="backWidth" value="14.0" step="0.25">
+                            <label>Back Width & Ease</label>
+                            <div class="dual-input">
+                                <input type="number" id="backWidth" value="14.0" step="0.25">
+                                <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="backWidthEase" value="0" step="0.25"></div>
+                            </div>
                         </div>
                         <div class="input-section">
-                            <label for="shoulderLength">Shoulder Length</label>
-                            <input type="number" id="shoulderLength" value="5.0" step="0.25">
+                            <label>Shoulder Length & Ease</label>
+                            <div class="dual-input">
+                                <input type="number" id="shoulderLength" value="5.0" step="0.25">
+                                <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="shoulderLengthEase" value="0" step="0.25"></div>
+                            </div>
                         </div>
                         <div class="input-section">
-                            <label for="backNeckToWaist">Back Waist Length</label>
-                            <input type="number" id="backNeckToWaist" value="15.5" step="0.25">
+                            <label>Back Waist Length & Ease</label>
+                            <div class="dual-input">
+                                <input type="number" id="backNeckToWaist" value="15.5" step="0.25">
+                                <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="backNeckToWaistEase" value="0" step="0.25"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -417,16 +429,25 @@
                                 </div>
                             </div>
                             <div class="input-section">
-                                <label for="sleeveLength">Length of Arm (Sleeve Length)</label>
-                                <input type="number" id="sleeveLength" value="23.0" step="0.25">
+                                <label>Length of Arm (Sleeve Length) & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="sleeveLength" value="23.0" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="sleeveLengthEase" value="0" step="0.25"></div>
+                                </div>
                             </div>
                             <div class="input-section">
-                                <label for="shoulderToElbow">Shoulder to Elbow</label>
-                                <input type="number" id="shoulderToElbow" value="12.5" step="0.25">
+                                <label>Shoulder to Elbow & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="shoulderToElbow" value="12.5" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="shoulderToElbowEase" value="0" step="0.25"></div>
+                                </div>
                             </div>
                             <div class="input-section">
-                                <label for="wristCirc">Wrist Circumference</label>
-                                <input type="number" id="wristCirc" value="6.25" step="0.25">
+                                <label>Wrist Circumference & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="wristCirc" value="6.25" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="wristCircEase" value="0" step="0.25"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -668,17 +689,18 @@
             if (!size) return;
 
             const sizes = {
-                'uk8':  { bust: 32.0, waist: 24.0, chest: 12.5, back: 13.5, shoulder: 4.875, bstToWst: 15.0, bicep: 10.5, sleeveLen: 22.5, elw: 12.0, wrist: 6.0 },
-                'uk10': { bust: 33.25, waist: 24.75, chest: 12.75, back: 13.75, shoulder: 4.875, bstToWst: 15.25, bicep: 11.0, sleeveLen: 22.75, elw: 12.25, wrist: 6.125 },
-                'uk12': { bust: 34.5, waist: 25.5, chest: 13.0, back: 14.0, shoulder: 5.0, bstToWst: 15.5, bicep: 11.5, sleeveLen: 23.0, elw: 12.5, wrist: 6.25 },
-                'uk14': { bust: 37.5, waist: 28.5, chest: 13.75, back: 14.75, shoulder: 5.25, bstToWst: 16.0, bicep: 12.25, sleeveLen: 23.5, elw: 13.0, wrist: 6.5 },
-                'uk16': { bust: 39.5, waist: 30.5, chest: 14.25, back: 15.25, shoulder: 5.375, bstToWst: 16.25, bicep: 13.0, sleeveLen: 24.0, elw: 13.5, wrist: 6.75 }
+                'uk8':  { bust: 32.0, waist: 24.0, hip: 34.0, chest: 12.5, back: 13.5, shoulder: 4.875, bstToWst: 15.0, bicep: 10.5, sleeveLen: 22.5, elw: 12.0, wrist: 6.0 },
+                'uk10': { bust: 33.25, waist: 24.75, hip: 35.5, chest: 12.75, back: 13.75, shoulder: 4.875, bstToWst: 15.25, bicep: 11.0, sleeveLen: 22.75, elw: 12.25, wrist: 6.125 },
+                'uk12': { bust: 34.5, waist: 25.5, hip: 37.0, chest: 13.0, back: 14.0, shoulder: 5.0, bstToWst: 15.5, bicep: 11.5, sleeveLen: 23.0, elw: 12.5, wrist: 6.25 },
+                'uk14': { bust: 37.5, waist: 28.5, hip: 39.5, chest: 13.75, back: 14.75, shoulder: 5.25, bstToWst: 16.0, bicep: 12.25, sleeveLen: 23.5, elw: 13.0, wrist: 6.5 },
+                'uk16': { bust: 39.5, waist: 30.5, hip: 41.5, chest: 14.25, back: 15.25, shoulder: 5.375, bstToWst: 16.25, bicep: 13.0, sleeveLen: 24.0, elw: 13.5, wrist: 6.75 }
             };
 
             const data = sizes[size];
             if (data) {
                 document.getElementById('bust').value = data.bust;
                 document.getElementById('waist').value = data.waist;
+                document.getElementById('hip').value = data.hip;
                 document.getElementById('chestWidth').value = data.chest;
                 document.getElementById('backWidth').value = data.back;
                 document.getElementById('shoulderLength').value = data.shoulder;
@@ -687,6 +709,15 @@
                 document.getElementById('sleeveLength').value = data.sleeveLen;
                 document.getElementById('shoulderToElbow').value = data.elw;
                 document.getElementById('wristCirc').value = data.wrist;
+
+                // Reset non-circumference length/width eases to 0 as requested
+                document.getElementById('chestWidthEase').value = 0;
+                document.getElementById('backWidthEase').value = 0;
+                document.getElementById('shoulderLengthEase').value = 0;
+                document.getElementById('backNeckToWaistEase').value = 0;
+                document.getElementById('sleeveLengthEase').value = 0;
+                document.getElementById('shoulderToElbowEase').value = 0;
+                document.getElementById('wristCircEase').value = 0;
             }
         }
 
@@ -737,25 +768,25 @@
 
             const pieces = [];
 
-            // 1. Bodice
-            const bust = parseFloat(document.getElementById('bust').value) + parseFloat(document.getElementById('bustEase').value);
-            const backLength = parseFloat(document.getElementById('backNeckToWaist').value);
+            // 1. Bodice (using total bust width + ease for drafting dimension)
+            const bustVal = parseFloat(document.getElementById('bust').value) + parseFloat(document.getElementById('bustEase').value);
+            const backLengthVal = parseFloat(document.getElementById('backNeckToWaist').value) + parseFloat(document.getElementById('backNeckToWaistEase').value);
             pieces.push({
-                name: `Bodice Block (Chest: ${document.getElementById('chestWidth').value}", Back: ${document.getElementById('backWidth').value}")`,
-                width: (bust / 4) * scaleFactor,
-                height: backLength * scaleFactor,
+                name: `Bodice Block (Bust: ${document.getElementById('bust').value}" + ${document.getElementById('bustEase').value}" ease)`,
+                width: (bustVal / 4) * scaleFactor,
+                height: backLengthVal * scaleFactor,
                 stroke: '#c25e6f',
                 fill: 'rgba(194, 94, 111, 0.06)'
             });
 
             // 2. Sleeve
             if (document.getElementById('includeSleeve').value === 'yes') {
-                const sLen = parseFloat(document.getElementById('sleeveLength').value) * scaleFactor;
+                const sLenVal = (parseFloat(document.getElementById('sleeveLength').value) + parseFloat(document.getElementById('sleeveLengthEase').value)) * scaleFactor;
                 const bicepVal = (parseFloat(document.getElementById('bicep').value) + parseFloat(document.getElementById('bicepEase').value)) * scaleFactor;
                 pieces.push({
-                    name: `Fitted Sleeve (Top Arm: ${document.getElementById('bicep').value}")`,
+                    name: `Fitted Sleeve (Bicep: ${document.getElementById('bicep').value}" + ${document.getElementById('bicepEase').value}" ease)`,
                     width: bicepVal,
-                    height: sLen,
+                    height: sLenVal,
                     stroke: '#5c524f',
                     fill: 'rgba(92, 82, 79, 0.05)'
                 });
