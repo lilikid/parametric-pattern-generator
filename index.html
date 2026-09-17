@@ -97,6 +97,43 @@
       loose:    { bust: 4.0, waist: 2.5, hip: 3.0 }
     };
 
+    // Helper: Calculate exact arc length of a cubic Bézier curve segment
+    function getBezierLength(p0, c1, c2, p3, steps = 100) {
+      let length = 0;
+      let prev = p0;
+      for (let i = 1; i <= steps; i++) {
+        let t = i / steps;
+        let nt = 1 - t;
+        let x = nt*nt*nt*p0.x + 3*nt*nt*t*c1.x + 3*nt*t*t*c2.x + t*t*t*p3.x;
+        let y = nt*nt*nt*p0.y + 3*nt*nt*t*c1.y + 3*nt*t*t*c2.y + t*t*t*p3.y;
+        let curr = { x, y };
+        length += Math.hypot(curr.x - prev.x, curr.y - prev.y);
+        prev = curr;
+      }
+      return length;
+    }
+
+    // Helper: Match curve lengths by iteratively adjusting control point weights
+    function balanceCurveLengths(p0, c1_a, c2_a, p3, c1_b, c2_b, targetLen) {
+      // Simple scaling adjustment on second curve to match targetLen
+      let scale = 1.0;
+      let bestC1 = { ...c1_b };
+      let bestC2 = { ...c2_b };
+      
+      for (let iter = 0; iter < 10; iter++) {
+        let currentLen = getBezierLength(p0, bestC1, bestC2, p3);
+        if (Math.abs(currentLen - targetLen) < 0.001) break;
+        let ratio = targetLen / (currentLen || 1);
+        scale *= Math.sqrt(ratio); // damped adjustment
+        
+        bestC1.x = p0.x + (c1_b.x - p0.x) * scale;
+        bestC1.y = p0.y + (c1_b.y - p0.y) * scale;
+        bestC2.x = p3.x + (c2_b.x - p3.x) * scale;
+        bestC2.y = p3.y + (c2_b.y - p3.y) * scale;
+      }
+      return { c1: bestC1, c2: bestC2 };
+    }
+
     function calculateBodice(m, profileKey, showGrid) {
       const ease = EASE_PROFILES[profileKey] || EASE_PROFILES.standard;
 
@@ -278,26 +315,34 @@
       svg += `<path class="scye" d="M ${s(b.sp.x)} ${s(b.sp.y)} C ${s(b.halfBackW)} ${s(l.bustY - 0.5)}, ${s(d.up.x - 0.8)} ${s(d.up.y)}, ${s(d.up.x)} ${s(d.up.y)} C ${s(d.up.x + 0.8)} ${s(d.up.y)}, ${s(d.cfX - f.halfChestW)} ${s(l.bustY - 0.5)}, ${s(f.sp.x)} ${s(f.sp.y)}" />`;
       svg += `<text class="lbl" x="${s(d.up.x) - 8}" y="${s(d.up.y) - 6}">UP</text>`;
 
-      // SIDE SEAMS USING MATHEMATICALLY DEFINED G1 CONTINUOUS CUBIC BÉZIER CURVES
-      const upY_s = s(d.up.y);
-      const waistY_s = s(l.waistY);
-      const hipY_s = s(l.hipY);
-      const upX_s = s(d.up.x);
+      // SIDE SEAMS WITH ARC-LENGTH BALANCING FOR SEWING PERFECTION
+      const up_pt = { x: d.up.x, y: d.up.y };
+      const waist_b_pt = { x: d.up.leftW, y: l.waistY };
+      const waist_f_pt = { x: d.up.rightW, y: l.waistY };
+      const hip_b_pt = { x: d.hip.backHipX, y: l.hipY };
+      const hip_f_pt = { x: d.hip.frontHipX, y: l.hipY };
 
-      const twoThirdsDrop = (waistY_s - upY_s) / 3;
-      const waistUpOffset = (waistY_s - upY_s) / 4;
-      const waistDownOffset = (hipY_s - waistY_s) / 3;
-      const hipUpOffset = (hipY_s - waistY_s) / 4;
+      // Base un-balanced handles for Upper (UP to Waist)
+      const twoThirdsY = d.up.y + (l.waistY - d.up.y) * (2 / 3);
+      const b_c1_raw = { x: d.up.x, y: twoThirdsY };
+      const b_c2_raw = { x: d.up.leftW, y: l.waistY - (l.waistY - d.up.y) * 0.25 };
+      
+      const f_c1_raw = { x: d.up.x, y: twoThirdsY };
+      const f_c2_raw = { x: d.up.rightW, y: l.waistY - (l.waistY - d.up.y) * 0.25 };
 
-      // Back Side Seam
-      const b_wX_s = s(d.up.leftW);
-      const b_hX_s = s(d.hip.backHipX);
-      svg += `<path class="outline" d="M ${upX_s} ${upY_s} C ${upX_s} ${upY_s + twoThirdsDrop}, ${b_wX_s} ${waistY_s - waistUpOffset}, ${b_wX_s} ${waistY_s} C ${b_wX_s} ${waistY_s + waistDownOffset}, ${b_hX_s} ${hipY_s - hipUpOffset}, ${b_hX_s} ${hipY_s}" />`;
+      // Measure back upper length and balance front upper length to match precisely
+      const backUpperLen = getBezierLength(up_pt, b_c1_raw, b_c2_raw, waist_b_pt);
+      const balancedFrontUpper = balanceCurveLengths(up_pt, f_c1_raw, f_c2_raw, waist_f_pt, f_c1_raw, f_c2_raw, backUpperLen);
 
-      // Front Side Seam
-      const f_wX_s = s(d.up.rightW);
-      const f_hX_s = s(d.hip.frontHipX);
-      svg += `<path class="outline" d="M ${upX_s} ${upY_s} C ${upX_s} ${upY_s + twoThirdsDrop}, ${f_wX_s} ${waistY_s - waistUpOffset}, ${f_wX_s} ${waistY_s} C ${f_wX_s} ${waistY_s + waistDownOffset}, ${f_hX_s} ${hipY_s - hipUpOffset}, ${f_hX_s} ${hipY_s}" />`;
+      // Render Back Upper & Lower Side Seam
+      const b_c3 = { x: waist_b_pt.x, y: waist_b_pt.y + (l.hipY - l.waistY) * 0.33 };
+      const b_c4 = { x: hip_b_pt.x, y: l.hipY - (l.hipY - l.waistY) * 0.25 };
+      svg += `<path class="outline" d="M ${s(up_pt.x)} ${s(up_pt.y)} C ${s(b_c1_raw.x)} ${s(b_c1_raw.y)}, ${s(b_c2_raw.x)} ${s(b_c2_raw.y)}, ${s(waist_b_pt.x)} ${s(waist_b_pt.y)} C ${s(b_c3.x)} ${s(b_c3.y)}, ${s(b_c4.x)} ${s(b_c4.y)}, ${s(hip_b_pt.x)} ${s(hip_b_pt.y)}" />`;
+
+      // Render Front Upper & Lower Side Seam (Balanced Length)
+      const f_c3 = { x: waist_f_pt.x, y: waist_f_pt.y + (l.hipY - l.waistY) * 0.33 };
+      const f_c4 = { x: hip_f_pt.x, y: l.hipY - (l.hipY - l.waistY) * 0.25 };
+      svg += `<path class="outline" d="M ${s(up_pt.x)} ${s(up_pt.y)} C ${s(balancedFrontUpper.c1.x)} ${s(balancedFrontUpper.c1.y)}, ${s(balancedFrontUpper.c2.x)} ${s(balancedFrontUpper.c2.y)}, ${s(waist_f_pt.x)} ${s(waist_f_pt.y)} C ${s(f_c3.x)} ${s(f_c3.y)}, ${s(f_c4.x)} ${s(f_c4.y)}, ${s(hip_f_pt.x)} ${s(hip_f_pt.y)}" />`;
 
       // BACK WAIST DART
       const b_left = b.waistDartX - (b.waistDartW / 2);
