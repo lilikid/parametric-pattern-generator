@@ -31,7 +31,9 @@
         header {
             max-width: 1400px;
             margin: 0 auto 20px auto;
-            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         header h1 {
@@ -39,11 +41,34 @@
             color: #111;
         }
 
+        .unit-selector {
+            display: flex;
+            background: #e9ecef;
+            border-radius: 4px;
+            padding: 2px;
+        }
+
+        .unit-btn {
+            background: transparent;
+            border: none;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        .unit-btn.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
         .workspace {
             max-width: 1400px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: 380px 1fr;
+            grid-template-columns: 420px 1fr;
             gap: 24px;
             align-items: start;
         }
@@ -69,8 +94,12 @@
             border-bottom: 2px solid var(--bg-color);
         }
 
-        .input-group {
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 110px;
+            gap: 10px;
             margin-bottom: 14px;
+            align-items: center;
         }
 
         .input-group label {
@@ -80,18 +109,35 @@
             margin-bottom: 4px;
         }
 
-        .input-group input, .input-group select {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 0.95rem;
+        .measurement-with-ease {
+            display: grid;
+            grid-template-columns: 1fr 90px;
+            gap: 8px;
+            align-items: center;
         }
 
-        .input-group input:focus {
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .input-group input:focus, .input-group select:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(2, 117, 216, 0.1);
+        }
+
+        .ease-input-label {
+            font-size: 0.75rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .standard-input-group {
+            margin-bottom: 14px;
         }
 
         .btn-container {
@@ -101,7 +147,7 @@
             margin-top: 20px;
         }
 
-        button {
+        button.action-btn {
             width: 100%;
             padding: 10px 16px;
             border: none;
@@ -138,18 +184,47 @@
             min-height: 700px;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            position: relative;
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-            overflow: hidden;
+        }
+
+        .preview-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--bg-color);
+        }
+
+        .zoom-controls {
+            display: flex;
+            gap: 6px;
+        }
+
+        .zoom-btn {
+            background: #e9ecef;
+            border: 1px solid var(--border-color);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .zoom-btn:hover {
+            background: #dde2e6;
         }
 
         #svg-preview-box {
             width: 100%;
-            height: 100%;
+            flex-grow: 1;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: auto;
+            position: relative;
+            background: #fff;
+            border: 1px dashed #dee2e6;
         }
     </style>
 </head>
@@ -157,64 +232,152 @@
 
     <header>
         <h1>Bodice Block Pattern Generator</h1>
+        <div class="unit-selector">
+            <button class="unit-btn active" id="unit-in" onclick="setUnit('in')">Inches (in)</button>
+            <button class="unit-btn" id="unit-cm" onclick="setUnit('cm')">Centimeters (cm)</button>
+        </div>
     </header>
 
     <div class="workspace">
         <!-- Left Panel: Measurements Form -->
         <div class="panel">
-            <h2>Measurements (Inches)</h2>
+            <h2>Measurements & Ease</h2>
             <form id="pattern-form">
-                <div class="input-group">
-                    <label for="bust">Bust</label>
-                    <input type="number" id="bust" value="36.0" step="0.25">
+                
+                <!-- Block Preset Selector -->
+                <div class="standard-input-group">
+                    <label for="blockPreset">Block Type & Ease Preset</label>
+                    <select id="blockPreset" onchange="applyPreset()">
+                        <option value="standard">Standard Woven Block (+2.0" Bust, +1.5" Waist)</option>
+                        <option value="fitted">Fitted / Close-Fitting (+1.0" Bust, +0.5" Waist)</option>
+                        <option value="loose">Relaxed / Loose Fit (+3.0" Bust, +2.5" Waist)</option>
+                        <option value="custom">Custom Ease Settings</option>
+                    </select>
                 </div>
-                <div class="input-group">
-                    <label for="waist">Waist</label>
-                    <input type="number" id="waist" value="28.0" step="0.25">
+
+                <hr style="margin: 14px 0; border:0; border-top:1px solid var(--border-color);">
+
+                <!-- Bust with Ease -->
+                <div class="standard-input-group">
+                    <label>Bust Measurement & Ease</label>
+                    <div class="measurement-with-ease">
+                        <input type="number" id="bust" value="36.0" step="0.25">
+                        <div>
+                            <span class="ease-input-label">Ease</span>
+                            <input type="number" id="bustEase" value="2.0" step="0.25">
+                        </div>
+                    </div>
                 </div>
-                <div class="input-group">
-                    <label for="hip">Hip</label>
-                    <input type="number" id="hip" value="38.0" step="0.25">
+
+                <!-- Waist with Ease -->
+                <div class="standard-input-group">
+                    <label>Waist Measurement & Ease</label>
+                    <div class="measurement-with-ease">
+                        <input type="number" id="waist" value="28.0" step="0.25">
+                        <div>
+                            <span class="ease-input-label">Ease</span>
+                            <input type="number" id="waistEase" value="1.5" step="0.25">
+                        </div>
+                    </div>
                 </div>
-                <div class="input-group">
+
+                <!-- Hip with Ease -->
+                <div class="standard-input-group">
+                    <label>Hip Measurement & Ease</label>
+                    <div class="measurement-with-ease">
+                        <input type="number" id="hip" value="38.0" step="0.25">
+                        <div>
+                            <span class="ease-input-label">Ease</span>
+                            <input type="number" id="hipEase" value="2.0" step="0.25">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other Standard Measurements -->
+                <div class="standard-input-group">
                     <label for="backWidth">Across Back Width</label>
                     <input type="number" id="backWidth" value="14.0" step="0.25">
                 </div>
-                <div class="input-group">
+                <div class="standard-input-group">
                     <label for="chestWidth">Across Chest Width</label>
                     <input type="number" id="chestWidth" value="13.5" step="0.25">
                 </div>
-                <div class="input-group">
+                <div class="standard-input-group">
                     <label for="shoulderLength">Shoulder Length</label>
                     <input type="number" id="shoulderLength" value="5.25" step="0.25">
                 </div>
-                <div class="input-group">
+                <div class="standard-input-group">
                     <label for="backNeckToWaist">Back Neck to Waist</label>
                     <input type="number" id="backNeckToWaist" value="16.0" step="0.25">
                 </div>
-                <div class="input-group">
+                <div class="standard-input-group">
                     <label for="waistToHip">Waist to Hip</label>
                     <input type="number" id="waistToHip" value="8.0" step="0.25">
                 </div>
 
                 <div class="btn-container">
-                    <button type="button" id="generate-btn" class="btn-primary">Generate Pattern</button>
-                    <button type="button" id="download-btn" class="btn-secondary">Download SVG Pattern</button>
+                    <button type="button" id="generate-btn" class="action-btn btn-primary">Generate Pattern</button>
+                    <button type="button" id="download-btn" class="action-btn btn-secondary">Download SVG Pattern</button>
                 </div>
             </form>
         </div>
 
-        <!-- Right Panel: Live SVG Preview Canvas -->
+        <!-- Right Panel: Live SVG Preview Canvas with Zoom & Grid Options -->
         <div class="preview-container">
+            <div class="preview-toolbar">
+                <span id="current-unit-label" style="font-size: 0.85rem; font-weight:600; color:#555;">Grid Unit: 1 Inch</span>
+                <div class="zoom-controls">
+                    <button class="zoom-btn" onclick="adjustZoom(-0.1)" title="Zoom Out">-</button>
+                    <button class="zoom-btn" onclick="resetZoom()" title="Reset Zoom">1:1</button>
+                    <button class="zoom-btn" onclick="adjustZoom(0.1)" title="Zoom In">+</button>
+                </div>
+            </div>
             <div id="svg-preview-box">
-                <!-- SVG will load here dynamically -->
                 <p style="color: #6c757d;">Click "Generate Pattern" to render block.</p>
             </div>
         </div>
     </div>
 
-    <script type="module">
-        // We will wire up our draftingEngine and svgRenderer modules here shortly.
+    <script>
+        let currentUnit = 'in';
+        let currentZoom = 1.0;
+
+        function setUnit(unit) {
+            currentUnit = unit;
+            document.getElementById('unit-in').classList.toggle('active', unit === 'in');
+            document.getElementById('unit-cm').classList.toggle('active', unit === 'cm');
+            document.getElementById('current-unit-label').innerText = unit === 'in' ? 'Grid Unit: 1 Inch' : 'Grid Unit: 1 Centimeter';
+        }
+
+        function applyPreset() {
+            const preset = document.getElementById('blockPreset').value;
+            const bEase = document.getElementById('bustEase');
+            const wEase = document.getElementById('waistEase');
+            const hEase = document.getElementById('hipEase');
+
+            if (preset === 'standard') {
+                bEase.value = 2.0;
+                wEase.value = 1.5;
+                hEase.value = 2.0;
+            } else if (preset === 'fitted') {
+                bEase.value = 1.0;
+                wEase.value = 0.5;
+                hEase.value = 1.0;
+            } else if (preset === 'loose') {
+                bEase.value = 3.0;
+                wEase.value = 2.5;
+                hEase.value = 3.0;
+            }
+        }
+
+        function adjustZoom(amount) {
+            currentZoom = Math.max(0.5, Math.min(2.5, currentZoom + amount));
+            // Hook up to SVG scaling container
+        }
+
+        function resetZoom() {
+            currentZoom = 1.0;
+        }
     </script>
 </body>
 </html>
