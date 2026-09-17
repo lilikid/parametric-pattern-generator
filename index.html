@@ -115,7 +115,6 @@
 
     // Helper: Match curve lengths by iteratively adjusting control point weights
     function balanceCurveLengths(p0, c1_a, c2_a, p3, c1_b, c2_b, targetLen) {
-      // Simple scaling adjustment on second curve to match targetLen
       let scale = 1.0;
       let bestC1 = { ...c1_b };
       let bestC2 = { ...c2_b };
@@ -124,7 +123,7 @@
         let currentLen = getBezierLength(p0, bestC1, bestC2, p3);
         if (Math.abs(currentLen - targetLen) < 0.001) break;
         let ratio = targetLen / (currentLen || 1);
-        scale *= Math.sqrt(ratio); // damped adjustment
+        scale *= Math.sqrt(ratio);
         
         bestC1.x = p0.x + (c1_b.x - p0.x) * scale;
         bestC1.y = p0.y + (c1_b.y - p0.y) * scale;
@@ -315,20 +314,20 @@
       svg += `<path class="scye" d="M ${s(b.sp.x)} ${s(b.sp.y)} C ${s(b.halfBackW)} ${s(l.bustY - 0.5)}, ${s(d.up.x - 0.8)} ${s(d.up.y)}, ${s(d.up.x)} ${s(d.up.y)} C ${s(d.up.x + 0.8)} ${s(d.up.y)}, ${s(d.cfX - f.halfChestW)} ${s(l.bustY - 0.5)}, ${s(f.sp.x)} ${s(f.sp.y)}" />`;
       svg += `<text class="lbl" x="${s(d.up.x) - 8}" y="${s(d.up.y) - 6}">UP</text>`;
 
-      // SIDE SEAMS WITH ARC-LENGTH BALANCING FOR SEWING PERFECTION
+      // SIDE SEAMS WITH STRAIGHTER UP-POINT DESCENT & ARC-LENGTH BALANCING
       const up_pt = { x: d.up.x, y: d.up.y };
       const waist_b_pt = { x: d.up.leftW, y: l.waistY };
       const waist_f_pt = { x: d.up.rightW, y: l.waistY };
       const hip_b_pt = { x: d.hip.backHipX, y: l.hipY };
       const hip_f_pt = { x: d.hip.frontHipX, y: l.hipY };
 
-      // Base un-balanced handles for Upper (UP to Waist)
-      const twoThirdsY = d.up.y + (l.waistY - d.up.y) * (2 / 3);
-      const b_c1_raw = { x: d.up.x, y: twoThirdsY };
-      const b_c2_raw = { x: d.up.leftW, y: l.waistY - (l.waistY - d.up.y) * 0.25 };
+      // Updated: Shortened upper control handle (25% down instead of 66%) for a straighter drop under UP
+      const upperHandleOffset = (l.waistY - d.up.y) * 0.25;
+      const b_c1_raw = { x: d.up.x, y: d.up.y + upperHandleOffset };
+      const b_c2_raw = { x: d.up.leftW, y: l.waistY - upperHandleOffset };
       
-      const f_c1_raw = { x: d.up.x, y: twoThirdsY };
-      const f_c2_raw = { x: d.up.rightW, y: l.waistY - (l.waistY - d.up.y) * 0.25 };
+      const f_c1_raw = { x: d.up.x, y: d.up.y + upperHandleOffset };
+      const f_c2_raw = { x: d.up.rightW, y: l.waistY - upperHandleOffset };
 
       // Measure back upper length and balance front upper length to match precisely
       const backUpperLen = getBezierLength(up_pt, b_c1_raw, b_c2_raw, waist_b_pt);
