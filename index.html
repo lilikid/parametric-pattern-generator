@@ -352,29 +352,6 @@
             grainline.setAttribute('stroke-width', '1');
             grainline.setAttribute('stroke-dasharray', '5,5');
             patternLayer.appendChild(grainline);
-
-            // Add CB marker point: 1 inch from top and 1 inch from right
-            const inchToPx = 2.54 * s; // 1 inch converted to pixels at current scale
-            const markerX = chestWidth - inchToPx;
-            const markerY = inchToPx;
-
-            const cbCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            cbCircle.setAttribute('cx', markerX);
-            cbCircle.setAttribute('cy', markerY);
-            cbCircle.setAttribute('r', '4');
-            cbCircle.setAttribute('fill', '#0066ff');
-            cbCircle.setAttribute('stroke', '#ffffff');
-            cbCircle.setAttribute('stroke-width', '1.5');
-            patternLayer.appendChild(cbCircle);
-
-            const cbText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            cbText.setAttribute('x', markerX + 8);
-            cbText.setAttribute('y', markerY + 4);
-            cbText.setAttribute('fill', '#0066ff');
-            cbText.setAttribute('font-size', '12');
-            cbText.setAttribute('font-weight', 'bold');
-            cbText.textContent = 'CB';
-            patternLayer.appendChild(cbText);
         }
 
         // Pan and Zoom Event Listeners
