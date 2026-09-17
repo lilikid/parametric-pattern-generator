@@ -872,6 +872,8 @@
         }
 
         const viewport = document.getElementById('svg-scroll-viewport');
+
+        // Mouse Drag Panning
         viewport.addEventListener('mousedown', (e) => {
             isDragging = true;
             startMouseX = e.clientX - panX;
@@ -884,6 +886,29 @@
             updateTransform();
         });
         window.addEventListener('mouseup', () => { isDragging = false; });
+
+        // Mouse Wheel Cursor-Centered Zoom
+        viewport.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const rect = viewport.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            const zoomIntensity = 0.1;
+            const oldScale = currentScale;
+            
+            if (e.deltaY < 0) {
+                currentScale = Math.min(3.0, currentScale + zoomIntensity);
+            } else {
+                currentScale = Math.max(0.3, currentScale - zoomIntensity);
+            }
+
+            // Adjust pan coordinates so zoom centers directly on the mouse cursor position
+            panX = mouseX - (mouseX - panX) * (currentScale / oldScale);
+            panY = mouseY - (mouseY - panY) * (currentScale / oldScale);
+
+            updateTransform();
+        }, { passive: false });
 
         window.onload = () => {
             initGrid();
