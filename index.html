@@ -3,15 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Bodice Pattern Generator</title>
+    <title>Lilinora | Precision Bodice Pattern Generator</title>
+    <!-- Google Fonts for Atelier/Couture Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #0275d8;
-            --primary-hover: #025aa5;
-            --bg-color: #f4f6f9;
+            --primary: #c25e6f; /* Sophisticated Rose/Couture Accent */
+            --primary-hover: #a84c5c;
+            --bg-color: #f8f6f5;
             --card-bg: #ffffff;
-            --border-color: #cbd5e1;
-            --text-color: #1e293b;
+            --border-color: #e2dcd9;
+            --text-color: #2c2524;
+            --heading-font: 'Playfair Display', serif;
+            --body-font: 'Montserrat', sans-serif;
         }
 
         * {
@@ -21,34 +25,71 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: var(--body-font);
             background-color: var(--bg-color);
             color: var(--text-color);
-            line-height: 1.4;
-            padding: 20px;
+            line-height: 1.5;
+            padding: 24px;
         }
 
+        /* Attractive Branded Header */
         header {
             max-width: 1450px;
-            margin: 0 auto 20px auto;
+            margin: 0 auto 24px auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: var(--card-bg);
-            padding: 15px 24px;
-            border-radius: 8px;
+            padding: 18px 28px;
+            border-radius: 12px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 12px rgba(44, 37, 36, 0.03);
         }
 
-        header h1 {
-            font-size: 1.35rem;
-            color: #0f172a;
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* Lilinora Custom Symbol / Logo Mark */
+        .brand-logo-symbol {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #c25e6f, #e09fabb0);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 4px 10px rgba(194, 94, 111, 0.25);
+        }
+
+        .brand-logo-symbol svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .brand-titles h1 {
+            font-family: var(--heading-font);
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1a1514;
+            letter-spacing: -0.01em;
+        }
+
+        .brand-titles p {
+            font-size: 0.8rem;
+            color: #7a6f6d;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            font-weight: 500;
         }
 
         .unit-selector {
             display: flex;
-            background: #e2e8f0;
+            background: #f0ebe8;
             border-radius: 6px;
             padding: 3px;
         }
@@ -57,18 +98,18 @@
             background: transparent;
             border: none;
             padding: 6px 14px;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: 600;
             cursor: pointer;
             border-radius: 4px;
-            color: #475569;
+            color: #7a6f6d;
             transition: all 0.2s;
         }
 
         .unit-btn.active {
             background: white;
             color: var(--primary);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
         }
 
         .workspace {
@@ -89,17 +130,18 @@
         .panel {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(44, 37, 36, 0.03);
         }
 
         .panel h2 {
-            font-size: 1.05rem;
-            margin-bottom: 16px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #f1f5f9;
-            color: #0f172a;
+            font-family: var(--heading-font);
+            font-size: 1.2rem;
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f0ebe8;
+            color: #1a1514;
         }
 
         .input-section {
@@ -111,10 +153,9 @@
             font-size: 0.82rem;
             font-weight: 600;
             margin-bottom: 5px;
-            color: #334155;
+            color: #4a3f3d;
         }
 
-        /* Clean Side-by-Side Measurement & Ease Layout */
         .dual-input {
             display: grid;
             grid-template-columns: 1fr 90px;
@@ -132,24 +173,25 @@
             right: 0;
             font-size: 0.7rem;
             font-weight: 600;
-            color: #64748b;
+            color: #8c7e7b;
         }
 
         input[type="number"], select {
             width: 100%;
-            padding: 8px 10px;
+            padding: 9px 12px;
             border: 1px solid var(--border-color);
             border-radius: 6px;
             font-size: 0.9rem;
+            font-family: var(--body-font);
             background: #fff;
-            color: #0f172a;
+            color: var(--text-color);
             transition: border-color 0.2s, box-shadow 0.2s;
         }
 
         input[type="number"]:focus, select:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(2, 117, 216, 0.15);
+            box-shadow: 0 0 0 3px rgba(194, 94, 111, 0.15);
         }
 
         .btn-container {
@@ -161,11 +203,12 @@
 
         button.action-btn {
             width: 100%;
-            padding: 10px 16px;
+            padding: 11px 16px;
             border: none;
             border-radius: 6px;
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             font-weight: 600;
+            font-family: var(--body-font);
             cursor: pointer;
             transition: background 0.2s;
         }
@@ -180,33 +223,33 @@
         }
 
         .btn-secondary {
-            background-color: #475569;
+            background-color: #5c524f;
             color: white;
         }
 
         .btn-secondary:hover {
-            background-color: #334155;
+            background-color: #423a38;
         }
 
-        /* Preview Container with Scrollable Viewport */
+        /* Preview Container */
         .preview-container {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 20px;
+            border-radius: 12px;
+            padding: 24px;
             height: 780px;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 12px rgba(44, 37, 36, 0.03);
         }
 
         .preview-toolbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #f1f5f9;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f0ebe8;
         }
 
         .zoom-controls {
@@ -216,32 +259,31 @@
         }
 
         .zoom-btn {
-            background: #f1f5f9;
+            background: #f8f6f5;
             border: 1px solid var(--border-color);
-            width: 30px;
-            height: 30px;
-            border-radius: 4px;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
             font-weight: bold;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #334155;
+            color: #4a3f3d;
         }
 
         .zoom-btn:hover {
-            background: #e2e8f0;
+            background: #f0ebe8;
         }
 
-        /* Scrollable Canvas Box with Scrollbars */
         #svg-scroll-viewport {
             width: 100%;
             flex-grow: 1;
-            overflow: auto; /* Enables vertical and horizontal scrollbars */
+            overflow: auto;
             position: relative;
-            background: #f8fafc;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
+            background: #faf8f7;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -260,7 +302,18 @@
 <body>
 
     <header>
-        <h1>Bodice Block Pattern Generator</h1>
+        <div class="brand-container">
+            <!-- Lilinora Custom Atelier Symbol (Needle & Thread Monogram) -->
+            <div class="brand-logo-symbol" title="Lilinora Atelier">
+                <svg viewBox="0 0 24 24">
+                    <path d="M18.5,2.5 C17.5,1.5 16,1.5 15,2.5 L6,11.5 C5.4,12.1 5,12.9 5,13.8 L5,18 L9.2,18 C10.1,18 10.9,17.6 11.5,17 L20.5,8 C21.5,7 21.5,5.5 20.5,4.5 L18.5,2.5 Z M8.4,16 L7,16 L7,14.6 C7,14.3 7.1,14 7.3,13.8 L12.5,8.6 L15.4,11.5 L10.2,16.7 C10,16.9 9.7,17 9.4,17 L8.4,16 Z M19.1,6.6 L18,7.7 L16.3,6 L17.4,4.9 C17.7,4.6 18.3,4.6 18.6,4.9 L19.1,5.4 C19.4,5.7 19.4,6.3 19.1,6.6 Z"/>
+                </svg>
+            </div>
+            <div class="brand-titles">
+                <h1>Lilinora</h1>
+                <p>Precision Bodice Atelier</p>
+            </div>
+        </div>
         <div class="unit-selector">
             <button class="unit-btn active" id="unit-in" onclick="setUnit('in')">Inches (in)</button>
             <button class="unit-btn" id="unit-cm" onclick="setUnit('cm')">Centimeters (cm)</button>
@@ -284,7 +337,7 @@
                     </select>
                 </div>
 
-                <hr style="margin: 16px 0; border:0; border-top:1px solid #e2e8f0;">
+                <hr style="margin: 16px 0; border:0; border-top:1px solid #f0ebe8;">
 
                 <!-- Bust with Ease -->
                 <div class="input-section">
@@ -322,7 +375,7 @@
                     </div>
                 </div>
 
-                <hr style="margin: 16px 0; border:0; border-top:1px solid #e2e8f0;">
+                <hr style="margin: 16px 0; border:0; border-top:1px solid #f0ebe8;">
 
                 <!-- Other Standard Measurements -->
                 <div class="input-section">
@@ -356,10 +409,10 @@
         <!-- Right Panel: Scrollable & Zoomable Preview Canvas -->
         <div class="preview-container">
             <div class="preview-toolbar">
-                <span id="current-unit-label" style="font-size: 0.85rem; font-weight:600; color:#334155;">Grid Unit: 1 Inch</span>
+                <span id="current-unit-label" style="font-size: 0.85rem; font-weight:600; color:#4a3f3d;">Grid Unit: 1 Inch</span>
                 <div class="zoom-controls">
                     <button class="zoom-btn" onclick="adjustZoom(-0.15)" title="Zoom Out">-</button>
-                    <button class="zoom-btn" onclick="resetZoom()" style="width: 45px; font-size: 0.8rem;" title="Reset Zoom">1:1</button>
+                    <button class="zoom-btn" onclick="resetZoom()" style="width: 48px; font-size: 0.78rem;" title="Reset Zoom">1:1</button>
                     <button class="zoom-btn" onclick="adjustZoom(0.15)" title="Zoom In">+</button>
                 </div>
             </div>
@@ -367,7 +420,7 @@
             <div id="svg-scroll-viewport">
                 <div id="svg-canvas-wrapper">
                     <!-- Pattern SVG renders inside here -->
-                    <p style="color: #64748b; font-size: 0.9rem;">Click "Generate Pattern" to render block.</p>
+                    <p style="color: #8c7e7b; font-size: 0.9rem;">Click "Generate Pattern" to render block.</p>
                 </div>
             </div>
         </div>
@@ -423,16 +476,14 @@
         // Mouse Wheel Zoom Listener inside viewport
         const viewport = document.getElementById('svg-scroll-viewport');
         viewport.addEventListener('wheel', function(e) {
-            if (e.ctrlKey || e.metaKey || true) { // Allows smooth wheel zoom
-                e.preventDefault();
-                const zoomIntensity = 0.1;
-                if (e.deltaY < 0) {
-                    currentScale = Math.min(3.0, currentScale + zoomIntensity);
-                } else {
-                    currentScale = Math.max(0.4, currentScale - zoomIntensity);
-                }
-                applyZoomTransform();
+            e.preventDefault();
+            const zoomIntensity = 0.1;
+            if (e.deltaY < 0) {
+                currentScale = Math.min(3.0, currentScale + zoomIntensity);
+            } else {
+                currentScale = Math.max(0.4, currentScale - zoomIntensity);
             }
+            applyZoomTransform();
         }, { passive: false });
     </script>
 </body>
