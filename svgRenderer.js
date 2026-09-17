@@ -1,192 +1,117 @@
 /**
- * Dynamic Pattern Drafting Engine for Bodice Block
- * Corrected front shoulder dart pivoting and responsive sizing geometry.
+ * Dynamic SVG Render Engine with Fully Locked Test Square and ViewBox
  */
 
-export function calculateBodiceBlock(measurements, easeOptions = {}) {
-  // 1. Extract Measurements & Apply Ease Settings
-  const bustEase = easeOptions.bustEase ?? 2.0; // inches
-  const waistEase = easeOptions.waistEase ?? 1.0;
-  const hipEase = easeOptions.hipEase ?? 2.0;
-
-  const bust = measurements.bust + bustEase;
-  const waist = measurements.waist + waistEase;
-  const hip = measurements.hip + hipEase;
-  const backWidth = measurements.backWidth;
-  const chestWidth = measurements.chestWidth;
-  const shoulderLength = measurements.shoulderLength;
-  const backNeckToWaist = measurements.backNeckToWaist;
-  const waistToHip = measurements.waistToHip;
-
-  // 2. Base Grid & Reference Lines
-  const cb = 0;
-  const totalWidth = bust / 2;
-  const cf = totalWidth;
-
-  const topLineY = 0;
-  const bustLineY = backNeckToWaist * 0.5;
-  const waistLineY = backNeckToWaist;
-  const hipLineY = waistLineY + waistToHip;
-
-  const neckWidth = ((bust / 8) + 1.25) / 2 - 0.25;
-  let baseOfNeckDepth = bust > 42 ? 3.375 : (bust < 34 ? 2.75 : 3.0);
-  let frontWaistDrop = bust > 42 ? 1.0 : 0.5;
-
-  const baseOfNeckY = topLineY + baseOfNeckDepth;
-  const chestLineY = bustLineY - ((bustLineY - baseOfNeckY) / 3);
-  const trueBustLineY = bustLineY + 1.0;
-
-  // Dynamic Bust Dart Width Calculation (proportional to bust expansion)
-  let bustDartWidth = 2.375 + ((bust - 36) / 4) * 0.35;
-  bustDartWidth = Math.max(2.125, Math.min(4.5, bustDartWidth));
-
-  // 3. Point Constructions
-
-  // --- BACK BLOCK POINTS & SHOULDER DART ---
-  const backNeckPoint = { x: cb + neckWidth, y: topLineY };
-  const backShoulderDropAngle = 15 * (Math.PI / 180);
-  const totalBackShWidth = shoulderLength + 0.5; 
+export function renderPatternSVG(draftData, scale = 20) {
+  const d = draftData;
   
-  const backSpTotalEnd = {
-    x: backNeckPoint.x + totalBackShWidth * Math.cos(backShoulderDropAngle),
-    y: backNeckPoint.y + totalBackShWidth * Math.sin(backShoulderDropAngle)
-  };
+  // Locked Canvas Boundaries (Independent of individual body sizes)
+  const fixedCanvasWidth = 50; 
+  const fixedCanvasHeight = 36;
 
-  const backShoulderMid = {
-    x: (backNeckPoint.x + backSpTotalEnd.x) / 2,
-    y: (backNeckPoint.y + backSpTotalEnd.y) / 2
-  };
+  const w = fixedCanvasWidth * scale;
+  const h = fixedCanvasHeight * scale;
+  const ox = 2 * scale;
+  const oy = 2 * scale;
 
-  const backDartW = 0.5;
-  const backDartApex = { x: backShoulderMid.x - 0.375, y: backShoulderMid.y + 2.5 };
-  const backDartInner = { x: backShoulderMid.x - (backDartW / 2), y: backShoulderMid.y };
-  const backDartOuter = { x: backShoulderMid.x + (backDartW / 2), y: backShoulderMid.y };
+  const px = (val) => ox + val * scale;
+  const py = (val) => oy + val * scale;
 
-  const dartBaseDrop = 0.15;
-  const dartBasePoint1 = { x: backDartInner.x, y: backDartInner.y + dartBaseDrop };
-  const dartBasePoint2 = { x: backDartOuter.x, y: backDartOuter.y + dartBaseDrop };
-
-  const backUnderarmPoint = { x: cb + (backWidth / 2) + 0.25, y: bustLineY };
-  const backWaistSideX = backUnderarmPoint.x - 0.75;
-  const backHipPoint = { x: cb + (hip / 4), y: hipLineY };
-
-  // --- FRONT BLOCK POINTS ---
-  const frontNeckPoint = { x: cf - neckWidth, y: topLineY };
-  const baseOfNeckPoint = { x: cf, y: baseOfNeckY };
-
-  const bustDartGuideX = cf - (chestWidth / 4);
-  const trueBustPoint = { x: bustDartGuideX, y: trueBustLineY };
-
-  // Front Shoulder Construction with Corrected Dart Pivoting
-  const frontShoulderAngle = 18 * (Math.PI / 180);
-  const dartDistanceFromNeck = 2.125; 
-
-  // Inner dart leg fixed position on shoulder line
-  const frontDartInnerLeg = {
-    x: frontNeckPoint.x - dartDistanceFromNeck * Math.cos(frontShoulderAngle),
-    y: frontNeckPoint.y + dartDistanceFromNeck * Math.sin(frontShoulderAngle)
-  };
-
-  // Outer dart leg pivots outward based on dynamic bustDartWidth
-  const remainingShAfterInner = shoulderLength - dartDistanceFromNeck;
-  const outerLegDistanceFromNeck = dartDistanceFromNeck + bustDartWidth;
+  // Explicit viewBox locks the coordinate system so the test square never scales or distorts
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="100%" height="100%" style="background:#fff; max-width:900px; height:auto;">`;
   
-  const frontDartOuterLeg = {
-    x: frontNeckPoint.x - outerLegDistanceFromNeck * Math.cos(frontShoulderAngle + 0.05),
-    y: frontNeckPoint.y + outerLegDistanceFromNeck * Math.sin(frontShoulderAngle + 0.05)
-  };
+  svg += `
+    <style>
+      .grid-line { stroke: #e0e0e0; stroke-dasharray: 4,4; stroke-width: 1; }
+      .pattern-line { stroke: #111111; stroke-width: 2; fill: none; }
+      .trued-line { stroke: #0275d8; stroke-width: 2; fill: none; }
+      .guide-line { stroke: #d9534f; stroke-dasharray: 3,3; stroke-width: 1.5; fill: none; }
+      .point { fill: #d9534f; }
+      .check-pass { fill: #2e7d32; font-weight: bold; }
+      .label { font-family: sans-serif; font-size: 11px; fill: #333; }
+    </style>
+  `;
 
-  const frontShoulderPoint = {
-    x: frontDartOuterLeg.x - remainingShAfterInner * Math.cos(frontShoulderAngle - 0.08),
-    y: frontDartOuterLeg.y + remainingShAfterInner * Math.sin(frontShoulderAngle - 0.08)
-  };
+  const lines = d.lines;
+  const back = d.back;
+  const front = d.front;
 
-  const dartFoldPeak = {
-    x: (frontDartInnerLeg.x + frontDartOuterLeg.x) / 2,
-    y: Math.min(frontDartInnerLeg.y, frontDartOuterLeg.y) - 0.4
-  };
+  // --- STRICTLY FIXED 2" x 2" TEST SQUARE (Pinned at top right corner) ---
+  const testSquareX = fixedCanvasWidth - 6;
+  const testSquareY = 1.0;
+  svg += `
+    <g transform="translate(${px(testSquareX)}, ${py(testSquareY)})">
+      <rect width="${2 * scale}" height="${2 * scale}" fill="none" stroke="#111" stroke-width="1.5" />
+      <line x1="0" y1="${scale}" x2="${2 * scale}" y2="${scale}" stroke="#ccc" stroke-dasharray="2,2" />
+      <line x1="${scale}" y1="0" x2="${scale}" y2="${2 * scale}" stroke="#ccc" stroke-dasharray="2,2" />
+      <text x="${scale}" y="${scale - 5}" font-size="9" text-anchor="middle" font-family="sans-serif">2" x 2"</text>
+      <text x="${scale}" y="${scale + 12}" font-size="9" text-anchor="middle" font-family="sans-serif">Test Square</text>
+    </g>
+  `;
 
-  // Chest & Armhole Guide Points
-  const frontChestPoint = { x: cf - ((chestWidth / 2) + 0.75), y: chestLineY };
-  const frontUnderarmPoint = { x: backUnderarmPoint.x, y: bustLineY };
+  // Grid Lines
+  svg += `<line class="grid-line" x1="${px(lines.cb)}" y1="${py(lines.bustLineY)}" x2="${px(lines.cf)}" y2="${py(lines.bustLineY)}" />`;
+  svg += `<line class="grid-line" x1="${px(lines.cb)}" y1="${py(lines.waistLineY)}" x2="${px(lines.cf)}" y2="${py(lines.waistLineY)}" />`;
+  svg += `<line class="grid-line" x1="${px(lines.cb)}" y1="${py(lines.hipLineY)}" x2="${px(lines.cf)}" y2="${py(lines.hipLineY)}" />`;
 
-  const spCpMidpoint = {
-    x: (frontShoulderPoint.x + frontChestPoint.x) / 2 - 0.375,
-    y: (frontShoulderPoint.y + frontChestPoint.y) / 2
-  };
+  // Center Back / Center Front
+  svg += `<line class="pattern-line" x1="${px(lines.cb)}" y1="${py(lines.topLineY)}" x2="${px(lines.cb)}" y2="${py(lines.hipLineY)}" />`;
+  svg += `<line class="pattern-line" x1="${px(lines.cf)}" y1="${py(lines.topLineY)}" x2="${px(lines.cf)}" y2="${py(front.waistCenterPoint.y)}" />`;
 
-  const dropIntersection = { x: frontChestPoint.x, y: bustLineY };
-  const frontArmhole45Point = {
-    x: dropIntersection.x - 0.5 * Math.cos(Math.PI / 4),
-    y: dropIntersection.y + 0.5 * Math.sin(Math.PI / 4)
-  };
+  // --- BACK SHOULDER SEAM & DART TRUEING ---
+  const p3 = back.shDartInner || { x: back.neckPoint.x + 1.5, y: back.neckPoint.y };
+  const p4 = back.shDartOuter || { x: back.neckPoint.x + 2.2, y: back.neckPoint.y };
+  const apex = back.shDartApex || { x: p3.x + 0.3, y: p3.y + 2.5 };
+  
+  const pt1 = back.dartBasePoint1 || { x: p3.x, y: p3.y + 0.25 };
+  const pt2 = back.dartBasePoint2 || { x: p4.x, y: p4.y + 0.25 };
 
-  // Waist & Side Seam Trueing
-  const frontWaistSideX = frontUnderarmPoint.x + 0.5;
-  const frontWaistCenterPoint = { x: cf, y: waistLineY + frontWaistDrop };
+  svg += `<line class="trued-line" x1="${px(back.neckPoint.x)}" y1="${py(back.neckPoint.y)}" x2="${px(p3.x)}" y2="${py(p3.y)}" />`;
+  svg += `<line class="trued-line" x1="${px(p3.x)}" y1="${py(p3.y)}" x2="${px(apex.x)}" y2="${py(apex.y)}" />`;
+  svg += `<line class="trued-line" x1="${px(apex.x)}" y1="${py(apex.y)}" x2="${px(p4.x)}" y2="${py(p4.y)}" />`;
+  svg += `<line class="trued-line" x1="${px(p4.x)}" y1="${py(p4.y)}" x2="${px(back.shoulderPoint.x)}" y2="${py(back.shoulderPoint.y)}" />`;
 
-  // --- SEAM LENGTH TRUEING CHECKS ---
-  const netBackShoulderLength = Math.hypot(
-    backSpTotalEnd.x - backNeckPoint.x,
-    backSpTotalEnd.y - backNeckPoint.y
-  ) - backDartW;
+  svg += `<line class="guide-line" x1="${px(pt1.x)}" y1="${py(pt1.y)}" x2="${px(pt2.x)}" y2="${py(pt2.y)}" />`;
 
-  const netFrontShoulderLength = (
-    Math.hypot(frontDartInnerLeg.x - frontNeckPoint.x, frontDartInnerLeg.y - frontNeckPoint.y) +
-    Math.hypot(frontShoulderPoint.x - frontDartOuterLeg.x, frontShoulderPoint.y - frontDartOuterLeg.y)
-  );
+  // --- FRONT SHOULDER SEAM & DART TRUEING ---
+  svg += `<line class="trued-line" x1="${px(front.neckPoint.x)}" y1="${py(front.neckPoint.y)}" x2="${px(front.dartInnerLeg.x)}" y2="${py(front.dartInnerLeg.y)}" />`;
+  svg += `<line class="trued-line" x1="${px(front.dartInnerLeg.x)}" y1="${py(front.dartInnerLeg.y)}" x2="${px(front.dartFoldPeak.x)}" y2="${py(front.dartFoldPeak.y)}" />`;
+  svg += `<line class="trued-line" x1="${px(front.dartFoldPeak.x)}" y1="${py(front.dartFoldPeak.y)}" x2="${px(front.dartOuterLeg.x)}" y2="${py(front.dartOuterLeg.y)}" />`;
+  svg += `<line class="trued-line" x1="${px(front.dartOuterLeg.x)}" y1="${py(front.dartOuterLeg.y)}" x2="${px(front.shoulderPoint.x)}" y2="${py(front.shoulderPoint.y)}" />`;
 
-  const shoulderSeamsMatch = Math.abs(netBackShoulderLength - netFrontShoulderLength) < 0.08;
+  svg += `<line class="guide-line" x1="${px(front.neckPoint.x)}" y1="${py(front.neckPoint.y)}" x2="${px(front.shoulderPoint.x)}" y2="${py(front.shoulderPoint.y)}" />`;
 
-  const backSideSeamLength = Math.hypot(backWaistSideX - backUnderarmPoint.x, waistLineY - bustLineY);
-  const frontSideSeamLength = Math.hypot(frontWaistSideX - frontUnderarmPoint.x, waistLineY - bustLineY);
-  const sideSeamDelta = Math.abs(backSideSeamLength - frontSideSeamLength);
+  svg += `<line class="pattern-line" x1="${px(front.dartInnerLeg.x)}" y1="${py(front.dartInnerLeg.y)}" x2="${px(front.trueBustPoint.x)}" y2="${py(front.trueBustPoint.y)}" />`;
+  svg += `<line class="pattern-line" x1="${px(front.dartOuterLeg.x)}" y1="${py(front.dartOuterLeg.y)}" x2="${px(front.trueBustPoint.x)}" y2="${py(front.trueBustPoint.y)}" />`;
 
-  return {
-    dimensions: { totalWidth, totalHeight: hipLineY },
-    lines: {
-      topLineY,
-      chestLineY,
-      bustLineY,
-      trueBustLineY,
-      waistLineY,
-      hipLineY,
-      cb,
-      cf
-    },
-    qualityChecks: {
-      shoulderSeamsMatch,
-      netBackShoulderLength: netBackShoulderLength.toFixed(2),
-      netFrontShoulderLength: netFrontShoulderLength.toFixed(2),
-      sideSeamDelta: sideSeamDelta.toFixed(2)
-    },
-    back: {
-      neckPoint: backNeckPoint,
-      shoulderPoint: backSpTotalEnd,
-      shDartInner: backDartInner,
-      shDartOuter: backDartOuter,
-      shDartApex: backDartApex,
-      dartBasePoint1,
-      dartBasePoint2,
-      underarmPoint: backUnderarmPoint,
-      waistSideX: backWaistSideX,
-      hipPoint: backHipPoint
-    },
-    front: {
-      neckPoint: frontNeckPoint,
-      baseOfNeck: baseOfNeckPoint,
-      shoulderPoint: frontShoulderPoint,
-      dartInnerLeg: frontDartInnerLeg,
-      dartOuterLeg: frontDartOuterLeg,
-      dartFoldPeak,
-      chestPoint: frontChestPoint,
-      spCpMidpoint,
-      underarmPoint: frontUnderarmPoint,
-      armhole45Point: frontArmhole45Point,
-      trueBustPoint,
-      waistCenterPoint: frontWaistCenterPoint,
-      waistSideX: frontWaistSideX,
-      hipPoint: { x: cf - ((hip / 4) + 1.25), y: hipLineY }
-    }
-  };
+  // --- NECKLINES ---
+  const backNeck = `M ${px(lines.cb)} ${py(lines.topLineY)} Q ${px(back.neckPoint.x - 0.5)} ${py(lines.topLineY + 0.5)}, ${px(back.neckPoint.x)} ${py(back.neckPoint.y)}`;
+  svg += `<path class="pattern-line" d="${backNeck}" />`;
+
+  const frontNeck = `M ${px(front.neckPoint.x)} ${py(front.neckPoint.y)} Q ${px(front.neckPoint.x)} ${py(front.baseOfNeck.y)}, ${px(front.baseOfNeck.x)} ${py(front.baseOfNeck.y)}`;
+  svg += `<path class="pattern-line" d="${frontNeck}" />`;
+
+  // --- FRONT ARMHOLE CURVE ---
+  const frontArmhole = `M ${px(front.shoulderPoint.x)} ${py(front.shoulderPoint.y)}
+                        Q ${px(front.spCpMidpoint.x)} ${py(front.spCpMidpoint.y)}, ${px(front.chestPoint.x)} ${py(front.chestPoint.y)}
+                        Q ${px(front.armhole45Point.x)} ${py(front.armhole45Point.y)}, ${px(front.underarmPoint.x)} ${py(front.underarmPoint.y)}`;
+  svg += `<path class="trued-line" d="${frontArmhole}" />`;
+
+  const sideSeamPath = `M ${px(front.underarmPoint.x)} ${py(lines.bustLineY)}
+                        Q ${px(front.underarmPoint.x)} ${py(lines.trueBustLineY)}, ${px(front.waistSideX)} ${py(lines.waistLineY)}`;
+  svg += `<path class="trued-line" d="${sideSeamPath}" />`;
+
+  // --- VERIFICATION BOX ---
+  const checks = d.qualityChecks;
+  svg += `
+    <g transform="translate(${px(lines.cb + 0.5)}, ${py(lines.hipLineY + 0.5)})">
+      <rect width="280" height="75" fill="#f8f9fa" stroke="#ccc" rx="4" />
+      <text x="10" y="20" class="label" style="font-weight:bold;">Pattern Verification Checks:</text>
+      <text x="10" y="42" class="label">Shoulder Lengths Match: <tspan class="check-pass">${checks.shoulderSeamsMatch ? 'PASS ✓' : 'FAIL ✗'}</tspan> (${checks.netBackShoulderLength}" / ${checks.netFrontShoulderLength}")</text>
+      <text x="10" y="60" class="label">Side Seam Alignment Delta: <tspan class="check-pass">${checks.sideSeamDelta < 0.1 ? 'PASS ✓' : 'ADJUST ⚠'}</tspan> (${checks.sideSeamDelta}")</text>
+    </g>
+  `;
+
+  svg += `</svg>`;
+  return svg;
 }
