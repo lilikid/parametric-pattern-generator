@@ -98,24 +98,34 @@ function drawPatternBlock(container, piece) {
     container.appendChild(text);
 }
 
-// Helper to visually render any drafting point and its label on the SVG
+// Helper to visually render any drafting point and its label with high contrast
 function drawDraftingPoint(container, point) {
+    // 1. Draw high-contrast outer ring / halo for visibility
+    const halo = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    halo.setAttribute('cx', point.x);
+    halo.setAttribute('cy', point.y);
+    halo.setAttribute('r', '6');
+    halo.setAttribute('fill', '#ffffff');
+    halo.setAttribute('stroke', '#2c2524');
+    halo.setAttribute('stroke-width', '1.5');
+    container.appendChild(halo);
+
+    // 2. Draw solid center core dot
     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     circle.setAttribute('cx', point.x);
     circle.setAttribute('cy', point.y);
-    circle.setAttribute('r', '3.5');
+    circle.setAttribute('r', '3');
     circle.setAttribute('fill', '#c25e6f');
-    circle.setAttribute('stroke', '#ffffff');
-    circle.setAttribute('stroke-width', '1.5');
     container.appendChild(circle);
 
+    // 3. Draw bold point label text (offset clearly inside/next to the corner)
     const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    text.setAttribute('x', point.x + 8);
-    text.setAttribute('y', point.y - 4);
-    text.setAttribute('fill', '#c25e6f');
+    text.setAttribute('x', point.x + 10);
+    text.setAttribute('y', point.y + 14);
+    text.setAttribute('fill', '#1a1514');
     text.setAttribute('font-family', 'Montserrat');
-    text.setAttribute('font-size', '11');
+    text.setAttribute('font-size', '12');
     text.setAttribute('font-weight', '700');
-    text.textContent = point.label;
+    text.textContent = `${point.label} (${point.x}, ${point.y})`;
     container.appendChild(text);
 }
