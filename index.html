@@ -292,8 +292,8 @@
             will-change: transform;
         }
 
-        .grid-line-minor { stroke: #f1edec; stroke-width: 0.5; }
-        .grid-line-major { stroke: #e2dcd9; stroke-width: 1; }
+        .grid-line-minor { stroke: #e6dfdc; stroke-width: 0.75; vector-effect: non-scaling-stroke; }
+        .grid-line-major { stroke: #c8bbb6; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
     </style>
 </head>
 <body>
@@ -648,20 +648,25 @@
             const gridGroup = document.getElementById('grid-group');
             gridGroup.innerHTML = '';
             const width = 1600, height = 1400;
-            const step = currentUnit === 'in' ? scaleFactor : scaleFactor * 0.4;
+            // When cm is selected, step represents 1 cm (scaled appropriately)
+            const step = currentUnit === 'in' ? scaleFactor : scaleFactor / 2.54;
 
-            for (let x = 0; x <= width; x += step / 4) {
+            for (let x = 0; x <= width; x += step) {
                 const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
                 line.setAttribute('x1', x); line.setAttribute('y1', 0);
                 line.setAttribute('x2', x); line.setAttribute('y2', height);
-                line.setAttribute('class', (x % step === 0) ? 'grid-line-major' : 'grid-line-minor');
+                // In cm mode, every 5th line or 10th line can be major, or standard major every cm with minor subdivisions
+                // Let's make every 5th cm a major line when in cm mode, or every inch equivalent.
+                const isMajor = currentUnit === 'in' ? (x % (step * 4) === 0) : (Math.round(x / step) % 5 === 0);
+                line.setAttribute('class', isMajor ? 'grid-line-major' : 'grid-line-minor');
                 gridGroup.appendChild(line);
             }
-            for (let y = 0; y <= height; y += step / 4) {
+            for (let y = 0; y <= height; y += step) {
                 const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
                 line.setAttribute('x1', 0); line.setAttribute('y1', y);
                 line.setAttribute('x2', width); line.setAttribute('y2', y);
-                line.setAttribute('class', (y % step === 0) ? 'grid-line-major' : 'grid-line-minor');
+                const isMajor = currentUnit === 'in' ? (y % (step * 4) === 0) : (Math.round(y / step) % 5 === 0);
+                line.setAttribute('class', isMajor ? 'grid-line-major' : 'grid-line-minor');
                 gridGroup.appendChild(line);
             }
         }
@@ -710,7 +715,6 @@
                 document.getElementById('shoulderToElbow').value = data.elw;
                 document.getElementById('wristCirc').value = data.wrist;
 
-                // Reset non-circumference length/width eases to 0 as requested
                 document.getElementById('chestWidthEase').value = 0;
                 document.getElementById('backWidthEase').value = 0;
                 document.getElementById('shoulderLengthEase').value = 0;
@@ -768,7 +772,6 @@
 
             const pieces = [];
 
-            // 1. Bodice (using total bust width + ease for drafting dimension)
             const bustVal = parseFloat(document.getElementById('bust').value) + parseFloat(document.getElementById('bustEase').value);
             const backLengthVal = parseFloat(document.getElementById('backNeckToWaist').value) + parseFloat(document.getElementById('backNeckToWaistEase').value);
             pieces.push({
@@ -779,7 +782,6 @@
                 fill: 'rgba(194, 94, 111, 0.06)'
             });
 
-            // 2. Sleeve
             if (document.getElementById('includeSleeve').value === 'yes') {
                 const sLenVal = (parseFloat(document.getElementById('sleeveLength').value) + parseFloat(document.getElementById('sleeveLengthEase').value)) * scaleFactor;
                 const bicepVal = (parseFloat(document.getElementById('bicep').value) + parseFloat(document.getElementById('bicepEase').value)) * scaleFactor;
@@ -792,7 +794,6 @@
                 });
             }
 
-            // 3. Skirt
             if (document.getElementById('includeSkirt').value === 'yes') {
                 const skirtHips = parseFloat(document.getElementById('skirtHips').value) + parseFloat(document.getElementById('skirtHipsEase').value);
                 const skirtLen = parseFloat(document.getElementById('skirtLength').value) + parseFloat(document.getElementById('skirtLengthEase').value);
@@ -805,7 +806,6 @@
                 });
             }
 
-            // 4. Trouser
             if (document.getElementById('includePant').value === 'yes') {
                 const thighVal = parseFloat(document.getElementById('thigh').value) + parseFloat(document.getElementById('thighEase').value);
                 const inseamVal = parseFloat(document.getElementById('inseam').value) + parseFloat(document.getElementById('inseamEase').value);
@@ -818,7 +818,6 @@
                 });
             }
 
-            // Grid Flow Layout
             const originX = 50;
             const originY = 50;
             const gapX = 60;
@@ -904,7 +903,6 @@
 
         const viewport = document.getElementById('svg-scroll-viewport');
 
-        // Mouse Drag Panning
         viewport.addEventListener('mousedown', (e) => {
             isDragging = true;
             startMouseX = e.clientX - panX;
@@ -918,7 +916,6 @@
         });
         window.addEventListener('mouseup', () => { isDragging = false; });
 
-        // Mouse Wheel Cursor-Centered Zoom
         viewport.addEventListener('wheel', (e) => {
             e.preventDefault();
             const rect = viewport.getBoundingClientRect();
@@ -934,7 +931,6 @@
                 currentScale = Math.max(0.3, currentScale - zoomIntensity);
             }
 
-            // Adjust pan coordinates so zoom centers directly on the mouse cursor position
             panX = mouseX - (mouseX - panX) * (currentScale / oldScale);
             panY = mouseY - (mouseY - panY) * (currentScale / oldScale);
 
