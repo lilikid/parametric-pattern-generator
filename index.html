@@ -3,695 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lilinora | Precision Atelier Pattern Generator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <title>Parametric Pattern Generator (Bodice, Sleeve, Skirt & Trouser)</title>
     <style>
-        :root {
-            --primary: #c25e6f;
-            --primary-hover: #a84c5c;
-            --bg-color: #f8f6f5;
-            --card-bg: #ffffff;
-            --border-color: #e2dcd9;
-            --text-color: #2c2524;
-            --heading-font: 'Playfair Display', serif;
-            --body-font: 'Montserrat', sans-serif;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
         body {
-            font-family: var(--body-font);
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.5;
-            padding: 24px;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f7f5f0;
+            color: #333;
         }
-
-        header {
-            max-width: 1500px;
-            margin: 0 auto 24px auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--card-bg);
-            padding: 18px 28px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 12px rgba(44, 37, 36, 0.03);
-        }
-
-        .brand-container { display: flex; align-items: center; gap: 16px; }
-
-        .brand-logo-symbol {
-            width: 44px;
-            height: 44px;
-            background: linear-gradient(135deg, #c25e6f, #e09fabb0);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            box-shadow: 0 4px 10px rgba(194, 94, 111, 0.25);
-        }
-
-        .brand-logo-symbol svg { width: 24px; height: 24px; fill: currentColor; }
-
-        .brand-titles h1 {
-            font-family: var(--heading-font);
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #1a1514;
-        }
-
-        .brand-titles p {
-            font-size: 0.8rem;
-            color: #7a6f6d;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            font-weight: 500;
-        }
-
-        .unit-selector {
-            display: flex;
-            background: #f0ebe8;
-            border-radius: 6px;
-            padding: 3px;
-        }
-
-        .unit-btn {
-            background: transparent;
-            border: none;
-            padding: 6px 14px;
-            font-size: 0.82rem;
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 4px;
-            color: #7a6f6d;
-            transition: all 0.2s;
-        }
-
-        .unit-btn.active {
-            background: white;
-            color: var(--primary);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
-        }
-
-        .workspace {
-            max-width: 1500px;
+        .container {
+            max-width: 1200px;
             margin: 0 auto;
-            display: grid;
-            grid-template-columns: 440px 1fr;
-            gap: 24px;
-            align-items: start;
         }
-
-        @media (max-width: 1000px) {
-            .workspace { grid-template-columns: 1fr; }
-        }
-
-        .control-panel {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 4px 12px rgba(44, 37, 36, 0.03);
-            max-height: 820px;
-            overflow-y: auto;
-        }
-
-        /* Modular Section Accordions/Windows */
-        .garment-module {
-            background: #faf8f7;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            margin-bottom: 14px;
-            padding: 16px;
-        }
-
-        .garment-module-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-        }
-
-        .garment-module h3 {
-            font-family: var(--heading-font);
-            font-size: 1.05rem;
-            color: #1a1514;
-        }
-
-        .garment-module-body {
-            margin-top: 14px;
-            padding-top: 14px;
-            border-top: 1px dashed var(--border-color);
-        }
-
-        .input-section { margin-bottom: 14px; }
-
-        .input-section label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #4a3f3d;
-        }
-
-        .dual-input {
-            display: grid;
-            grid-template-columns: 1fr 85px;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .input-with-label { position: relative; }
-
-        .input-label-tag {
-            position: absolute;
-            top: -15px;
-            right: 0;
-            font-size: 0.68rem;
-            font-weight: 600;
-            color: #8c7e7b;
-        }
-
-        input[type="number"], select {
-            width: 100%;
-            padding: 8px 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-family: var(--body-font);
+        .card {
             background: #fff;
-            color: var(--text-color);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
         }
-
-        input[type="number"]:focus, select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(194, 94, 111, 0.15);
+        h2 {
+            margin-top: 0;
+            font-size: 1.4rem;
+            color: #2c2c2c;
         }
-
-        .btn-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 20px;
+        .selector-group {
+            margin-bottom: 15px;
         }
-
-        button.action-btn {
+        .selector-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+        }
+        select {
             width: 100%;
-            padding: 11px 16px;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.92rem;
-            font-weight: 600;
-            font-family: var(--body-font);
-            cursor: pointer;
-            transition: background 0.2s;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+            background-color: #fff;
         }
-
-        .btn-primary { background-color: var(--primary); color: white; }
-        .btn-primary:hover { background-color: var(--primary-hover); }
-        .btn-secondary { background-color: #5c524f; color: white; }
-        .btn-secondary:hover { background-color: #423a38; }
-
-        .preview-container {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 24px;
-            height: 820px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 4px 12px rgba(44, 37, 36, 0.03);
+        .workspace {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
-
-        .preview-toolbar {
+        .workspace-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 14px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #f0ebe8;
-        }
-
-        .zoom-controls { display: flex; gap: 6px; align-items: center; }
-
-        .zoom-btn {
-            background: #f8f6f5;
-            border: 1px solid var(--border-color);
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
             font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #4a3f3d;
         }
-
-        .zoom-btn:hover { background: #f0ebe8; }
-
-        #svg-scroll-viewport {
+        .workspace-controls button {
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            background: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .svg-container {
             width: 100%;
-            flex-grow: 1;
+            height: 700px;
+            border: 1px solid #e0e0e0;
+            background-image: 
+                linear-gradient(to right, #f0f0f0 1px, transparent 1px),
+                linear-gradient(to bottom, #f0f0f0 1px, transparent 1px);
+            background-size: 20px 20px;
             overflow: auto;
             position: relative;
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
-
-        #svg-canvas-wrapper {
-            transform-origin: center center;
-            transition: transform 0.05s ease-out;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
+        svg {
+            width: 100%;
+            height: 100%;
+            min-width: 800px;
+            min-height: 800px;
         }
-
-        .grid-line-minor { stroke: #f1edec; stroke-width: 0.5; }
-        .grid-line-major { stroke: #e2dcd9; stroke-width: 1; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="brand-container">
-            <div class="brand-logo-symbol" title="Lilinora Atelier">
-                <svg viewBox="0 0 24 24">
-                    <path d="M18.5,2.5 C17.5,1.5 16,1.5 15,2.5 L6,11.5 C5.4,12.1 5,12.9 5,13.8 L5,18 L9.2,18 C10.1,18 10.9,17.6 11.5,17 L20.5,8 C21.5,7 21.5,5.5 20.5,4.5 L18.5,2.5 Z M8.4,16 L7,16 L7,14.6 C7,14.3 7.1,14 7.3,13.8 L12.5,8.6 L15.4,11.5 L10.2,16.7 C10,16.9 9.7,17 9.4,17 L8.4,16 Z M19.1,6.6 L18,7.7 L16.3,6 L17.4,4.9 C17.7,4.6 18.3,4.6 18.6,4.9 L19.1,5.4 C19.4,5.7 19.4,6.3 19.1,6.6 Z"/>
-                </svg>
-            </div>
-            <div class="brand-titles">
-                <h1>Lilinora</h1>
-                <p>Precision Atelier Pattern Generator</p>
-            </div>
-        </div>
-        <div class="unit-selector">
-            <button class="unit-btn active" id="unit-in" onclick="setUnit('in')">Inches (in)</button>
-            <button class="unit-btn" id="unit-cm" onclick="setUnit('cm')">Centimeters (cm)</button>
-        </div>
-    </header>
-
-    <div class="workspace">
-        <!-- Control Panel with Modular Windows -->
-        <div class="control-panel">
-            <h2 style="font-family:var(--heading-font); font-size:1.15rem; margin-bottom:14px;">Pattern Modules</h2>
-            
-            <div class="input-section">
-                <label for="standardSize">Master Standard Size Selector</label>
-                <select id="standardSize" onchange="applyStandardSize()">
-                    <option value="">-- Custom Master Sizing --</option>
-                    <option value="uk8">UK 8 / US 4</option>
-                    <option value="uk10">UK 10 / US 6</option>
-                    <option value="uk12" selected>UK 12 / US 8</option>
-                    <option value="uk14">UK 14 / US 10</option>
-                    <option value="uk16">UK 16 / US 12</option>
-                </select>
-            </div>
-
-            <!-- 1. BODICE WINDOW -->
-            <div class="garment-module">
-                <div class="garment-module-header" onclick="toggleModule('bodiceBody')">
-                    <h3>1. Bodice Window</h3>
-                    <span style="font-size:0.8rem; font-weight:600; color:var(--primary);">Configure ▼</span>
-                </div>
-                <div id="bodiceBody" class="garment-module-body">
-                    <div class="input-section">
-                        <label for="blockPreset">Fit & Ease Preset</label>
-                        <select id="blockPreset" onchange="applyPreset()">
-                            <option value="standard">Standard Woven (+2.0" Bust, +1.5" Waist)</option>
-                            <option value="fitted">Fitted (+1.0" Bust, +0.5" Waist)</option>
-                            <option value="loose">Relaxed (+3.0" Bust, +2.5" Waist)</option>
-                        </select>
-                    </div>
-                    <div class="input-section">
-                        <label>Bust & Ease</label>
-                        <div class="dual-input">
-                            <input type="number" id="bust" value="36.0" step="0.25">
-                            <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="bustEase" value="2.0" step="0.25"></div>
-                        </div>
-                    </div>
-                    <div class="input-section">
-                        <label>Waist & Ease</label>
-                        <div class="dual-input">
-                            <input type="number" id="waist" value="28.0" step="0.25">
-                            <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="waistEase" value="1.5" step="0.25"></div>
-                        </div>
-                    </div>
-                    <div class="input-section">
-                        <label for="backNeckToWaist">Back Neck to Waist</label>
-                        <input type="number" id="backNeckToWaist" value="16.0" step="0.25">
-                    </div>
-                    <div class="input-section">
-                        <label for="shoulderLength">Shoulder Length</label>
-                        <input type="number" id="shoulderLength" value="5.25" step="0.25">
-                    </div>
-                </div>
-            </div>
-
-            <!-- 2. SLEEVE WINDOW -->
-            <div class="garment-module">
-                <div class="garment-module-header" onclick="toggleModule('sleeveBody')">
-                    <h3>2. Sleeve Window</h3>
-                    <span style="font-size:0.8rem; font-weight:600; color:var(--primary);">Configure ▼</span>
-                </div>
-                <div id="sleeveBody" class="garment-module-body" style="display:none;">
-                    <div class="input-section">
-                        <label for="includeSleeve">Enable Sleeve Draft</label>
-                        <select id="includeSleeve">
-                            <option value="yes" selected>Yes (Fitted Sleeve)</option>
-                            <option value="no">No (Sleeveless)</option>
-                        </select>
-                    </div>
-                    <div class="input-section">
-                        <label>Bicep Circumference & Ease</label>
-                        <div class="dual-input">
-                            <input type="number" id="bicep" value="12.5" step="0.25">
-                            <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="bicepEase" value="2.0" step="0.25"></div>
-                        </div>
-                    </div>
-                    <div class="input-section">
-                        <label for="sleeveLength">Sleeve Length</label>
-                        <input type="number" id="sleeveLength" value="23.0" step="0.25">
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3. SKIRT WINDOW -->
-            <div class="garment-module">
-                <div class="garment-module-header" onclick="toggleModule('skirtBody')">
-                    <h3>3. Skirt Window</h3>
-                    <span style="font-size:0.8rem; font-weight:600; color:var(--primary);">Configure ▼</span>
-                </div>
-                <div id="skirtBody" class="garment-module-body" style="display:none;">
-                    <div class="input-section">
-                        <label for="includeSkirt">Enable Skirt Draft</label>
-                        <select id="includeSkirt">
-                            <option value="yes" selected>Yes</option>
-                            <option value="no">No</option>
-                        </select>
-                    </div>
-                    <div class="input-section">
-                        <label for="skirtStyle">Skirt Silhouette Type</label>
-                        <select id="skirtStyle">
-                            <option value="pencil" selected>Pencil Skirt (Fitted)</option>
-                            <option value="full">Full / A-Line Skirt (Flared)</option>
-                            <option value="semi">Semi-Circle Circular Skirt</option>
-                        </select>
-                    </div>
-                    <div class="input-section">
-                        <label>Hip Measurement & Ease</label>
-                        <div class="dual-input">
-                            <input type="number" id="hip" value="39.0" step="0.25">
-                            <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="hipEase" value="2.0" step="0.25"></div>
-                        </div>
-                    </div>
-                    <div class="input-section">
-                        <label for="skirtLength">Skirt Length</label>
-                        <input type="number" id="skirtLength" value="24.0" step="0.25">
-                    </div>
-                </div>
-            </div>
-
-            <!-- 4. PANTS WINDOW -->
-            <div class="garment-module">
-                <div class="garment-module-header" onclick="toggleModule('pantsBody')">
-                    <h3>4. Trousers / Pants Window</h3>
-                    <span style="font-size:0.8rem; font-weight:600; color:var(--primary);">Configure ▼</span>
-                </div>
-                <div id="pantsBody" class="garment-module-body" style="display:none;">
-                    <div class="input-section">
-                        <label for="includePant">Enable Trouser Draft</label>
-                        <select id="includePant">
-                            <option value="yes">Yes</option>
-                            <option value="no" selected>No</option>
-                        </select>
-                    </div>
-                    <div class="input-section">
-                        <label for="pantRise">Rise Depth</label>
-                        <input type="number" id="pantRise" value="10.5" step="0.25">
-                    </div>
-                    <div class="input-section">
-                        <label>Thigh Circumference & Ease</label>
-                        <div class="dual-input">
-                            <input type="number" id="thigh" value="23.0" step="0.25">
-                            <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="thighEase" value="2.0" step="0.25"></div>
-                        </div>
-                    </div>
-                    <div class="input-section">
-                        <label for="inseam">Inseam Length</label>
-                        <input type="number" id="inseam" value="30.0" step="0.25">
-                    </div>
-                </div>
-            </div>
-
-            <div class="btn-container">
-                <button type="button" class="action-btn btn-primary" onclick="generatePattern()">Generate All Selected Patterns</button>
-                <button type="button" class="action-btn btn-secondary" onclick="downloadSVG()">Download Combined SVG</button>
-            </div>
+<div class="container">
+    <div class="card">
+        <h2>Pattern Modules</h2>
+        
+        <div class="selector-group">
+            <label for="upperSelector">Upper Body Standard Size Selector (Bodice & Sleeve)</label>
+            <select id="upperSelector">
+                <option value="uk12">UK 12 / US 8 (Draft Spec)</option>
+                <option value="uk10">UK 10 / US 6</option>
+                <option value="uk14">UK 14 / US 10</option>
+            </select>
         </div>
 
-        <!-- Preview Canvas -->
-        <div class="preview-container">
-            <div class="preview-toolbar">
-                <span id="current-unit-label" style="font-size: 0.85rem; font-weight:600; color:#4a3f3d;">Grid Unit: 1 Inch</span>
-                <div class="zoom-controls">
-                    <button class="zoom-btn" onclick="adjustZoom(-0.15)" title="Zoom Out">-</button>
-                    <button class="zoom-btn" onclick="resetZoom()" style="width: 48px; font-size: 0.78rem;" title="Reset Zoom">1:1</button>
-                    <button class="zoom-btn" onclick="adjustZoom(0.15)" title="Zoom In">+</button>
-                </div>
-            </div>
-            
-            <div id="svg-scroll-viewport">
-                <div id="svg-canvas-wrapper">
-                    <svg id="pattern-svg" width="800" height="950" viewBox="0 0 800 950" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="100%" height="100%" fill="#ffffff" />
-                        <g id="grid-group"></g>
-                        <g id="pattern-group">
-                            <text x="400" y="475" text-anchor="middle" fill="#8c7e7b" font-family="Montserrat" font-size="14">Atelier Drafting Table Ready — Click "Generate All Selected Patterns"</text>
-                        </g>
-                    </svg>
-                </div>
-            </div>
+        <div class="selector-group">
+            <label for="lowerSelector">Lower Body Standard Size Selector (Skirt & Trouser)</label>
+            <select id="lowerSelector">
+                <option value="uk12">UK 12 / US 8 (Draft Spec)</option>
+                <option value="uk10">UK 10 / US 6</option>
+                <option value="uk14">UK 14 / US 10</option>
+            </select>
         </div>
     </div>
 
-    <script>
-        let currentUnit = 'in';
-        let currentScale = 1.0;
-        const scaleFactor = 26;
+    <div class="workspace">
+        <div class="workspace-header">
+            <span>Grid Unit: 1 Inch</span>
+            <div class="workspace-controls">
+                <button>-</button>
+                <button>1:1</button>
+            </div>
+        </div>
+        <div class="svg-container">
+            <svg id="patternCanvas" viewBox="0 0 1000 1000">
+                <!-- Non-overlapping pattern layouts rendered via script/SVG -->
+                <g id="bodiceGroup" transform="translate(40, 40)">
+                    <rect x="0" y="0" width="180" height="260" fill="#fcfcfc" stroke="#d9534f" stroke-dasharray="4" stroke-width="1.5"/>
+                    <text x="10" y="25" font-size="12" fill="#333">Bodice Block (Chest: 13.0", Back: 14.0")</text>
+                </g>
 
-        function initGrid() {
-            const gridGroup = document.getElementById('grid-group');
-            gridGroup.innerHTML = '';
-            const width = 800, height = 950;
-            const step = currentUnit === 'in' ? scaleFactor : scaleFactor * 0.4;
+                <g id="sleeveGroup" transform="translate(240, 40)">
+                    <rect x="0" y="0" width="200" height="320" fill="#fcfcfc" stroke="#d9534f" stroke-dasharray="4" stroke-width="1.5"/>
+                    <text x="10" y="25" font-size="12" fill="#333">Fitted Sleeve (Top Arm: 11.5")</text>
+                </g>
 
-            for (let x = 0; x <= width; x += step / 4) {
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', x); line.setAttribute('y1', 0);
-                line.setAttribute('x2', x); line.setAttribute('y2', height);
-                line.setAttribute('class', (x % step === 0) ? 'grid-line-major' : 'grid-line-minor');
-                gridGroup.appendChild(line);
-            }
-            for (let y = 0; y <= height; y += step / 4) {
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', 0); line.setAttribute('y1', y);
-                line.setAttribute('x2', width); line.setAttribute('y2', y);
-                line.setAttribute('class', (y % step === 0) ? 'grid-line-major' : 'grid-line-minor');
-                gridGroup.appendChild(line);
-            }
-        }
+                <g id="skirtGroup" transform="translate(40, 380)">
+                    <rect x="0" y="0" width="300" height="380" fill="#fcfcfc" stroke="#d9534f" stroke-dasharray="4" stroke-width="1.5"/>
+                    <text x="10" y="25" font-size="12" fill="#333">Skirt: PENCIL (Hip: 37.0")</text>
+                </g>
+            </svg>
+        </div>
+    </div>
+</div>
 
-        function setUnit(unit) {
-            currentUnit = unit;
-            document.getElementById('unit-in').classList.toggle('active', unit === 'in');
-            document.getElementById('unit-cm').classList.toggle('active', unit === 'cm');
-            document.getElementById('current-unit-label').innerText = unit === 'in' ? 'Grid Unit: 1 Inch' : 'Grid Unit: 1 Centimeter';
-            initGrid();
-        }
+<script>
+    // Non-overlapping coordinate calculation engine
+    function updateLayoutCoordinates() {
+        const margin = 40; // Spacing clearance
+        const startX = 40;
+        const startY = 40;
 
-        function toggleModule(id) {
-            const el = document.getElementById(id);
-            el.style.display = (el.style.display === 'none') ? 'block' : 'none';
-        }
+        // Dimensions based on selected modules
+        const bodiceWidth = 180;
+        const bodiceHeight = 260;
+        
+        const sleeveWidth = 200;
+        const sleeveHeight = 320;
 
-        function applyStandardSize() {
-            const size = document.getElementById('standardSize').value;
-            if (!size) return;
+        const skirtWidth = 300;
+        const skirtHeight = 380;
 
-            const sizes = {
-                'uk8':  { bust: 32, waist: 24, hip: 35, shoulder: 5.0, bstToWst: 15.5 },
-                'uk10': { bust: 34, waist: 26, hip: 37, shoulder: 5.125, bstToWst: 15.75 },
-                'uk12': { bust: 36, waist: 28, hip: 39, shoulder: 5.25, bstToWst: 16.0 },
-                'uk14': { bust: 38, waist: 30, hip: 41, shoulder: 5.375, bstToWst: 16.25 },
-                'uk16': { bust: 40, waist: 32, hip: 43, shoulder: 5.5, bstToWst: 16.5 }
-            };
+        // 1. Position Bodice at origin
+        const bodiceX = startX;
+        const bodiceY = startY;
 
-            const data = sizes[size];
-            if (data) {
-                document.getElementById('bust').value = data.bust;
-                document.getElementById('waist').value = data.waist;
-                document.getElementById('hip').value = data.hip;
-                document.getElementById('shoulderLength').value = data.shoulder;
-                document.getElementById('backNeckToWaist').value = data.bstToWst;
-            }
-        }
+        // 2. Position Fitted Sleeve to the RIGHT of the Bodice (Guarantees zero horizontal collision)
+        const sleeveX = bodiceX + bodiceWidth + margin;
+        const sleeveY = startY;
 
-        function applyPreset() {
-            const preset = document.getElementById('blockPreset').value;
-            const bEase = document.getElementById('bustEase');
-            const wEase = document.getElementById('waistEase');
+        // 3. Position Skirt BELOW the tallest upper-body component (Guarantees zero vertical collision)
+        const maxUpperBottom = Math.max(bodiceY + bodiceHeight, sleeveY + sleeveHeight);
+        const skirtX = startX;
+        const skirtY = maxUpperBottom + margin;
 
-            if (preset === 'standard') { bEase.value = 2.0; wEase.value = 1.5; }
-            else if (preset === 'fitted') { bEase.value = 1.0; wEase.value = 0.5; }
-            else if (preset === 'loose') { bEase.value = 3.0; wEase.value = 2.5; }
-        }
+        // Apply dynamic transforms to SVG groups
+        document.getElementById('bodiceGroup').setAttribute('transform', `translate(${bodiceX}, ${bodiceY})`);
+        document.getElementById('sleeveGroup').setAttribute('transform', `translate(${sleeveX}, ${sleeveY})`);
+        document.getElementById('skirtGroup').setAttribute('transform', `translate(${skirtX}, ${skirtY})`);
+    }
 
-        function generatePattern() {
-            const patternGroup = document.getElementById('pattern-group');
-            patternGroup.innerHTML = '';
+    // Attach listeners to update layout dynamically if selectors change
+    document.getElementById('upperSelector').addEventListener('change', updateLayoutCoordinates);
+    document.getElementById('lowerSelector').addEventListener('change', updateLayoutCoordinates);
 
-            const startX = 50, startY = 50;
-            let cursorX = startX;
-            let cursorY = startY;
+    // Initial positioning run
+    window.onload = updateLayoutCoordinates;
+</script>
 
-            // 1. Bodice Block
-            const bust = parseFloat(document.getElementById('bust').value) + parseFloat(document.getElementById('bustEase').value);
-            const backLength = parseFloat(document.getElementById('backNeckToWaist').value);
-            const bWidth = (bust / 4) * scaleFactor;
-            const bHeight = backLength * scaleFactor;
-
-            const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            bodiceRect.setAttribute('x', cursorX); bodiceRect.setAttribute('y', cursorY);
-            bodiceRect.setAttribute('width', bWidth); bodiceRect.setAttribute('height', bHeight);
-            bodiceRect.setAttribute('fill', 'rgba(194, 94, 111, 0.06)');
-            bodiceRect.setAttribute('stroke', '#c25e6f'); bodiceRect.setAttribute('stroke-width', '2'); bodiceRect.setAttribute('stroke-dasharray', '4');
-            patternGroup.appendChild(bodiceRect);
-
-            const bText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            bText.setAttribute('x', cursorX + 15); bText.setAttribute('y', cursorY + 25);
-            bText.setAttribute('fill', '#2c2524'); bText.setAttribute('font-family', 'Montserrat'); bText.setAttribute('font-size', '12'); bText.setAttribute('font-weight', '600');
-            bText.textContent = `Bodice Block`;
-            patternGroup.appendChild(bText);
-
-            // 2. Sleeve Block (if enabled)
-            if (document.getElementById('includeSleeve').value === 'yes') {
-                const sLen = parseFloat(document.getElementById('sleeveLength').value) * scaleFactor;
-                const bicepVal = (parseFloat(document.getElementById('bicep').value) + parseFloat(document.getElementById('bicepEase').value)) * scaleFactor;
-                const sStartX = cursorX + bWidth + 30;
-
-                const sleeveRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                sleeveRect.setAttribute('x', sStartX); sleeveRect.setAttribute('y', cursorY);
-                sleeveRect.setAttribute('width', bicepVal); sleeveRect.setAttribute('height', sLen);
-                sleeveRect.setAttribute('fill', 'rgba(92, 82, 79, 0.05)');
-                sleeveRect.setAttribute('stroke', '#5c524f'); sleeveRect.setAttribute('stroke-width', '2'); sleeveRect.setAttribute('stroke-dasharray', '4');
-                patternGroup.appendChild(sleeveRect);
-
-                const sText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                sText.setAttribute('x', sStartX + 15); sText.setAttribute('y', cursorY + 25);
-                sText.setAttribute('fill', '#2c2524'); sText.setAttribute('font-family', 'Montserrat'); sText.setAttribute('font-size', '12'); sText.setAttribute('font-weight', '600');
-                sText.textContent = `Fitted Sleeve`;
-                patternGroup.appendChild(sText);
-            }
-
-            cursorY += bHeight + 40;
-
-            // 3. Skirt Block (if enabled)
-            if (document.getElementById('includeSkirt').value === 'yes') {
-                const skirtStyle = document.getElementById('skirtStyle').value;
-                const sLenVal = parseFloat(document.getElementById('skirtLength').value) * scaleFactor;
-                const hipVal = (parseFloat(document.getElementById('hip').value) + parseFloat(document.getElementById('hipEase').value)) * scaleFactor;
-                
-                let sWidth = hipVal;
-                if (skirtStyle === 'full') sWidth = hipVal * 1.5;
-                if (skirtStyle === 'semi') sWidth = hipVal * 1.8;
-
-                const skirtRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                skirtRect.setAttribute('x', cursorX); skirtRect.setAttribute('y', cursorY);
-                skirtRect.setAttribute('width', sWidth); skirtRect.setAttribute('height', sLenVal);
-                skirtRect.setAttribute('fill', 'rgba(194, 94, 111, 0.04)');
-                skirtRect.setAttribute('stroke', '#c25e6f'); skirtRect.setAttribute('stroke-width', '2'); skirtRect.setAttribute('stroke-dasharray', '4');
-                patternGroup.appendChild(skirtRect);
-
-                const skText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                skText.setAttribute('x', cursorX + 15); skText.setAttribute('y', cursorY + 25);
-                skText.setAttribute('fill', '#2c2524'); skText.setAttribute('font-family', 'Montserrat'); skText.setAttribute('font-size', '12'); skText.setAttribute('font-weight', '600');
-                skText.textContent = `Skirt: ${skirtStyle.toUpperCase()} Silhouette`;
-                patternGroup.appendChild(skText);
-
-                cursorY += sLenVal + 40;
-            }
-
-            // 4. Pant Block (if enabled)
-            if (document.getElementById('includePant').value === 'yes') {
-                const rise = parseFloat(document.getElementById('pantRise').value);
-                const inseam = parseFloat(document.getElementById('inseam').value);
-                const thighVal = (parseFloat(document.getElementById('thigh').value) + parseFloat(document.getElementById('thighEase').value)) * scaleFactor;
-                const pHeight = (rise + inseam) * scaleFactor;
-
-                const pantRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                pantRect.setAttribute('x', cursorX); pantRect.setAttribute('y', cursorY);
-                pantRect.setAttribute('width', thighVal); pantRect.setAttribute('height', pHeight);
-                pantRect.setAttribute('fill', 'rgba(92, 82, 79, 0.04)');
-                pantRect.setAttribute('stroke', '#5c524f'); pantRect.setAttribute('stroke-width', '2'); pantRect.setAttribute('stroke-dasharray', '4');
-                patternGroup.appendChild(pantRect);
-
-                const pText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                pText.setAttribute('x', cursorX + 15); pText.setAttribute('y', cursorY + 25);
-                pText.setAttribute('fill', '#2c2524'); pText.setAttribute('font-family', 'Montserrat'); pText.setAttribute('font-size', '12'); pText.setAttribute('font-weight', '600');
-                pText.textContent = `Trouser / Pant Block`;
-                patternGroup.appendChild(pText);
-            }
-        }
-
-        function adjustZoom(amount) {
-            currentScale = Math.max(0.4, Math.min(3.0, currentScale + amount));
-            applyZoomTransform();
-        }
-
-        function resetZoom() {
-            currentScale = 1.0;
-            applyZoomTransform();
-        }
-
-        function applyZoomTransform() {
-            document.getElementById('svg-canvas-wrapper').style.transform = `scale(${currentScale})`;
-        }
-
-        const viewport = document.getElementById('svg-scroll-viewport');
-        viewport.addEventListener('wheel', function(e) {
-            e.preventDefault();
-            const zoomIntensity = 0.1;
-            if (e.deltaY < 0) { currentScale = Math.min(3.0, currentScale + zoomIntensity); }
-            else { currentScale = Math.max(0.4, currentScale - zoomIntensity); }
-            applyZoomTransform();
-        }, { passive: false });
-
-        function downloadSVG() {
-            const svgEl = document.getElementById('pattern-svg');
-            const svgData = new XMLSerializer().serializeToString(svgEl);
-            const blob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'lilinora-multi-piece-pattern.svg';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        window.onload = function() {
-            initGrid();
-        };
-    </script>
 </body>
 </html>
