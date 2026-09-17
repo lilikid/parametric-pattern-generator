@@ -1,6 +1,6 @@
 /**
  * Dynamic Pattern Drafting Engine for Bodice Block
- * Locked to standard rectangle length/width formulas with overlap prevention buffer.
+ * Enforces strictly constant vertical length independent of bust size.
  */
 
 export function calculateBodiceBlock(measurements, easeOptions = {}) {
@@ -15,32 +15,37 @@ export function calculateBodiceBlock(measurements, easeOptions = {}) {
   const backWidth = measurements.backWidth;
   const chestWidth = measurements.chestWidth;
   const shoulderLength = measurements.shoulderLength;
+  
+  // Strict length measurements (completely isolated from bust)
   const backNeckToWaist = measurements.backNeckToWaist;
   const waistToHip = measurements.waistToHip;
 
-  // 2. Fixed Rectangle Dimensions per Source & User Correction
+  // 2. Fixed Rectangle Dimensions 
   // Width = 1/2 hip + 1.25" + 2" overlap prevention buffer
   const totalWidth = (hip / 2) + 3.25; 
-  // Length = Back Waist + Waist to Hip + 1" (Constant regardless of bust size)
+  
+  // STRICTLY CONSTANT HEIGHT: Depends ONLY on Back Waist + Waist to Hip + 1" 
   const totalHeight = backNeckToWaist + waistToHip + 1.0;
 
   const cb = 0;
   const cf = totalWidth;
 
   const topLineY = 0;
-  const bustLineY = backNeckToWaist * 0.5;
   const waistLineY = backNeckToWaist;
   const hipLineY = waistLineY + waistToHip;
+  
+  // Bust line placed proportionally from top line using back-waist length only
+  const bustLineY = backNeckToWaist * 0.5;
 
-  const neckWidth = ((bust / 8) + 1.25) / 2 - 0.25;
-  let baseOfNeckDepth = bust > 42 ? 3.375 : (bust < 34 ? 2.75 : 3.0);
-  let frontWaistDrop = bust > 42 ? 1.0 : 0.5;
+  const neckWidth = 2.75; // Constant standard neckline width block reference
+  const baseOfNeckDepth = 3.0; 
+  const frontWaistDrop = 0.5;
 
   const baseOfNeckY = topLineY + baseOfNeckDepth;
   const chestLineY = bustLineY - ((bustLineY - baseOfNeckY) / 3);
   const trueBustLineY = bustLineY + 1.0;
 
-  // Dynamic Bust Dart Width Calculation
+  // Dynamic Bust Dart Width Calculation (Only affects dart opening, never height/length)
   let bustDartWidth = 2.375 + ((bust - 36) / 4) * 0.35;
   bustDartWidth = Math.max(2.125, Math.min(4.5, bustDartWidth));
 
@@ -81,7 +86,6 @@ export function calculateBodiceBlock(measurements, easeOptions = {}) {
   const bustDartGuideX = cf - (chestWidth / 4);
   const trueBustPoint = { x: bustDartGuideX, y: trueBustLineY };
 
-  // Front Shoulder Construction with Corrected Dart Pivoting
   const frontShoulderAngle = 18 * (Math.PI / 180);
   const dartDistanceFromNeck = 2.125; 
 
@@ -108,7 +112,6 @@ export function calculateBodiceBlock(measurements, easeOptions = {}) {
     y: Math.min(frontDartInnerLeg.y, frontDartOuterLeg.y) - 0.4
   };
 
-  // Chest & Armhole Guide Points
   const frontChestPoint = { x: cf - ((chestWidth / 2) + 0.75), y: chestLineY };
   const frontUnderarmPoint = { x: backUnderarmPoint.x, y: bustLineY };
 
@@ -123,7 +126,6 @@ export function calculateBodiceBlock(measurements, easeOptions = {}) {
     y: dropIntersection.y + 0.5 * Math.sin(Math.PI / 4)
   };
 
-  // Waist & Side Seam Trueing
   const frontWaistSideX = frontUnderarmPoint.x + 0.5;
   const frontWaistCenterPoint = { x: cf, y: waistLineY + frontWaistDrop };
 
