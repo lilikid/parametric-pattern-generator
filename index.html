@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lilinora | Precision Bodice Pattern Generator</title>
-    <!-- Google Fonts for Atelier/Couture Typography -->
+    <title>Lilinora | Precision Pattern Generator</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -18,11 +17,7 @@
             --body-font: 'Montserrat', sans-serif;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: var(--body-font);
@@ -32,7 +27,6 @@
             padding: 24px;
         }
 
-        /* Attractive Branded Header */
         header {
             max-width: 1450px;
             margin: 0 auto 24px auto;
@@ -46,11 +40,7 @@
             box-shadow: 0 4px 12px rgba(44, 37, 36, 0.03);
         }
 
-        .brand-container {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
+        .brand-container { display: flex; align-items: center; gap: 16px; }
 
         .brand-logo-symbol {
             width: 44px;
@@ -64,18 +54,13 @@
             box-shadow: 0 4px 10px rgba(194, 94, 111, 0.25);
         }
 
-        .brand-logo-symbol svg {
-            width: 24px;
-            height: 24px;
-            fill: currentColor;
-        }
+        .brand-logo-symbol svg { width: 24px; height: 24px; fill: currentColor; }
 
         .brand-titles h1 {
             font-family: var(--heading-font);
             font-size: 1.6rem;
             font-weight: 700;
             color: #1a1514;
-            letter-spacing: -0.01em;
         }
 
         .brand-titles p {
@@ -115,15 +100,13 @@
             max-width: 1450px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: 400px 1fr;
+            grid-template-columns: 420px 1fr;
             gap: 24px;
             align-items: start;
         }
 
         @media (max-width: 950px) {
-            .workspace {
-                grid-template-columns: 1fr;
-            }
+            .workspace { grid-template-columns: 1fr; }
         }
 
         .panel {
@@ -132,6 +115,8 @@
             border-radius: 12px;
             padding: 24px;
             box-shadow: 0 4px 12px rgba(44, 37, 36, 0.03);
+            max-height: 820px;
+            overflow-y: auto;
         }
 
         .panel h2 {
@@ -143,9 +128,7 @@
             color: #1a1514;
         }
 
-        .input-section {
-            margin-bottom: 16px;
-        }
+        .input-section { margin-bottom: 16px; }
 
         .input-section label {
             display: block;
@@ -162,9 +145,7 @@
             align-items: center;
         }
 
-        .input-with-label {
-            position: relative;
-        }
+        .input-with-label { position: relative; }
 
         .input-label-tag {
             position: absolute;
@@ -193,6 +174,14 @@
             box-shadow: 0 0 0 3px rgba(194, 94, 111, 0.15);
         }
 
+        .conditional-group {
+            background: #faf8f7;
+            border: 1px dashed var(--border-color);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
         .btn-container {
             display: flex;
             flex-direction: column;
@@ -212,31 +201,17 @@
             transition: background 0.2s;
         }
 
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-secondary { background-color: #5c524f; color: white; }
+        .btn-secondary:hover { background-color: #423a38; }
 
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .btn-secondary {
-            background-color: #5c524f;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background-color: #423a38;
-        }
-
-        /* Preview Container */
         .preview-container {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 24px;
-            height: 780px;
+            height: 820px;
             display: flex;
             flex-direction: column;
             box-shadow: 0 4px 12px rgba(44, 37, 36, 0.03);
@@ -251,11 +226,7 @@
             border-bottom: 1px solid #f0ebe8;
         }
 
-        .zoom-controls {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-        }
+        .zoom-controls { display: flex; gap: 6px; align-items: center; }
 
         .zoom-btn {
             background: #f8f6f5;
@@ -271,9 +242,7 @@
             color: #4a3f3d;
         }
 
-        .zoom-btn:hover {
-            background: #f0ebe8;
-        }
+        .zoom-btn:hover { background: #f0ebe8; }
 
         #svg-scroll-viewport {
             width: 100%;
@@ -297,22 +266,8 @@
             padding: 40px;
         }
 
-        /* Drafting Grid Styling */
-        .grid-line-minor {
-            stroke: #f1edec;
-            stroke-width: 0.5;
-        }
-
-        .grid-line-major {
-            stroke: #e2dcd9;
-            stroke-width: 1;
-        }
-
-        .axis-line {
-            stroke: #c25e6f;
-            stroke-width: 1.5;
-            stroke-opacity: 0.4;
-        }
+        .grid-line-minor { stroke: #f1edec; stroke-width: 0.5; }
+        .grid-line-major { stroke: #e2dcd9; stroke-width: 1; }
     </style>
 </head>
 <body>
@@ -326,7 +281,7 @@
             </div>
             <div class="brand-titles">
                 <h1>Lilinora</h1>
-                <p>Precision Bodice Atelier</p>
+                <p>Precision Pattern Generator</p>
             </div>
         </div>
         <div class="unit-selector">
@@ -336,23 +291,36 @@
     </header>
 
     <div class="workspace">
-        <!-- Left Panel: Measurements Form -->
+        <!-- Left Panel -->
         <div class="panel">
-            <h2>Measurements & Ease</h2>
+            <h2>Measurements & Options</h2>
             <form id="pattern-form">
                 
+                <!-- Standard Size Quick Fill -->
                 <div class="input-section">
-                    <label for="blockPreset">Block Type & Ease Preset</label>
-                    <select id="blockPreset" onchange="applyPreset()">
-                        <option value="standard">Standard Woven Block (+2.0" Bust, +1.5" Waist)</option>
-                        <option value="fitted">Fitted / Close-Fitting (+1.0" Bust, +0.5" Waist)</option>
-                        <option value="loose">Relaxed / Loose Fit (+3.0" Bust, +2.5" Waist)</option>
-                        <option value="custom">Custom Ease Settings</option>
+                    <label for="standardSize">Standard Size Quick Fill</label>
+                    <select id="standardSize" onchange="applyStandardSize()">
+                        <option value="">-- Custom Measurements --</option>
+                        <option value="uk8">UK 8 / US 4 (Bust 32, Waist 24, Hip 35)</option>
+                        <option value="uk10">UK 10 / US 6 (Bust 34, Waist 26, Hip 37)</option>
+                        <option value="uk12" selected>UK 12 / US 8 (Bust 36, Waist 28, Hip 39)</option>
+                        <option value="uk14">UK 14 / US 10 (Bust 38, Waist 30, Hip 41)</option>
+                        <option value="uk16">UK 16 / US 12 (Bust 40, Waist 32, Hip 43)</option>
                     </select>
                 </div>
 
-                <hr style="margin: 16px 0; border:0; border-top:1px solid #f0ebe8;">
+                <div class="input-section">
+                    <label for="blockPreset">Fit & Ease Preset</label>
+                    <select id="blockPreset" onchange="applyPreset()">
+                        <option value="standard">Standard Woven Block (+2.0" Bust, +1.5" Waist)</option>
+                        <option value="fitted">Fitted Block (+1.0" Bust, +0.5" Waist)</option>
+                        <option value="loose">Relaxed Fit (+3.0" Bust, +2.5" Waist)</option>
+                    </select>
+                </div>
 
+                <hr style="margin: 14px 0; border:0; border-top:1px solid #f0ebe8;">
+
+                <!-- Core Measurements -->
                 <div class="input-section">
                     <label>Bust Measurement & Ease</label>
                     <div class="dual-input">
@@ -378,7 +346,7 @@
                 <div class="input-section">
                     <label>Hip Measurement & Ease</label>
                     <div class="dual-input">
-                        <input type="number" id="hip" value="38.0" step="0.25">
+                        <input type="number" id="hip" value="39.0" step="0.25">
                         <div class="input-with-label">
                             <span class="input-label-tag">Ease</span>
                             <input type="number" id="hipEase" value="2.0" step="0.25">
@@ -386,7 +354,7 @@
                     </div>
                 </div>
 
-                <hr style="margin: 16px 0; border:0; border-top:1px solid #f0ebe8;">
+                <hr style="margin: 14px 0; border:0; border-top:1px solid #f0ebe8;">
 
                 <div class="input-section">
                     <label for="backWidth">Across Back Width</label>
@@ -409,14 +377,78 @@
                     <input type="number" id="waistToHip" value="8.0" step="0.25">
                 </div>
 
+                <hr style="margin: 14px 0; border:0; border-top:1px solid #f0ebe8;">
+
+                <!-- Sleeve Options -->
+                <div class="input-section">
+                    <label for="sleeveStyle">Sleeve Option</label>
+                    <select id="sleeveStyle" onchange="toggleSleeveInputs()">
+                        <option value="sleeveless">Sleeveless Bodice</option>
+                        <option value="with-sleeve" selected>With Fitted Sleeve</option>
+                    </select>
+                </div>
+
+                <div id="sleeveInputsGroup" class="conditional-group">
+                    <div class="input-section">
+                        <label for="armscyeDepth">Armscye Depth</label>
+                        <input type="number" id="armscyeDepth" value="7.5" step="0.25">
+                    </div>
+                    <div class="input-section">
+                        <label for="bicep">Bicep Circumference & Ease</label>
+                        <div class="dual-input">
+                            <input type="number" id="bicep" value="12.5" step="0.25">
+                            <div class="input-with-label">
+                                <span class="input-label-tag">Ease</span>
+                                <input type="number" id="bicepEase" value="2.0" step="0.25">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-section">
+                        <label for="sleeveLength">Sleeve Length</label>
+                        <input type="number" id="sleeveLength" value="23.0" step="0.25">
+                    </div>
+                </div>
+
+                <hr style="margin: 14px 0; border:0; border-top:1px solid #f0ebe8;">
+
+                <!-- Pant Option Inputs -->
+                <div class="input-section">
+                    <label for="includePant">Include Pant Drafting Block</label>
+                    <select id="includePant" onchange="togglePantInputs()">
+                        <option value="no" selected>Bodice Only</option>
+                        <option value="yes">Include Trousers / Pants</option>
+                    </select>
+                </div>
+
+                <div id="pantInputsGroup" class="conditional-group" style="display:none;">
+                    <div class="input-section">
+                        <label for="pantRise">Rise Depth</label>
+                        <input type="number" id="pantRise" value="10.5" step="0.25">
+                    </div>
+                    <div class="input-section">
+                        <label for="thigh">Thigh Circumference & Ease</label>
+                        <div class="dual-input">
+                            <input type="number" id="thigh" value="23.0" step="0.25">
+                            <div class="input-with-label">
+                                <span class="input-label-tag">Ease</span>
+                                <input type="number" id="thighEase" value="2.0" step="0.25">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-section">
+                        <label for="inseam">Inseam Length</label>
+                        <input type="number" id="inseam" value="30.0" step="0.25">
+                    </div>
+                </div>
+
                 <div class="btn-container">
-                    <button type="button" id="generate-btn" class="action-btn btn-primary" onclick="generatePattern()">Generate Pattern</button>
-                    <button type="button" id="download-btn" class="action-btn btn-secondary" onclick="downloadSVG()">Download SVG Pattern</button>
+                    <button type="button" class="action-btn btn-primary" onclick="generatePattern()">Generate Pattern</button>
+                    <button type="button" class="action-btn btn-secondary" onclick="downloadSVG()">Download SVG Pattern</button>
                 </div>
             </form>
         </div>
 
-        <!-- Right Panel: Scrollable & Zoomable Preview Canvas -->
+        <!-- Right Panel Preview -->
         <div class="preview-container">
             <div class="preview-toolbar">
                 <span id="current-unit-label" style="font-size: 0.85rem; font-weight:600; color:#4a3f3d;">Grid Unit: 1 Inch</span>
@@ -429,13 +461,11 @@
             
             <div id="svg-scroll-viewport">
                 <div id="svg-canvas-wrapper">
-                    <!-- Initial Drafting Grid Rendered Immediately -->
-                    <svg id="pattern-svg" width="600" height="800" viewBox="0 0 600 800" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Background -->
+                    <svg id="pattern-svg" width="700" height="900" viewBox="0 0 700 900" xmlns="http://www.w3.org/2000/svg">
                         <rect width="100%" height="100%" fill="#ffffff" />
                         <g id="grid-group"></g>
                         <g id="pattern-group">
-                            <text x="300" y="400" text-anchor="middle" fill="#8c7e7b" font-family="Montserrat" font-size="14">Drafting Grid Ready — Click "Generate Pattern"</text>
+                            <text x="350" y="450" text-anchor="middle" fill="#8c7e7b" font-family="Montserrat" font-size="14">Drafting Workspace Ready — Click "Generate Pattern"</text>
                         </g>
                     </svg>
                 </div>
@@ -446,33 +476,25 @@
     <script>
         let currentUnit = 'in';
         let currentScale = 1.0;
-        const scaleFactor = 30; // pixels per unit (inch or cm representation)
+        const scaleFactor = 28;
 
         function initGrid() {
             const gridGroup = document.getElementById('grid-group');
             gridGroup.innerHTML = '';
-            
-            const width = 600;
-            const height = 800;
-            const step = currentUnit === 'in' ? scaleFactor : scaleFactor * 0.4; // Minor grid steps
+            const width = 700, height = 900;
+            const step = currentUnit === 'in' ? scaleFactor : scaleFactor * 0.4;
 
-            // Minor grid lines
             for (let x = 0; x <= width; x += step / 4) {
                 const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', x);
-                line.setAttribute('y1', 0);
-                line.setAttribute('x2', x);
-                line.setAttribute('y2', height);
+                line.setAttribute('x1', x); line.setAttribute('y1', 0);
+                line.setAttribute('x2', x); line.setAttribute('y2', height);
                 line.setAttribute('class', (x % step === 0) ? 'grid-line-major' : 'grid-line-minor');
                 gridGroup.appendChild(line);
             }
-
             for (let y = 0; y <= height; y += step / 4) {
                 const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', 0);
-                line.setAttribute('y1', y);
-                line.setAttribute('x2', width);
-                line.setAttribute('y2', y);
+                line.setAttribute('x1', 0); line.setAttribute('y1', y);
+                line.setAttribute('x2', width); line.setAttribute('y2', y);
                 line.setAttribute('class', (y % step === 0) ? 'grid-line-major' : 'grid-line-minor');
                 gridGroup.appendChild(line);
             }
@@ -486,64 +508,122 @@
             initGrid();
         }
 
+        function applyStandardSize() {
+            const size = document.getElementById('standardSize').value;
+            if (!size) return;
+
+            const sizes = {
+                'uk8':  { bust: 32, waist: 24, hip: 35, back: 13, chest: 12.5, shoulder: 5.0, bstToWst: 15.5 },
+                'uk10': { bust: 34, waist: 26, hip: 37, back: 13.5, chest: 13.0, shoulder: 5.125, bstToWst: 15.75 },
+                'uk12': { bust: 36, waist: 28, hip: 39, back: 14, chest: 13.5, shoulder: 5.25, bstToWst: 16.0 },
+                'uk14': { bust: 38, waist: 30, hip: 41, back: 14.5, chest: 14.0, shoulder: 5.375, bstToWst: 16.25 },
+                'uk16': { bust: 40, waist: 32, hip: 43, back: 15, chest: 14.5, shoulder: 5.5, bstToWst: 16.5 }
+            };
+
+            const data = sizes[size];
+            if (data) {
+                document.getElementById('bust').value = data.bust;
+                document.getElementById('waist').value = data.waist;
+                document.getElementById('hip').value = data.hip;
+                document.getElementById('backWidth').value = data.back;
+                document.getElementById('chestWidth').value = data.chest;
+                document.getElementById('shoulderLength').value = data.shoulder;
+                document.getElementById('backNeckToWaist').value = data.bstToWst;
+            }
+        }
+
         function applyPreset() {
             const preset = document.getElementById('blockPreset').value;
             const bEase = document.getElementById('bustEase');
             const wEase = document.getElementById('waistEase');
             const hEase = document.getElementById('hipEase');
 
-            if (preset === 'standard') {
-                bEase.value = 2.0;
-                wEase.value = 1.5;
-                hEase.value = 2.0;
-            } else if (preset === 'fitted') {
-                bEase.value = 1.0;
-                wEase.value = 0.5;
-                hEase.value = 1.0;
-            } else if (preset === 'loose') {
-                bEase.value = 3.0;
-                wEase.value = 2.5;
-                hEase.value = 3.0;
-            }
+            if (preset === 'standard') { bEase.value = 2.0; wEase.value = 1.5; hEase.value = 2.0; }
+            else if (preset === 'fitted') { bEase.value = 1.0; wEase.value = 0.5; hEase.value = 1.0; }
+            else if (preset === 'loose') { bEase.value = 3.0; wEase.value = 2.5; hEase.value = 3.0; }
+        }
+
+        function toggleSleeveInputs() {
+            const style = document.getElementById('sleeveStyle').value;
+            document.getElementById('sleeveInputsGroup').style.display = (style === 'with-sleeve') ? 'block' : 'none';
+        }
+
+        function togglePantInputs() {
+            const include = document.getElementById('includePant').value;
+            document.getElementById('pantInputsGroup').style.display = (include === 'yes') ? 'block' : 'none';
         }
 
         function generatePattern() {
             const patternGroup = document.getElementById('pattern-group');
             patternGroup.innerHTML = '';
 
-            // Pull values for calculation base
             const bust = parseFloat(document.getElementById('bust').value) + parseFloat(document.getElementById('bustEase').value);
             const waist = parseFloat(document.getElementById('waist').value) + parseFloat(document.getElementById('waistEase').value);
             const backLength = parseFloat(document.getElementById('backNeckToWaist').value);
-            
-            // Example calculated block bounding box for visualization
-            const blockWidth = (bust / 4) * scaleFactor;
-            const blockHeight = backLength * scaleFactor;
-            const startX = 150;
-            const startY = 100;
+            const hasSleeve = document.getElementById('sleeveStyle').value === 'with-sleeve';
+            const hasPant = document.getElementById('includePant').value === 'yes';
 
-            // Draw calculated bodice block outline based on user inputs
-            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            rect.setAttribute('x', startX);
-            rect.setAttribute('y', startY);
-            rect.setAttribute('width', blockWidth);
-            rect.setAttribute('height', blockHeight);
-            rect.setAttribute('fill', 'rgba(194, 94, 111, 0.08)');
-            rect.setAttribute('stroke', '#c25e6f');
-            rect.setAttribute('stroke-width', '2');
-            rect.setAttribute('stroke-dasharray', '4');
-            patternGroup.appendChild(rect);
+            // 1. Draw Bodice Block
+            const bWidth = (bust / 4) * scaleFactor;
+            const bHeight = backLength * scaleFactor;
+            const startX = 60;
+            const startY = 60;
 
-            // Label
-            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            text.setAttribute('x', startX + 15);
-            text.setAttribute('y', startY + 30);
-            text.setAttribute('fill', '#2c2524');
-            text.setAttribute('font-family', 'Montserrat');
-            text.setAttribute('font-size', '12');
-            text.setAttribute('font-weight', '600');
-            text.textContent = `Calculated Block (Bust: ${bust}${currentUnit})`;
-            patternGroup.appendChild(text);
+            const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            bodiceRect.setAttribute('x', startX); bodiceRect.setAttribute('y', startY);
+            bodiceRect.setAttribute('width', bWidth); bodiceRect.setAttribute('height', bHeight);
+            bodiceRect.setAttribute('fill', 'rgba(194, 94, 111, 0.06)');
+            bodiceRect.setAttribute('stroke', '#c25e6f'); bodiceRect.setAttribute('stroke-width', '2'); bodiceRect.setAttribute('stroke-dasharray', '4');
+            patternGroup.appendChild(bodiceRect);
+
+            const bText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            bText.setAttribute('x', startX + 15); bText.setAttribute('y', startY + 25);
+            bText.setAttribute('fill', '#2c2524'); bText.setAttribute('font-family', 'Montserrat'); bText.setAttribute('font-size', '12'); bText.setAttribute('font-weight', '600');
+            bText.textContent = `Bodice Block (Bust: ${bust}${currentUnit})`;
+            patternGroup.appendChild(bText);
+
+            // 2. Draw Sleeve Block if selected
+            if (hasSleeve) {
+                const sLen = parseFloat(document.getElementById('sleeveLength').value) * scaleFactor;
+                const bicepVal = (parseFloat(document.getElementById('bicep').value) + parseFloat(document.getElementById('bicepEase').value)) * scaleFactor;
+                const sStartX = startX + bWidth + 40;
+
+                const sleeveRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                sleeveRect.setAttribute('x', sStartX); sleeveRect.setAttribute('y', startY);
+                sleeveRect.setAttribute('width', bicepVal); sleeveRect.setAttribute('height', sLen);
+                sleeveRect.setAttribute('fill', 'rgba(92, 82, 79, 0.05)');
+                sleeveRect.setAttribute('stroke', '#5c524f'); sleeveRect.setAttribute('stroke-width', '2'); sleeveRect.setAttribute('stroke-dasharray', '4');
+                patternGroup.appendChild(sleeveRect);
+
+                const sText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                sText.setAttribute('x', sStartX + 15); sText.setAttribute('y', startY + 25);
+                sText.setAttribute('fill', '#2c2524'); sText.setAttribute('font-family', 'Montserrat'); sText.setAttribute('font-size', '12'); sText.setAttribute('font-weight', '600');
+                sText.textContent = `Fitted Sleeve Block`;
+                patternGroup.appendChild(sText);
+            }
+
+            // 3. Draw Pant Block if selected
+            if (hasPant) {
+                const rise = parseFloat(document.getElementById('pantRise').value);
+                const inseam = parseFloat(document.getElementById('inseam').value);
+                const thighVal = (parseFloat(document.getElementById('thigh').value) + parseFloat(document.getElementById('thighEase').value)) * scaleFactor;
+                const pHeight = (rise + inseam) * scaleFactor;
+                const pStartX = startX;
+                const pStartY = startY + bHeight + 40;
+
+                const pantRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                pantRect.setAttribute('x', pStartX); pantRect.setAttribute('y', pStartY);
+                pantRect.setAttribute('width', thighVal); pantRect.setAttribute('height', pHeight);
+                pantRect.setAttribute('fill', 'rgba(194, 94, 111, 0.04)');
+                pantRect.setAttribute('stroke', '#c25e6f'); pantRect.setAttribute('stroke-width', '2'); pantRect.setAttribute('stroke-dasharray', '4');
+                patternGroup.appendChild(pantRect);
+
+                const pText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                pText.setAttribute('x', pStartX + 15); pText.setAttribute('y', pStartY + 25);
+                pText.setAttribute('fill', '#2c2524'); pText.setAttribute('font-family', 'Montserrat'); pText.setAttribute('font-size', '12'); pText.setAttribute('font-weight', '600');
+                pText.textContent = `Trouser / Pant Block`;
+                patternGroup.appendChild(pText);
+            }
         }
 
         function adjustZoom(amount) {
@@ -557,20 +637,15 @@
         }
 
         function applyZoomTransform() {
-            const wrapper = document.getElementById('svg-canvas-wrapper');
-            wrapper.style.transform = `scale(${currentScale})`;
+            document.getElementById('svg-canvas-wrapper').style.transform = `scale(${currentScale})`;
         }
 
-        // Mouse Wheel Zoom Listener inside viewport
         const viewport = document.getElementById('svg-scroll-viewport');
         viewport.addEventListener('wheel', function(e) {
             e.preventDefault();
             const zoomIntensity = 0.1;
-            if (e.deltaY < 0) {
-                currentScale = Math.min(3.0, currentScale + zoomIntensity);
-            } else {
-                currentScale = Math.max(0.4, currentScale - zoomIntensity);
-            }
+            if (e.deltaY < 0) { currentScale = Math.min(3.0, currentScale + zoomIntensity); }
+            else { currentScale = Math.max(0.4, currentScale - zoomIntensity); }
             applyZoomTransform();
         }, { passive: false });
 
@@ -581,15 +656,16 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'lilinora-bodice-pattern.svg';
+            a.download = 'lilinora-complete-pattern.svg';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
         }
 
-        // Initialize grid on load
         window.onload = function() {
             initGrid();
+            toggleSleeveInputs();
+            togglePantInputs();
         };
     </script>
 </body>
