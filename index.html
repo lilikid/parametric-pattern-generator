@@ -180,6 +180,7 @@
       const totalBackShWidth = m.shoulderLength + 0.5;
       const b_spTotalEnd = { x: neckW + totalBackShWidth, y: b_shoulderDrop };
 
+      // Shoulder Mid Point & Apex positioning (per instructions)
       const b_shoulderMid = {
         x: (b_np.x + b_spTotalEnd.x) / 2,
         y: (b_np.y + b_spTotalEnd.y) / 2
@@ -195,18 +196,21 @@
       const len2 = dist(raw_b_shDartOuter, b_shDartApex);
       
       let final_b_shDartInner, final_b_shDartOuter;
+      // Calculate the angle of the shoulder line to adjust points along it
       const shoulderAngle = Math.atan2(b_spTotalEnd.y - b_np.y, b_spTotalEnd.x - b_np.x);
 
       if (len2 > len1) {
-        const targetLen = len2;
+        const targetLen = len2; // Outer leg is longer, so use its length
         const dx = Math.cos(shoulderAngle) * targetLen;
         const dy = Math.sin(shoulderAngle) * targetLen;
+        // Recalculate inner point position to maintain length
         final_b_shDartInner = { x: b_shDartApex.x + dx, y: b_shDartApex.y + dy };
         final_b_shDartOuter = raw_b_shDartOuter;
       } else {
-        const targetLen = len1;
+        const targetLen = len1; // Inner leg is longer (less likely)
         const dx = Math.cos(shoulderAngle + Math.PI) * targetLen;
         const dy = Math.sin(shoulderAngle + Math.PI) * targetLen;
+        // Recalculate outer point position to maintain length
         final_b_shDartOuter = { x: b_shDartApex.x + dx, y: b_shDartApex.y + dy };
         final_b_shDartInner = raw_b_shDartInner;
       }
@@ -227,16 +231,4 @@
       const f_dartW = 1.0;
       const f_halfSh = totalFrontShWidth / 2;
       const f_shDartInner = { x: f_cfX - neckW - f_halfSh + (f_dartW / 2), y: topY + 0.3 };
-      const f_shDartOuter = { x: f_cfX - neckW - f_halfSh - (f_dartW / 2), y: topY + 0.6 };
-
-      const f_waistDartTop = { x: f_apex.x, y: f_apex.y + 1.0 };
-      const f_waistDartBottom = { x: f_apex.x, y: waistY + (m.waistToHip * 0.55) };
-
-      const upX = backBustW + (blockGap / 2);
-      const upY = bustY + 0.5;
-
-      const sideWaistLeft = backBustW - sideWaistIntakeEach;
-      const sideWaistRight = backBustW + blockGap + sideWaistIntakeEach;
-
-      const backHipX = backHipW;
-      const frontHipX = f_cfX - frontHipW
+      const f_shDartOuter = { x: f_cfX - neck
