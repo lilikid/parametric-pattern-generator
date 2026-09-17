@@ -1,18 +1,23 @@
 /**
- * Dynamic SVG Render Engine with Visual Trueing Indicators
+ * Dynamic SVG Render Engine with Fixed ViewBox and Visual Trueing Indicators
  */
 
 export function renderPatternSVG(draftData, scale = 20) {
   const d = draftData;
-  const w = (d.dimensions.totalWidth + 4) * scale;
-  const h = (d.dimensions.totalHeight + 6) * scale;
+  
+  // Use a fixed max width/height canvas coordinate frame (e.g., 44" block space) so the screen/test square never jumps
+  const fixedCanvasWidth = 44; 
+  const fixedCanvasHeight = 35;
+
+  const w = fixedCanvasWidth * scale;
+  const h = fixedCanvasHeight * scale;
   const ox = 2 * scale;
   const oy = 2 * scale;
 
   const px = (val) => ox + val * scale;
   const py = (val) => oy + val * scale;
 
-  let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="background:#fff;">`;
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="100%" height="100%" style="background:#fff; max-width:850px;">`;
   
   svg += `
     <style>
@@ -29,6 +34,19 @@ export function renderPatternSVG(draftData, scale = 20) {
   const lines = d.lines;
   const back = d.back;
   const front = d.front;
+
+  // --- FIXED 2" x 2" TEST SQUARE (Always pinned at top right independent of bust size) ---
+  const testSquareX = fixedCanvasWidth - 5;
+  const testSquareY = 0.5;
+  svg += `
+    <g transform="translate(${px(testSquareX)}, ${py(testSquareY)})">
+      <rect width="${2 * scale}" height="${2 * scale}" fill="none" stroke="#111" stroke-width="1.5" />
+      <line x1="0" y1="${scale}" x2="${2 * scale}" y2="${scale}" stroke="#ccc" stroke-dasharray="2,2" />
+      <line x1="${scale}" y1="0" x2="${scale}" y2="${2 * scale}" stroke="#ccc" stroke-dasharray="2,2" />
+      <text x="${scale}" y="${scale - 5}" font-size="9" text-anchor="middle" font-family="sans-serif">2" x 2"</text>
+      <text x="${scale}" y="${scale + 12}" font-size="9" text-anchor="middle" font-family="sans-serif">Test Square</text>
+    </g>
+  `;
 
   // Grid Lines
   svg += `<line class="grid-line" x1="${px(lines.cb)}" y1="${py(lines.bustLineY)}" x2="${px(lines.cf)}" y2="${py(lines.bustLineY)}" />`;
@@ -59,7 +77,7 @@ export function renderPatternSVG(draftData, scale = 20) {
   svg += `<line class="trued-line" x1="${px(front.neckPoint.x)}" y1="${py(front.neckPoint.y)}" x2="${px(front.dartInnerLeg.x)}" y2="${py(front.dartInnerLeg.y)}" />`;
   svg += `<line class="trued-line" x1="${px(front.dartInnerLeg.x)}" y1="${py(front.dartInnerLeg.y)}" x2="${px(front.dartFoldPeak.x)}" y2="${py(front.dartFoldPeak.y)}" />`;
   svg += `<line class="trued-line" x1="${px(front.dartFoldPeak.x)}" y1="${py(front.dartFoldPeak.y)}" x2="${px(front.dartOuterLeg.x)}" y2="${py(front.dartOuterLeg.y)}" />`;
-  svg += `<line class="trued-line" x1="${px(front.dartOuterLeg.x)}" y1="${py(front.dartOuterLeg.y)}" x2="${px(front.shoulderPoint.x)}" y2="${py(front.shoulderPoint.y)}" />`;
+  svg += `<line class="trued-line" x1="${px(front.dartOuterLeg.x)}" y1="${py(front.dartOuterLeg.y)}" x2="${px(front.shoulderPoint.x)}" y2="${px(front.shoulderPoint.y)}" />`;
 
   // Closed Shoulder Straight Trueing Reference
   svg += `<line class="guide-line" x1="${px(front.neckPoint.x)}" y1="${py(front.neckPoint.y)}" x2="${px(front.shoulderPoint.x)}" y2="${py(front.shoulderPoint.y)}" />`;
