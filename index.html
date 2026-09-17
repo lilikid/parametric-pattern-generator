@@ -227,8 +227,132 @@
       const f_spTotalEnd = { x: f_cfX - neckW - totalFrontShWidth, y: b_shoulderDrop + 0.2 };
 
       const f_apex = { x: f_cfX - (m.bust / 10 + 0.75), y: trueBustY };
+      function renderSVG(d) {
+      const scale = 72; // 72 pixels per inch
+      const wPx = d.totalW * scale;
+      const hPx = d.totalH * scale;
 
-      const f_dartW = 1.0;
-      const f_halfSh = totalFrontShWidth / 2;
-      const f_shDartInner = { x: f_cfX - neckW - f_halfSh + (f_dartW / 2), y: topY + 0.3 };
-      const f_shDartOuter = { x: f_cfX - neck
+      let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${wPx} ${hPx}" width="100%" height="100%">`;
+      svg += `<defs>
+        <style>
+          .grid { stroke: #e2e8f0; stroke-width: 0.5; stroke-dasharray: 4 4; }
+          .axis-label { font-size: 10px; fill: #718096; font-family: sans-serif; }
+          .pattern-line { stroke: #1a202c; stroke-width: 2; fill: none; }
+          .construction-line { stroke: #cbd5e0; stroke-width: 1; fill: none; stroke-dasharray: 2 2; }
+          .dart-line { stroke: #e53e3e; stroke-width: 1.5; fill: none; }
+          .grainline { stroke: #3182ce; stroke-width: 1; stroke-dasharray: 6 3; }
+          .text-label { font-size: 11px; fill: #2d3748; font-family: sans-serif; font-weight: 600; }
+        </style>
+      </defs>`;
+
+      svg += `<rect width="100%" height="100%" fill="#ffffff" rx="6"/>`;
+
+      if (d.showGrid) {
+        svg += `<g id="grid">`;
+        for (let x = 0; x <= d.totalW; x += 1) {
+          svg += `<line x1="${x*scale}" y1="0" x2="${x*scale}" y2="${hPx}" class="grid" />`;
+          svg += `<text x="${x*scale + 2}" y="12" class="axis-label">${x}&quot;</text>`;
+        }
+        for (let y = 0; y <= d.totalH; y += 1) {
+          svg += `<line x1="0" y1="${y*scale}" x2="${wPx}" y2="${y*scale}" class="grid" />`;
+          svg += `<text x="4" y="${y*scale - 2}" class="axis-label">${y}&quot;</text>`;
+        }
+        svg += `</g>`;
+
+        svg += `<g id="construction">`;
+        const l = d.lines;
+        svg += `<line x1="${d.cbX*scale}" y1="${l.topY*scale}" x2="${d.cfX*scale}" y2="${l.topY*scale}" class="construction-line" />`;
+        svg += `<line x1="${d.cbX*scale}" y1="${l.bustY*scale}" x2="${d.cfX*scale}" y2="${l.bustY*scale}" class="construction-line" />`;
+        svg += `<line x1="${d.cbX*scale}" y1="${l.waistY*scale}" x2="${d.cfX*scale}" y2="${l.waistY*scale}" class="construction-line" />`;
+        svg += `<line x1="${d.cbX*scale}" y1="${l.hipY*scale}" x2="${d.cfX*scale}" y2="${l.hipY*scale}" class="construction-line" />`;
+        svg += `</g>`;
+      }
+
+      // --- BACK PIECE RENDER ---
+      svg += `<g id="back-piece">`;
+      svg += `<path d="M ${d.cbX*scale} ${d.lines.topY*scale} 
+                   L ${d.back.np.x*scale} ${d.back.np.y*scale} 
+                   L ${d.back.shDartInner.x*scale} ${d.back.shDartInner.y*scale} 
+                   L ${d.back.shDartApex.x*scale} ${d.back.shDartApex.y*scale} 
+                   L ${d.back.shDartOuter.x*scale} ${d.back.shDartOuter.y*scale} 
+                   L ${d.back.sp.x*scale} ${d.back.sp.y*scale} 
+                   Q ${(d.back.sp.x + 0.2)*scale} ${(d.lines.bustY)*scale}, ${d.up.leftW*scale} ${d.lines.bustY*scale} 
+                   L ${d.up.leftW*scale} ${d.lines.waistY*scale} 
+                   L ${d.hip.backHipX*scale} ${d.lines.hipY*scale} 
+                   L ${d.cbX*scale} ${d.lines.hipY*scale} Z" class="pattern-line" />`;
+
+      svg += `<line x1="${d.back.shDartInner.x*scale}" y1="${d.back.shDartInner.y*scale}" x2="${d.back.shDartApex.x*scale}" y2="${d.back.shDartApex.y*scale}" class="dart-line" />`;
+      svg += `<line x1="${d.back.shDartOuter.x*scale}" y1="${d.back.shDartOuter.y*scale}" x2="${d.back.shDartApex.x*scale}" y2="${d.back.shDartApex.y*scale}" class="dart-line" />`;
+      
+      svg += `<line x1="${d.back.waistDartTop.x*scale}" y1="${d.back.waistDartTop.y*scale}" x2="${d.back.waistDartBottom.x*scale}" y2="${d.back.waistDartBottom.y*scale}" class="dart-line" />`;
+      svg += `<line x1="${(d.back.waistDartX - d.back.waistDartW/2)*scale}" y1="${d.lines.waistY*scale}" x2="${d.back.waistDartApex ? d.back.waistDartApex.x*scale : d.back.waistDartBottom.x*scale}" y2="${d.back.waistDartBottom.y*scale}" class="dart-line" />`;
+      
+      svg += `<text x="${(d.cbX + 1.5)*scale}" y="${(d.lines.bustY + 1)*scale}" class="text-label">BACK BLOCK</text>`;
+      svg += `</g>`;
+
+      // --- FRONT PIECE RENDER ---
+      svg += `<g id="front-piece">`;
+      svg += `<path d="M ${d.cfX*scale} ${d.lines.topY*scale} 
+                   L ${d.front.np.x*scale} ${d.front.np.y*scale} 
+                   L ${d.front.shDartInner.x*scale} ${d.front.shDartInner.y*scale} 
+                   L ${d.front.apex.x*scale} ${d.front.apex.y*scale} 
+                   L ${d.front.shDartOuter.x*scale} ${d.front.shDartOuter.y*scale} 
+                   L ${d.front.sp.x*scale} ${d.front.sp.y*scale} 
+                   Q ${(d.front.sp.x - 0.2)*scale} ${(d.lines.bustY)*scale}, ${d.up.rightW*scale} ${d.lines.bustY*scale} 
+                   L ${d.up.rightW*scale} ${d.lines.waistY*scale} 
+                   L ${d.hip.frontHipX*scale} ${d.lines.hipY*scale} 
+                   L ${d.cfX*scale} ${d.lines.hipY*scale} Z" class="pattern-line" />`;
+
+      svg += `<line x1="${d.front.shDartInner.x*scale}" y1="${d.front.shDartInner.y*scale}" x2="${d.front.apex.x*scale}" y2="${d.front.apex.y*scale}" class="dart-line" />`;
+      svg += `<line x1="${d.front.shDartOuter.x*scale}" y1="${d.front.shDartOuter.y*scale}" x2="${d.front.apex.x*scale}" y2="${d.front.apex.y*scale}" class="dart-line" />`;
+
+      svg += `<text x="${(d.cfX - 2.5)*scale}" y="${(d.lines.bustY + 1)*scale}" class="text-label">FRONT BLOCK</text>`;
+      svg += `</g>`;
+
+      svg += `</svg>`;
+      return svg;
+    }
+
+    function updatePattern() {
+      const measurements = {
+        bust: parseFloat(document.getElementById('bust').value),
+        waist: parseFloat(document.getElementById('waist').value),
+        hip: parseFloat(document.getElementById('hip').value),
+        backWidth: parseFloat(document.getElementById('backWidth').value),
+        chestWidth: parseFloat(document.getElementById('chestWidth').value),
+        shoulderLength: parseFloat(document.getElementById('shoulderLength').value),
+        backNeckToWaist: parseFloat(document.getElementById('backNeckToWaist').value),
+        waistToHip: parseFloat(document.getElementById('waistToHip').value)
+      };
+
+      const profileKey = document.getElementById('easeProfile').value;
+      const showGrid = document.getElementById('showGrid').checked;
+
+      const data = calculateBodice(measurements, profileKey, showGrid);
+      const svgString = renderSVG(data);
+      document.getElementById('svgContainer').innerHTML = svgString;
+    }
+
+    document.getElementById('generateBtn').addEventListener('click', updatePattern);
+    document.getElementById('easeProfile').addEventListener('change', updatePattern);
+    document.getElementById('showGrid').addEventListener('change', updatePattern);
+
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      const svgContent = document.getElementById('svgContainer').innerHTML;
+      const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'bodice_technical_block.svg';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    // Initial render on load
+    window.onload = updatePattern;
+  </script>
+</body>
+</html>
+      
