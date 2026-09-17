@@ -183,21 +183,22 @@
       const b_dartW = 0.5;
       const b_shDartApex = { x: b_shoulderMid.x - 0.375, y: b_shoulderMid.y + 2.5 };
 
+      // Outer leg stays anchored to the true shoulder line endpoint (SP side)
       const b_shDartOuter = { 
         x: b_shoulderMid.x + (b_dartW / 2), 
-        y: b_shoulderMid.y 
+        y: b_shoulderDrop + (b_shoulderMid.x + (b_dartW / 2) - b_np.x) * ((b_shoulderDrop - topY) / (b_spTotalEnd.x - b_np.x))
       };
       
-      // Force dart legs to equal length by adjusting from the neck side correctly
       const b_leg2Vec = { x: b_shDartApex.x - b_shDartOuter.x, y: b_shDartApex.y - b_shDartOuter.y };
       const b_leg2Len = Math.hypot(b_leg2Vec.x, b_leg2Vec.y);
-      
-      const b_leg1Vec = { x: b_np.x - b_shDartApex.x, y: b_np.y - b_shDartApex.y };
-      const b_leg1Len = Math.hypot(b_leg1Vec.x, b_leg1Vec.y);
+
+      // Inner leg (Neck side) gets the exact same length as leg 2, creating the correct step-down point marked in red
+      const b_leg1VecDir = { x: b_np.x - b_shDartApex.x, y: b_np.y - b_shDartApex.y };
+      const b_leg1RawLen = Math.hypot(b_leg1VecDir.x, b_leg1VecDir.y);
 
       const b_shDartInner = {
-        x: b_shDartApex.x + (b_leg2Len / b_leg1Len) * b_leg1Vec.x,
-        y: b_shDartApex.y + (b_leg2Len / b_leg1Len) * b_leg1Vec.y
+        x: b_shDartApex.x + (b_leg2Len / b_leg1RawLen) * b_leg1VecDir.x,
+        y: b_shDartApex.y + (b_leg2Len / b_leg1RawLen) * b_leg1VecDir.y
       };
 
       const b_waistDartX = backBustW * 0.45;
