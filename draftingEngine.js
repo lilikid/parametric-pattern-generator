@@ -1,8 +1,12 @@
 // --- LILINORA DRAFTING ENGINE: POINT-BY-POINT SEQUENCING ---
 
 function generatePattern() {
+    console.log("Generating pattern and rendering points...");
     const patternGroup = document.getElementById('pattern-group');
-    if (!patternGroup) return;
+    if (!patternGroup) {
+        console.error("Pattern group element not found!");
+        return;
+    }
     patternGroup.innerHTML = '';
 
     const scaleFactor = 26; // Standard grid scale factor
@@ -20,7 +24,7 @@ function generatePattern() {
         isIndependent: true
     };
 
-    // Read input values from existing HTML elements safely
+    // Read input values safely
     const bustInput = document.getElementById('bust');
     const bustEaseInput = document.getElementById('bustEase');
     const backWaistInput = document.getElementById('backNeckToWaist');
@@ -32,7 +36,7 @@ function generatePattern() {
     const bodiceWidth = (bustVal / 4) * scaleFactor;
     const bodiceHeight = backLengthVal * scaleFactor;
 
-    // Render Bodice Block
+    // 1. Render Bodice Block
     drawPatternBlock(patternGroup, {
         name: `Bodice Block [${CB_Top.label}] (Bust: ${bustVal}")`,
         x: CB_Top.x,
@@ -43,9 +47,7 @@ function generatePattern() {
         fill: 'rgba(194, 94, 111, 0.06)'
     });
 
-    // ==========================================
-    // OPTIONAL PIECES (Sleeve, Skirt, Trousers)
-    // ==========================================
+    // 2. Render Optional Sleeve Block
     const includeSleeve = document.getElementById('includeSleeve');
     if (includeSleeve && includeSleeve.value === 'yes') {
         const bicepInput = document.getElementById('bicep');
@@ -67,14 +69,12 @@ function generatePattern() {
         });
     }
 
-    // ==========================================
-    // RENDER VISUAL POINTS & LABELS
-    // ==========================================
-    // Call the point renderer here so it appears on top of the blocks
+    // 3. Render Visual Drafting Point 1 (CB) ON TOP of blocks
     drawDraftingPoint(patternGroup, CB_Top);
+    console.log("Point CB rendered successfully at:", CB_Top.x, CB_Top.y);
 }
 
-// Helper function to render pattern blocks onto the SVG canvas
+// Helper function to render pattern blocks
 function drawPatternBlock(container, piece) {
     const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     rect.setAttribute('x', piece.x);
@@ -98,34 +98,34 @@ function drawPatternBlock(container, piece) {
     container.appendChild(text);
 }
 
-// Helper to visually render any drafting point and its label with high contrast
+// Helper to visually render the drafting point with a distinct high-visibility marker
 function drawDraftingPoint(container, point) {
-    // 1. Draw high-contrast outer ring / halo for visibility
+    // Outer white halo for contrast against grid and rectangle
     const halo = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     halo.setAttribute('cx', point.x);
     halo.setAttribute('cy', point.y);
-    halo.setAttribute('r', '6');
+    halo.setAttribute('r', '7');
     halo.setAttribute('fill', '#ffffff');
-    halo.setAttribute('stroke', '#2c2524');
-    halo.setAttribute('stroke-width', '1.5');
+    halo.setAttribute('stroke', '#2563eb');
+    halo.setAttribute('stroke-width', '2');
     container.appendChild(halo);
 
-    // 2. Draw solid center core dot
+    // Inner solid blue core dot
     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     circle.setAttribute('cx', point.x);
     circle.setAttribute('cy', point.y);
-    circle.setAttribute('r', '3');
-    circle.setAttribute('fill', '#c25e6f');
+    circle.setAttribute('r', '3.5');
+    circle.setAttribute('fill', '#2563eb');
     container.appendChild(circle);
 
-    // 3. Draw bold point label text (offset clearly inside/next to the corner)
+    // Label text
     const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    text.setAttribute('x', point.x + 10);
-    text.setAttribute('y', point.y + 14);
+    text.setAttribute('x', point.x + 12);
+    text.setAttribute('y', point.y + 4);
     text.setAttribute('fill', '#1a1514');
     text.setAttribute('font-family', 'Montserrat');
     text.setAttribute('font-size', '12');
     text.setAttribute('font-weight', '700');
-    text.textContent = `${point.label} (${point.x}, ${point.y})`;
+    text.textContent = `${point.label} (Point 1)`;
     container.appendChild(text);
 }
