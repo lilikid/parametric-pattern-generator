@@ -794,7 +794,30 @@
         function generatePattern() {
             const patternGroup = document.getElementById('pattern-group');
             patternGroup.innerHTML = '';
+// Add CB marker point: 1 inch from top and 1 inch from left
+const inchToPx = 2.54 * s; // 1 inch converted to pixels (2.54 cm * 10px)
+const markerX = inchToPx;        // Exactly 1 inch inward from the left edge (X = 0)
+const markerY = inchToPx;        // 1 inch down from the top edge (Y = 0)
 
+// Create the blue dot (circle)
+const cbCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+cbCircle.setAttribute('cx', markerX);
+cbCircle.setAttribute('cy', markerY);
+cbCircle.setAttribute('r', '4');
+cbCircle.setAttribute('fill', '#0066ff');
+cbCircle.setAttribute('stroke', '#ffffff');
+cbCircle.setAttribute('stroke-width', '1.5');
+patternLayer.appendChild(cbCircle);
+
+// Create the "CB" text label next to the dot
+const cbText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+cbText.setAttribute('x', markerX + 8);
+cbText.setAttribute('y', markerY + 4);
+cbText.setAttribute('fill', '#0066ff');
+cbText.setAttribute('font-size', '12');
+cbText.setAttribute('font-weight', 'bold');
+cbText.textContent = 'CB';
+patternLayer.appendChild(cbText);
             const pieces = [];
 
             const bustVal = parseFloat(document.getElementById('bust').value) + parseFloat(document.getElementById('bustEase').value);
