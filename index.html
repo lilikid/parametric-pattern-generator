@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #c25e6f; /* Sophisticated Rose/Couture Accent */
+            --primary: #c25e6f;
             --primary-hover: #a84c5c;
             --bg-color: #f8f6f5;
             --card-bg: #ffffff;
@@ -52,7 +52,6 @@
             gap: 16px;
         }
 
-        /* Lilinora Custom Symbol / Logo Mark */
         .brand-logo-symbol {
             width: 44px;
             height: 44px;
@@ -281,7 +280,7 @@
             flex-grow: 1;
             overflow: auto;
             position: relative;
-            background: #faf8f7;
+            background: #ffffff;
             border: 1px solid var(--border-color);
             border-radius: 8px;
             display: flex;
@@ -297,13 +296,29 @@
             justify-content: center;
             padding: 40px;
         }
+
+        /* Drafting Grid Styling */
+        .grid-line-minor {
+            stroke: #f1edec;
+            stroke-width: 0.5;
+        }
+
+        .grid-line-major {
+            stroke: #e2dcd9;
+            stroke-width: 1;
+        }
+
+        .axis-line {
+            stroke: #c25e6f;
+            stroke-width: 1.5;
+            stroke-opacity: 0.4;
+        }
     </style>
 </head>
 <body>
 
     <header>
         <div class="brand-container">
-            <!-- Lilinora Custom Atelier Symbol (Needle & Thread Monogram) -->
             <div class="brand-logo-symbol" title="Lilinora Atelier">
                 <svg viewBox="0 0 24 24">
                     <path d="M18.5,2.5 C17.5,1.5 16,1.5 15,2.5 L6,11.5 C5.4,12.1 5,12.9 5,13.8 L5,18 L9.2,18 C10.1,18 10.9,17.6 11.5,17 L20.5,8 C21.5,7 21.5,5.5 20.5,4.5 L18.5,2.5 Z M8.4,16 L7,16 L7,14.6 C7,14.3 7.1,14 7.3,13.8 L12.5,8.6 L15.4,11.5 L10.2,16.7 C10,16.9 9.7,17 9.4,17 L8.4,16 Z M19.1,6.6 L18,7.7 L16.3,6 L17.4,4.9 C17.7,4.6 18.3,4.6 18.6,4.9 L19.1,5.4 C19.4,5.7 19.4,6.3 19.1,6.6 Z"/>
@@ -326,7 +341,6 @@
             <h2>Measurements & Ease</h2>
             <form id="pattern-form">
                 
-                <!-- Block Preset Selector -->
                 <div class="input-section">
                     <label for="blockPreset">Block Type & Ease Preset</label>
                     <select id="blockPreset" onchange="applyPreset()">
@@ -339,7 +353,6 @@
 
                 <hr style="margin: 16px 0; border:0; border-top:1px solid #f0ebe8;">
 
-                <!-- Bust with Ease -->
                 <div class="input-section">
                     <label>Bust Measurement & Ease</label>
                     <div class="dual-input">
@@ -351,7 +364,6 @@
                     </div>
                 </div>
 
-                <!-- Waist with Ease -->
                 <div class="input-section">
                     <label>Waist Measurement & Ease</label>
                     <div class="dual-input">
@@ -363,7 +375,6 @@
                     </div>
                 </div>
 
-                <!-- Hip with Ease -->
                 <div class="input-section">
                     <label>Hip Measurement & Ease</label>
                     <div class="dual-input">
@@ -377,7 +388,6 @@
 
                 <hr style="margin: 16px 0; border:0; border-top:1px solid #f0ebe8;">
 
-                <!-- Other Standard Measurements -->
                 <div class="input-section">
                     <label for="backWidth">Across Back Width</label>
                     <input type="number" id="backWidth" value="14.0" step="0.25">
@@ -400,8 +410,8 @@
                 </div>
 
                 <div class="btn-container">
-                    <button type="button" id="generate-btn" class="action-btn btn-primary">Generate Pattern</button>
-                    <button type="button" id="download-btn" class="action-btn btn-secondary">Download SVG Pattern</button>
+                    <button type="button" id="generate-btn" class="action-btn btn-primary" onclick="generatePattern()">Generate Pattern</button>
+                    <button type="button" id="download-btn" class="action-btn btn-secondary" onclick="downloadSVG()">Download SVG Pattern</button>
                 </div>
             </form>
         </div>
@@ -419,8 +429,15 @@
             
             <div id="svg-scroll-viewport">
                 <div id="svg-canvas-wrapper">
-                    <!-- Pattern SVG renders inside here -->
-                    <p style="color: #8c7e7b; font-size: 0.9rem;">Click "Generate Pattern" to render block.</p>
+                    <!-- Initial Drafting Grid Rendered Immediately -->
+                    <svg id="pattern-svg" width="600" height="800" viewBox="0 0 600 800" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Background -->
+                        <rect width="100%" height="100%" fill="#ffffff" />
+                        <g id="grid-group"></g>
+                        <g id="pattern-group">
+                            <text x="300" y="400" text-anchor="middle" fill="#8c7e7b" font-family="Montserrat" font-size="14">Drafting Grid Ready — Click "Generate Pattern"</text>
+                        </g>
+                    </svg>
                 </div>
             </div>
         </div>
@@ -429,12 +446,44 @@
     <script>
         let currentUnit = 'in';
         let currentScale = 1.0;
+        const scaleFactor = 30; // pixels per unit (inch or cm representation)
+
+        function initGrid() {
+            const gridGroup = document.getElementById('grid-group');
+            gridGroup.innerHTML = '';
+            
+            const width = 600;
+            const height = 800;
+            const step = currentUnit === 'in' ? scaleFactor : scaleFactor * 0.4; // Minor grid steps
+
+            // Minor grid lines
+            for (let x = 0; x <= width; x += step / 4) {
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', x);
+                line.setAttribute('y1', 0);
+                line.setAttribute('x2', x);
+                line.setAttribute('y2', height);
+                line.setAttribute('class', (x % step === 0) ? 'grid-line-major' : 'grid-line-minor');
+                gridGroup.appendChild(line);
+            }
+
+            for (let y = 0; y <= height; y += step / 4) {
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', 0);
+                line.setAttribute('y1', y);
+                line.setAttribute('x2', width);
+                line.setAttribute('y2', y);
+                line.setAttribute('class', (y % step === 0) ? 'grid-line-major' : 'grid-line-minor');
+                gridGroup.appendChild(line);
+            }
+        }
 
         function setUnit(unit) {
             currentUnit = unit;
             document.getElementById('unit-in').classList.toggle('active', unit === 'in');
             document.getElementById('unit-cm').classList.toggle('active', unit === 'cm');
             document.getElementById('current-unit-label').innerText = unit === 'in' ? 'Grid Unit: 1 Inch' : 'Grid Unit: 1 Centimeter';
+            initGrid();
         }
 
         function applyPreset() {
@@ -456,6 +505,45 @@
                 wEase.value = 2.5;
                 hEase.value = 3.0;
             }
+        }
+
+        function generatePattern() {
+            const patternGroup = document.getElementById('pattern-group');
+            patternGroup.innerHTML = '';
+
+            // Pull values for calculation base
+            const bust = parseFloat(document.getElementById('bust').value) + parseFloat(document.getElementById('bustEase').value);
+            const waist = parseFloat(document.getElementById('waist').value) + parseFloat(document.getElementById('waistEase').value);
+            const backLength = parseFloat(document.getElementById('backNeckToWaist').value);
+            
+            // Example calculated block bounding box for visualization
+            const blockWidth = (bust / 4) * scaleFactor;
+            const blockHeight = backLength * scaleFactor;
+            const startX = 150;
+            const startY = 100;
+
+            // Draw calculated bodice block outline based on user inputs
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('x', startX);
+            rect.setAttribute('y', startY);
+            rect.setAttribute('width', blockWidth);
+            rect.setAttribute('height', blockHeight);
+            rect.setAttribute('fill', 'rgba(194, 94, 111, 0.08)');
+            rect.setAttribute('stroke', '#c25e6f');
+            rect.setAttribute('stroke-width', '2');
+            rect.setAttribute('stroke-dasharray', '4');
+            patternGroup.appendChild(rect);
+
+            // Label
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', startX + 15);
+            text.setAttribute('y', startY + 30);
+            text.setAttribute('fill', '#2c2524');
+            text.setAttribute('font-family', 'Montserrat');
+            text.setAttribute('font-size', '12');
+            text.setAttribute('font-weight', '600');
+            text.textContent = `Calculated Block (Bust: ${bust}${currentUnit})`;
+            patternGroup.appendChild(text);
         }
 
         function adjustZoom(amount) {
@@ -485,6 +573,24 @@
             }
             applyZoomTransform();
         }, { passive: false });
+
+        function downloadSVG() {
+            const svgEl = document.getElementById('pattern-svg');
+            const svgData = new XMLSerializer().serializeToString(svgEl);
+            const blob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'lilinora-bodice-pattern.svg';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // Initialize grid on load
+        window.onload = function() {
+            initGrid();
+        };
     </script>
 </body>
 </html>
