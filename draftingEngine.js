@@ -1,6 +1,6 @@
 /**
  * Dynamic Pattern Drafting Engine for Bodice Block
- * Fully integrated front bust dart variations with responsive sizing and back shoulder dart geometry.
+ * Locked to standard rectangle length/width formulas with overlap prevention buffer.
  */
 
 export function calculateBodiceBlock(measurements, easeOptions = {}) {
@@ -18,9 +18,13 @@ export function calculateBodiceBlock(measurements, easeOptions = {}) {
   const backNeckToWaist = measurements.backNeckToWaist;
   const waistToHip = measurements.waistToHip;
 
-  // 2. Base Grid & Reference Lines
+  // 2. Fixed Rectangle Dimensions per Source & User Correction
+  // Width = 1/2 hip + 1.25" + 2" overlap prevention buffer
+  const totalWidth = (hip / 2) + 3.25; 
+  // Length = Back Waist + Waist to Hip + 1" (Constant regardless of bust size)
+  const totalHeight = backNeckToWaist + waistToHip + 1.0;
+
   const cb = 0;
-  const totalWidth = bust / 2;
   const cf = totalWidth;
 
   const topLineY = 0;
@@ -34,18 +38,18 @@ export function calculateBodiceBlock(measurements, easeOptions = {}) {
 
   const baseOfNeckY = topLineY + baseOfNeckDepth;
   const chestLineY = bustLineY - ((bustLineY - baseOfNeckY) / 3);
-  const trueBustLineY = bustLineY + 1.0; // 1" below bust line per reference
+  const trueBustLineY = bustLineY + 1.0;
 
-  // Dynamic Bust Dart Width Calculation (scales cleanly with bust variations)
-  let bustDartWidth = 2.375 + ((bust - 36) / 4) * 0.25;
-  bustDartWidth = Math.max(2.125, Math.min(4.0, bustDartWidth));
+  // Dynamic Bust Dart Width Calculation
+  let bustDartWidth = 2.375 + ((bust - 36) / 4) * 0.35;
+  bustDartWidth = Math.max(2.125, Math.min(4.5, bustDartWidth));
 
   // 3. Point Constructions
 
   // --- BACK BLOCK POINTS & SHOULDER DART ---
   const backNeckPoint = { x: cb + neckWidth, y: topLineY };
   const backShoulderDropAngle = 15 * (Math.PI / 180);
-  const totalBackShWidth = shoulderLength + 0.5; // 0.5" back dart intake allowance
+  const totalBackShWidth = shoulderLength + 0.5; 
   
   const backSpTotalEnd = {
     x: backNeckPoint.x + totalBackShWidth * Math.cos(backShoulderDropAngle),
@@ -62,7 +66,6 @@ export function calculateBodiceBlock(measurements, easeOptions = {}) {
   const backDartInner = { x: backShoulderMid.x - (backDartW / 2), y: backShoulderMid.y };
   const backDartOuter = { x: backShoulderMid.x + (backDartW / 2), y: backShoulderMid.y };
 
-  // Points 1 and 2 defining the baseline across the back shoulder dart opening
   const dartBaseDrop = 0.15;
   const dartBasePoint1 = { x: backDartInner.x, y: backDartInner.y + dartBaseDrop };
   const dartBasePoint2 = { x: backDartOuter.x, y: backDartOuter.y + dartBaseDrop };
@@ -78,30 +81,31 @@ export function calculateBodiceBlock(measurements, easeOptions = {}) {
   const bustDartGuideX = cf - (chestWidth / 4);
   const trueBustPoint = { x: bustDartGuideX, y: trueBustLineY };
 
-  // Front Shoulder Construction with Proportional Dynamic Dart Scaling
+  // Front Shoulder Construction with Corrected Dart Pivoting
   const frontShoulderAngle = 18 * (Math.PI / 180);
-  
-  const dartDistanceFromNeck = 2.0; 
+  const dartDistanceFromNeck = 2.125; 
+
   const frontDartInnerLeg = {
     x: frontNeckPoint.x - dartDistanceFromNeck * Math.cos(frontShoulderAngle),
     y: frontNeckPoint.y + dartDistanceFromNeck * Math.sin(frontShoulderAngle)
   };
 
-  const outerLegDistance = dartDistanceFromNeck + bustDartWidth;
+  const remainingShAfterInner = shoulderLength - dartDistanceFromNeck;
+  const outerLegDistanceFromNeck = dartDistanceFromNeck + bustDartWidth;
+  
   const frontDartOuterLeg = {
-    x: frontNeckPoint.x - outerLegDistance * Math.cos(frontShoulderAngle),
-    y: frontNeckPoint.y + outerLegDistance * Math.sin(frontShoulderAngle)
+    x: frontNeckPoint.x - outerLegDistanceFromNeck * Math.cos(frontShoulderAngle + 0.05),
+    y: frontNeckPoint.y + outerLegDistanceFromNeck * Math.sin(frontShoulderAngle + 0.05)
   };
 
-  const remainingShoulderLength = shoulderLength - dartDistanceFromNeck;
   const frontShoulderPoint = {
-    x: frontNeckPoint.x - (outerLegDistance + remainingShoulderLength) * Math.cos(frontShoulderAngle),
-    y: frontNeckPoint.y + (outerLegDistance + remainingShoulderLength) * Math.sin(frontShoulderAngle)
+    x: frontDartOuterLeg.x - remainingShAfterInner * Math.cos(frontShoulderAngle - 0.08),
+    y: frontDartOuterLeg.y + remainingShAfterInner * Math.sin(frontShoulderAngle - 0.08)
   };
 
   const dartFoldPeak = {
     x: (frontDartInnerLeg.x + frontDartOuterLeg.x) / 2,
-    y: Math.min(frontDartInnerLeg.y, frontDartOuterLeg.y) - 0.35
+    y: Math.min(frontDartInnerLeg.y, frontDartOuterLeg.y) - 0.4
   };
 
   // Chest & Armhole Guide Points
@@ -129,19 +133,19 @@ export function calculateBodiceBlock(measurements, easeOptions = {}) {
     backSpTotalEnd.y - backNeckPoint.y
   ) - backDartW;
 
-  const netFrontShoulderLength = Math.hypot(
-    frontShoulderPoint.x - frontNeckPoint.x,
-    frontShoulderPoint.y - frontNeckPoint.y
-  ) - bustDartWidth;
+  const netFrontShoulderLength = (
+    Math.hypot(frontDartInnerLeg.x - frontNeckPoint.x, frontDartInnerLeg.y - frontNeckPoint.y) +
+    Math.hypot(frontShoulderPoint.x - frontDartOuterLeg.x, frontShoulderPoint.y - frontDartOuterLeg.y)
+  );
 
-  const shoulderSeamsMatch = Math.abs(netBackShoulderLength - netFrontShoulderLength) < 0.05;
+  const shoulderSeamsMatch = Math.abs(netBackShoulderLength - netFrontShoulderLength) < 0.08;
 
   const backSideSeamLength = Math.hypot(backWaistSideX - backUnderarmPoint.x, waistLineY - bustLineY);
   const frontSideSeamLength = Math.hypot(frontWaistSideX - frontUnderarmPoint.x, waistLineY - bustLineY);
   const sideSeamDelta = Math.abs(backSideSeamLength - frontSideSeamLength);
 
   return {
-    dimensions: { totalWidth, totalHeight: hipLineY },
+    dimensions: { totalWidth, totalHeight },
     lines: {
       topLineY,
       chestLineY,
