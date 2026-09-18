@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lilinora | Precision Atelier Pattern Generator</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <!-- Include jsPDF Library for client-side actual-size PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root {
@@ -287,7 +286,6 @@
             border-bottom: 1px solid #f0ebe8;
         }
 
-        /* Tabs Navigation Bar */
         .tabs-bar {
             display: flex;
             gap: 6px;
@@ -332,7 +330,6 @@
 
         .zoom-btn:hover { background: #f0ebe8; }
 
-        /* Pattern display viewport area */
         .pattern-workspace-view {
             width: 100%;
             flex-grow: 1;
@@ -412,11 +409,9 @@
     </header>
 
     <div class="workspace">
-        <!-- Control Panel -->
         <div class="control-panel">
             <h2 style="font-family:var(--heading-font); font-size:1.15rem; margin-bottom:14px;">Pattern Modules</h2>
             
-            <!-- BRACKET 1: UPPER BODY -->
             <div class="section-bracket">
                 <div class="section-bracket-title"><span>[ Upper Body: Bodice & Sleeve ]</span></div>
                 
@@ -552,7 +547,6 @@
                 </div>
             </div>
 
-            <!-- BRACKET 2: LOWER BODY -->
             <div class="section-bracket">
                 <div class="section-bracket-title"><span>[ Lower Body: Skirt & Trousers ]</span></div>
                 
@@ -655,7 +649,6 @@
                 </div>
             </div>
 
-            <!-- ACTION & READY-TO-CUT EXPORT TOOLBAR -->
             <div class="btn-container">
                 <button type="button" class="action-btn btn-primary" onclick="generatePattern()">Generate All Selected Patterns</button>
                 <button type="button" class="action-btn btn-secondary" onclick="downloadSVG()">Download Combined SVG</button>
@@ -671,7 +664,6 @@
             </div>
         </div>
 
-        <!-- Preview Canvas -->
         <div class="preview-container">
             <div class="preview-toolbar">
                 <span id="current-unit-label" style="font-size: 0.85rem; font-weight:600; color:#4a3f3d;">Grid Unit: 1 Inch (0.5" Subdivisions)</span>
@@ -929,20 +921,15 @@
             const bodiceGroup = document.querySelector('#svg-bodice .pattern-group-sub');
             bodiceGroup.innerHTML = '';
             
-            // --- UPDATED BODICE BOX CALCULATIONS ---
             const hipVal = parseFloat(document.getElementById('hip').value);
             const hipEaseVal = parseFloat(document.getElementById('hipEase').value);
             const backLengthVal = parseFloat(document.getElementById('backNeckToWaist').value);
             const waistToHipVal = parseFloat(document.getElementById('waistToHip').value);
 
-            // Unit-dependent allowances: 2" or 5cm for width, 1" or 2.5cm for length
             const widthAllowance = (currentUnit === 'in') ? 2.0 : 5.0;
             const lengthAllowance = (currentUnit === 'in') ? 1.0 : 2.5;
 
-            // Width = (1/2 Hip + Hip Ease) + Allowance
             const bWidth = (((hipVal + hipEaseVal) / 2) + widthAllowance) * scaleFactor;
-            
-            // Height = Back Waist + Waist-to-Hip + Allowance
             const bHeight = (backLengthVal + waistToHipVal + lengthAllowance) * scaleFactor;
             
             document.getElementById('bodiceTitle').textContent = `Bodice Block (Hip: ${hipVal}" + ${hipEaseVal}" ease)`;
@@ -953,6 +940,28 @@
             bodiceRect.setAttribute('fill', 'rgba(194, 94, 111, 0.06)');
             bodiceRect.setAttribute('stroke', '#c25e6f'); bodiceRect.setAttribute('stroke-width', '2'); bodiceRect.setAttribute('stroke-dasharray', '4');
             bodiceGroup.appendChild(bodiceRect);
+
+            // CB (Center Back) Top-Left Corner Label
+            const labelCB = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            labelCB.setAttribute('x', 55);
+            labelCB.setAttribute('y', 42);
+            labelCB.setAttribute('font-family', 'Montserrat, sans-serif');
+            labelCB.setAttribute('font-size', '12');
+            labelCB.setAttribute('font-weight', '600');
+            labelCB.setAttribute('fill', '#c25e6f');
+            labelCB.textContent = 'CB (Center Back)';
+            bodiceGroup.appendChild(labelCB);
+
+            // CF (Center Front) Top-Right Corner Label
+            const labelCF = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            labelCF.setAttribute('x', 50 + bWidth - 110);
+            labelCF.setAttribute('y', 42);
+            labelCF.setAttribute('font-family', 'Montserrat, sans-serif');
+            labelCF.setAttribute('font-size', '12');
+            labelCF.setAttribute('font-weight', '600');
+            labelCF.setAttribute('fill', '#c25e6f');
+            labelCF.textContent = 'CF (Center Front)';
+            bodiceGroup.appendChild(labelCF);
 
             const hasSleeve = document.getElementById('includeSleeve').value === 'yes';
             const sleeveGroup = document.querySelector('#svg-sleeve .pattern-group-sub');
