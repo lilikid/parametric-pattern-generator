@@ -1042,14 +1042,45 @@
             bodiceGroup.appendChild(neckPointCircle);
 
             const neckWidthText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            neckWidthText.setAttribute('x', 50 + backNeckWidthPixels - 10);
-            neckWidthText.setAttribute('y', napeLineY - 10);
+            neckWidthText.setAttribute('x', 50);
+            neckWidthText.setAttribute('y', napeLineY + 16);
             neckWidthText.setAttribute('font-family', 'Montserrat, sans-serif');
-            neckWidthText.setAttribute('font-size', '11');
+            neckWidthText.setAttribute('font-size', '10');
             neckWidthText.setAttribute('font-weight', 'bold');
             neckWidthText.setAttribute('fill', '#8b5cf6');
-            neckWidthText.textContent = `Point Back Neck Width (${backNeckWidth.toFixed(2)}" / ${(backNeckWidth * 2.54).toFixed(1)}cm)`;
+            neckWidthText.textContent = `Back Neck Width Point (${backNeckWidth.toFixed(2)}" / ${(backNeckWidth * 2.54).toFixed(1)}cm)`;
             bodiceGroup.appendChild(neckWidthText);
+
+
+            // STEP 5: Square up 3/4" (2cm) from Back Width neck point and place Back Neck Point
+            const squareUpInches = 0.75; // 3/4 inch
+            const squareUpPixels = squareUpInches * scaleFactor;
+            const finalNeckPointY = napeLineY - squareUpPixels;
+            const finalNeckPointX = 50 + backNeckWidthPixels;
+
+            const squareUpLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            squareUpLine.setAttribute('x1', finalNeckPointX); squareUpLine.setAttribute('y1', napeLineY);
+            squareUpLine.setAttribute('x2', finalNeckPointX); squareUpLine.setAttribute('y2', finalNeckPointY);
+            squareUpLine.setAttribute('stroke', '#0284c7');
+            squareUpLine.setAttribute('stroke-width', '2');
+            bodiceGroup.appendChild(squareUpLine);
+
+            const finalNeckPointCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            finalNeckPointCircle.setAttribute('cx', finalNeckPointX);
+            finalNeckPointCircle.setAttribute('cy', finalNeckPointY);
+            finalNeckPointCircle.setAttribute('r', '5');
+            finalNeckPointCircle.setAttribute('fill', '#0284c7');
+            bodiceGroup.appendChild(finalNeckPointCircle);
+
+            const finalNeckText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            finalNeckText.setAttribute('x', finalNeckPointX + 8);
+            finalNeckText.setAttribute('y', finalNeckPointY - 4);
+            finalNeckText.setAttribute('font-family', 'Montserrat, sans-serif');
+            finalNeckText.setAttribute('font-size', '11');
+            finalNeckText.setAttribute('font-weight', 'bold');
+            finalNeckText.setAttribute('fill', '#0284c7');
+            finalNeckText.textContent = 'Back Neck Point';
+            bodiceGroup.appendChild(finalNeckText);
 
 
             // Draw Bodice Pattern Box Frame
