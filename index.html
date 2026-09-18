@@ -979,11 +979,8 @@
 
 
             // STEP 2: Drawing the Nape Line
-            // Base UK 12 bust is 34.5 (or base 34.5" = 1.0 inch drop). 
-            // Difference from base 34.5 bust, scaled by 3/16" (0.1875") per 2 sizes (approx 2" difference in total bust steps).
             const baseBustSpec = 34.5;
             const bustDifference = totalBust - baseBustSpec;
-            // 3/16 inch per 2 sizes translates to 3/32 inch (0.09375") per 1 inch of bust change
             const napeLineDropInches = 1.0 + (bustDifference * (0.1875 / 2.0));
             const napeLineY = 50 + (napeLineDropInches * scaleFactor);
 
@@ -1001,6 +998,29 @@
             napeText.setAttribute('fill', '#1f7a8c');
             napeText.textContent = `Nape Line (${napeLineDropInches.toFixed(2)}" / ${(napeLineDropInches * 2.54).toFixed(1)}cm down)`;
             bodiceGroup.appendChild(napeText);
+
+
+            // STEP 3: Drawing the Waist Line
+            // Measure down from the Nape line: half Back Waist measurement plus 3/8" (1cm), 
+            // or plus 5/8" (1.5cm) if total bust is over 40" (100cm).
+            const halfBackWaist = backLengthVal / 2.0;
+            const extraWaistAllowance = totalBust > 40.0 ? 0.625 : 0.375; // 5/8" vs 3/8"
+            const totalWaistDropFromNape = halfBackWaist + extraWaistAllowance;
+            const waistLineY = napeLineY + (totalWaistDropFromNape * scaleFactor);
+
+            const waistLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            waistLine.setAttribute('x1', 50); waistLine.setAttribute('y1', waistLineY);
+            waistLine.setAttribute('x2', 50 + bWidth); waistLine.setAttribute('y2', waistLineY);
+            waistLine.setAttribute('stroke', '#c25e6f'); waistLine.setAttribute('stroke-width', '2');
+            bodiceGroup.appendChild(waistLine);
+
+            const waistText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            waistText.setAttribute('x', 60); waistText.setAttribute('y', waistLineY - 6);
+            waistText.setAttribute('font-family', 'Montserrat, sans-serif');
+            waistText.setAttribute('font-size', '11'); waistText.setAttribute('font-weight', 'bold');
+            waistText.setAttribute('fill', '#c25e6f');
+            waistText.textContent = `Waist Line (${totalWaistDropFromNape.toFixed(2)}" down from Nape)`;
+            bodiceGroup.appendChild(waistText);
 
 
             // Draw Bodice Pattern Box Frame
