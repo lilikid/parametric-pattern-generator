@@ -1104,15 +1104,69 @@
             const cbIntersectionX = 50;
             const cbIntersectionY = napeLineY;
             const neckCurvePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            // Quadratic or cubic bezier to flatten out horizontally at CB (start at cbIntersectionX, cbIntersectionY with horizontal tangent)
             const controlPointX = cbIntersectionX + (finalNeckPointX - cbIntersectionX) * 0.4;
-            const controlPointY = cbIntersectionY; // Keep horizontal tangent at CB
+            const controlPointY = cbIntersectionY;
             const neckCurveData = `M ${cbIntersectionX} ${cbIntersectionY} Q ${controlPointX} ${controlPointY}, ${finalNeckPointX} ${finalNeckPointY}`;
             neckCurvePath.setAttribute('d', neckCurveData);
             neckCurvePath.setAttribute('stroke', '#2c2524');
             neckCurvePath.setAttribute('stroke-width', '2');
             neckCurvePath.setAttribute('fill', 'none');
             bodiceGroup.appendChild(neckCurvePath);
+
+
+            // STEP 7 (including the flattening transition right after Step 6):
+            // Start flattening the neck curve that was drawn in step six (the curve connecting the Back Neck point with the intersection of the Nape Line with the line below the Point CB), 
+            // this curve should start flattening from middle of the back neck width line then move smoothly to meet the nape line and overlay with the nape line just at the middle of the back Neck width line.
+            const midNeckWidthX = 50 + (backNeckWidthPixels / 2);
+            const midNeckWidthY = napeLineY;
+
+            const flattenedCurvePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            // Path overlaying/flattening along the Nape Line from CB (50, napeLineY) to the middle of the back neck width line (midNeckWidthX, midNeckWidthY), 
+            // and then transitioning smoothly up to the Back Neck Point (finalNeckPointX, finalNeckPointY).
+            const flatCurveData = `M ${cbIntersectionX} ${cbIntersectionY} L ${midNeckWidthX} ${midNeckWidthY} Q ${midNeckWidthX + (finalNeckPointX - midNeckWidthX)*0.5} ${midNeckWidthY}, ${finalNeckPointX} ${finalNeckPointY}`;
+            flattenedCurvePath.setAttribute('d', flatCurveData);
+            flattenedCurvePath.setAttribute('stroke', '#e11d48');
+            flattenedCurvePath.setAttribute('stroke-width', '2');
+            flattenedCurvePath.setAttribute('fill', 'none');
+            bodiceGroup.appendChild(flattenedCurvePath);
+
+            if (!removeNames) {
+                const flatCurveText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                flatCurveText.setAttribute('x', midNeckWidthX - 10);
+                flatCurveText.setAttribute('y', napeLineY + 38);
+                flatCurveText.setAttribute('font-family', 'Montserrat, sans-serif');
+                flatCurveText.setAttribute('font-size', '10');
+                flatCurveText.setAttribute('font-weight', '600');
+                flatCurveText.setAttribute('fill', '#e11d48');
+                flatCurveText.textContent = 'Flattened Neck Curve Transition';
+                bodiceGroup.appendChild(flatCurveText);
+            }
+
+            // Step 7: Draw the horizontal Back shoulder line by: Measuring 1¼" (3cm) down from the Nape Line Square across a guide line of about 10" (25cm) and label it the Shoulder Line. Make it sharp dotted line.
+            const shoulderLineDropInches = 1.25; // 1 1/4" (3cm)
+            const shoulderLineDropPixels = shoulderLineDropInches * scaleFactor;
+            const shoulderLineY = napeLineY + shoulderLineDropPixels;
+            const shoulderLineWidthPixels = 10.0 * scaleFactor; // 10" guide line (~25cm)
+
+            const backShoulderLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            backShoulderLine.setAttribute('x1', 50); backShoulderLine.setAttribute('y1', shoulderLineY);
+            backShoulderLine.setAttribute('x2', 50 + shoulderLineWidthPixels); backShoulderLine.setAttribute('y2', shoulderLineY);
+            backShoulderLine.setAttribute('stroke', '#10b981');
+            backShoulderLine.setAttribute('stroke-width', '1.5');
+            backShoulderLine.setAttribute('stroke-dasharray', '2 4'); // sharp dotted line appearance
+            bodiceGroup.appendChild(backShoulderLine);
+
+            if (!removeNames) {
+                const shoulderLineText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                shoulderLineText.setAttribute('x', 60);
+                shoulderLineText.setAttribute('y', shoulderLineY - 6);
+                shoulderLineText.setAttribute('font-family', 'Montserrat, sans-serif');
+                shoulderLineText.setAttribute('font-size', '11');
+                shoulderLineText.setAttribute('font-weight', '600');
+                shoulderLineText.setAttribute('fill', '#10b981');
+                shoulderLineText.textContent = 'Shoulder Line (1¼" down from Nape Line)';
+                bodiceGroup.appendChild(shoulderLineText);
+            }
 
 
             // Draw Bodice Pattern Box Frame
