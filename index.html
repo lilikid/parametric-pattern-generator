@@ -657,18 +657,7 @@
                 const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
                 line.setAttribute('x1', x); line.setAttribute('y1', 0);
                 line.setAttribute('x2', x); line.setAttribute('y2', height);
-
-                const ratio = x / baseStep;
-                const isMajor = Math.abs(ratio - Math.round(ratio)) < 0.001 && Math.round(ratio) % (currentUnit === 'in' ? 4 : 5) === 0;
-                const isHalf = Math.abs(ratio - Math.round(ratio)) < 0.001;
-
-                if (isMajor) {
-                    line.setAttribute('class', 'grid-line-major');
-                } else if (isHalf) {
-                    line.setAttribute('class', 'grid-line-half');
-                } else {
-                    line.setAttribute('class', 'grid-line-sub');
-                }
+                line.setAttribute('class', (x % baseStep === 0) ? 'grid-line-major' : 'grid-line-sub');
                 gridGroup.appendChild(line);
             }
 
@@ -676,18 +665,7 @@
                 const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
                 line.setAttribute('x1', 0); line.setAttribute('y1', y);
                 line.setAttribute('x2', width); line.setAttribute('y2', y);
-
-                const ratio = y / baseStep;
-                const isMajor = Math.abs(ratio - Math.round(ratio)) < 0.001 && Math.round(ratio) % (currentUnit === 'in' ? 4 : 5) === 0;
-                const isHalf = Math.abs(ratio - Math.round(ratio)) < 0.001;
-
-                if (isMajor) {
-                    line.setAttribute('class', 'grid-line-major');
-                } else if (isHalf) {
-                    line.setAttribute('class', 'grid-line-half');
-                } else {
-                    line.setAttribute('class', 'grid-line-sub');
-                }
+                line.setAttribute('class', (y % baseStep === 0) ? 'grid-line-major' : 'grid-line-sub');
                 gridGroup.appendChild(line);
             }
         }
@@ -696,33 +674,47 @@
             currentUnit = unit;
             document.getElementById('unit-in').classList.toggle('active', unit === 'in');
             document.getElementById('unit-cm').classList.toggle('active', unit === 'cm');
-            document.getElementById('current-unit-label').innerText = unit === 'in' ? 'Grid Unit: 1 Inch (0.5" Subdivisions)' : 'Grid Unit: 1 Centimeter (0.5cm Subdivisions)';
+            document.getElementById('current-unit-label').innerText = unit === 'in' ? 'Grid Unit: 1 Inch' : 'Grid Unit: 1 Centimeter';
             initGrid();
+            generatePattern();
         }
 
         function toggleModule(id) {
             const el = document.getElementById(id);
-            el.style.display = (el.style.display === 'none') ? 'block' : 'none';
+            el.style.display = el.style.display === 'none' ? 'block' : 'none';
         }
 
-        function togglePieceConfig(containerId, val) {
-            const container = document.getElementById(containerId);
-            container.style.display = (val === 'yes') ? 'block' : 'none';
+        function togglePieceConfig(id, val) {
+            document.getElementById(id).style.opacity = val === 'yes' ? '1' : '0.4';
+            document.getElementById(id).style.pointerEvents = val === 'yes' ? 'auto' : 'none';
+        }
+
+        function applyPreset() {
+            const val = document.getElementById('blockPreset').value;
+            if (val === 'standard') {
+                document.getElementById('bustEase').value = 2.0;
+                document.getElementById('waistEase').value = 1.5;
+            } else if (val === 'fitted') {
+                document.getElementById('bustEase').value = 1.0;
+                document.getElementById('waistEase').value = 0.5;
+            } else if (val === 'loose') {
+                document.getElementById('bustEase').value = 3.0;
+                document.getElementById('waistEase').value = 2.5;
+            }
+            generatePattern();
         }
 
         function applyUpperStandardSize() {
             const size = document.getElementById('upperStandardSize').value;
             if (!size) return;
+            const data = {
+                uk8:  { bust: 32.0, waist: 24.0, hip: 34.5, chest: 12.0, back: 13.0, shoulder: 4.75, backLen: 15.0, bicep: 10.5, sleeve: 22.25, elbow: 12.0, wrist: 6.0 },
+                uk10: { bust: 33.25, waist: 24.75, hip: 35.75, chest: 12.5, back: 13.5, shoulder: 4.87, backLen: 15.25, bicep: 11.0, sleeve: 22.5, elbow: 12.25, wrist: 6.12 },
+                uk12: { bust: 34.5, waist: 25.5, hip: 37.0, chest: 13.0, back: 14.0, shoulder: 5.0, backLen: 15.5, bicep: 11.5, sleeve: 23.0, elbow: 12.5, wrist: 6.25 },
+                uk14: { bust: 36.5, waist: 27.5, hip: 39.0, chest: 13.75, back: 14.75, shoulder: 5.2, backLen: 15.87, bicep: 12.12, sleeve: 23.37, elbow: 12.87, wrist: 6.43 },
+                uk16: { bust: 38.5, waist: 29.5, hip: 41.0, chest: 14.5, back: 15.5, shoulder: 5.4, backLen: 16.25, bicep: 12.75, sleeve: 23.75, elbow: 13.25, wrist: 6.62 }
+            }[size];
 
-            const sizes = {
-                'uk8':  { bust: 32.0, waist: 24.0, hip: 34.0, chest: 12.5, back: 13.5, shoulder: 4.875, bstToWst: 15.0, bicep: 10.5, sleeveLen: 22.5, elw: 12.0, wrist: 6.0 },
-                'uk10': { bust: 33.25, waist: 24.75, hip: 35.5, chest: 12.75, back: 13.75, shoulder: 4.875, bstToWst: 15.25, bicep: 11.0, sleeveLen: 22.75, elw: 12.25, wrist: 6.125 },
-                'uk12': { bust: 34.5, waist: 25.5, hip: 37.0, chest: 13.0, back: 14.0, shoulder: 5.0, bstToWst: 15.5, bicep: 11.5, sleeveLen: 23.0, elw: 12.5, wrist: 6.25 },
-                'uk14': { bust: 37.5, waist: 28.5, hip: 39.5, chest: 13.75, back: 14.75, shoulder: 5.25, bstToWst: 16.0, bicep: 12.25, sleeveLen: 23.5, elw: 13.0, wrist: 6.5 },
-                'uk16': { bust: 39.5, waist: 30.5, hip: 41.5, chest: 14.25, back: 15.25, shoulder: 5.375, bstToWst: 16.25, bicep: 13.0, sleeveLen: 24.0, elw: 13.5, wrist: 6.75 }
-            };
-
-            const data = sizes[size];
             if (data) {
                 document.getElementById('bust').value = data.bust;
                 document.getElementById('waist').value = data.waist;
@@ -730,156 +722,83 @@
                 document.getElementById('chestWidth').value = data.chest;
                 document.getElementById('backWidth').value = data.back;
                 document.getElementById('shoulderLength').value = data.shoulder;
-                document.getElementById('backNeckToWaist').value = data.bstToWst;
+                document.getElementById('backNeckToWaist').value = data.backLen;
                 document.getElementById('bicep').value = data.bicep;
-                document.getElementById('sleeveLength').value = data.sleeveLen;
-                document.getElementById('shoulderToElbow').value = data.elw;
+                document.getElementById('sleeveLength').value = data.sleeve;
+                document.getElementById('shoulderToElbow').value = data.elbow;
                 document.getElementById('wristCirc').value = data.wrist;
-
-                document.getElementById('chestWidthEase').value = 0;
-                document.getElementById('backWidthEase').value = 0;
-                document.getElementById('shoulderLengthEase').value = 0;
-                document.getElementById('backNeckToWaistEase').value = 0;
-                document.getElementById('sleeveLengthEase').value = 0;
-                document.getElementById('shoulderToElbowEase').value = 0;
-                document.getElementById('wristCircEase').value = 0;
+                generatePattern();
             }
         }
 
         function applyLowerStandardSize() {
             const size = document.getElementById('lowerStandardSize').value;
             if (!size) return;
+            const data = {
+                uk8:  { waist: 24.0, hips: 34.5, len: 37.5, knee: 22.0, rise: 11.0, thigh: 21.5, kneeCirc: 13.0, inseam: 29.0 },
+                uk10: { waist: 24.75, hips: 35.75, len: 38.0, knee: 22.5, rise: 11.25, thigh: 22.25, kneeCirc: 13.25, inseam: 29.5 },
+                uk12: { waist: 26.0, hips: 36.0, len: 38.5, knee: 23.0, rise: 11.5, thigh: 23.0, kneeCirc: 13.5, inseam: 30.0 },
+                uk14: { waist: 28.0, hips: 38.5, len: 39.0, knee: 24.0, rise: 11.87, thigh: 24.25, kneeCirc: 14.0, inseam: 30.5 },
+                uk16: { waist: 30.0, hips: 40.5, len: 39.5, knee: 25.0, rise: 12.25, thigh: 25.5, kneeCirc: 14.5, inseam: 31.0 }
+            }[size];
 
-            const sizes = {
-                'uk8':  { waist: 24.0, hips: 35.0, skirtLen: 37.0, kneeToWst: 22.0, hipLine: 8.25, yoke: 5.5, rise: 10.75, thigh: 21.5, knee: 12.5, inseam: 29.0 },
-                'uk10': { waist: 24.75, hips: 36.0, skirtLen: 37.5, kneeToWst: 22.5, hipLine: 8.5, yoke: 5.75, rise: 11.0, thigh: 22.25, knee: 13.0, inseam: 29.5 },
-                'uk12': { waist: 26.0, hips: 36.0, skirtLen: 38.5, kneeToWst: 23.0, hipLine: 8.75, yoke: 6.0, rise: 11.5, thigh: 23.0, knee: 13.5, inseam: 30.0 },
-                'uk14': { waist: 28.5, hips: 40.0, skirtLen: 39.0, kneeToWst: 23.5, hipLine: 9.0, yoke: 6.25, rise: 12.0, thigh: 24.5, knee: 14.25, inseam: 30.5 },
-                'uk16': { waist: 30.5, hips: 42.0, skirtLen: 39.5, kneeToWst: 24.0, hipLine: 9.25, yoke: 6.5, rise: 12.5, thigh: 26.0, knee: 15.0, inseam: 31.0 }
-            };
-
-            const data = sizes[size];
             if (data) {
                 document.getElementById('skirtWaist').value = data.waist;
                 document.getElementById('skirtHips').value = data.hips;
-                document.getElementById('skirtLength').value = data.skirtLen;
-                document.getElementById('skirtWaistToKnee').value = data.kneeToWst;
-                document.getElementById('skirtHipLine').value = data.hipLine;
-                document.getElementById('skirtYokeLine').value = data.yoke;
-
+                document.getElementById('skirtLength').value = data.len;
+                document.getElementById('skirtWaistToKnee').value = data.knee;
                 document.getElementById('pantWaist').value = data.waist;
                 document.getElementById('pantHips').value = data.hips;
                 document.getElementById('pantRise').value = data.rise;
                 document.getElementById('thigh').value = data.thigh;
-                document.getElementById('kneeCirc').value = data.knee;
+                document.getElementById('kneeCirc').value = data.kneeCirc;
                 document.getElementById('inseam').value = data.inseam;
+                generatePattern();
             }
-        }
-
-        function applyPreset() {
-            const preset = document.getElementById('blockPreset').value;
-            const bEase = document.getElementById('bustEase');
-            const wEase = document.getElementById('waistEase');
-            const hEase = document.getElementById('hipEase');
-
-            if (preset === 'standard') { bEase.value = 2.0; wEase.value = 1.5; hEase.value = 2.0; }
-            else if (preset === 'fitted') { bEase.value = 1.0; wEase.value = 0.5; hEase.value = 1.0; }
-            else if (preset === 'loose') { bEase.value = 3.0; wEase.value = 2.5; hEase.value = 3.0; }
         }
 
         function generatePattern() {
             const patternGroup = document.getElementById('pattern-group');
             patternGroup.innerHTML = '';
+            
+            const s = currentUnit === 'in' ? scaleFactor : scaleFactor / 2.54;
 
-            // --- SEQUENTIAL INDEPENDENT & DEPENDENT POINT DEFINITIONS ---
-            // Point 1: Center Back (CB) Top Anchor Origin
-            const CB_Top = {
-                label: "CB",
-                description: "Center Back Top Corner (Anchor Origin)",
-                x: 50,
-                y: 50,
-                isIndependent: true
-            };
+            // Add Left-aligned CB marker point (1 inch from top and 1 inch from left)
+            const inchToPx = 2.54 * s; 
+            const markerX = inchToPx;        
+            const markerY = inchToPx;        
 
-            const pieces = [];
+            const cbCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            cbCircle.setAttribute('cx', markerX);
+            cbCircle.setAttribute('cy', markerY);
+            cbCircle.setAttribute('r', '4');
+            cbCircle.setAttribute('fill', '#0066ff');
+            cbCircle.setAttribute('stroke', '#ffffff');
+            cbCircle.setAttribute('stroke-width', '1.5');
+            patternGroup.appendChild(cbCircle);
+
+            const cbText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            cbText.setAttribute('x', markerX + 8);
+            cbText.setAttribute('y', markerY + 4);
+            cbText.setAttribute('fill', '#0066ff');
+            cbText.setAttribute('font-size', '12');
+            cbText.setAttribute('font-weight', 'bold');
+            cbText.textContent = 'CB';
+            patternGroup.appendChild(cbText);
 
             const bustVal = parseFloat(document.getElementById('bust').value) + parseFloat(document.getElementById('bustEase').value);
             const backLengthVal = parseFloat(document.getElementById('backNeckToWaist').value) + parseFloat(document.getElementById('backNeckToWaistEase').value);
             
-            pieces.push({
-                name: `Bodice Block [${CB_Top.label}] (Bust: ${document.getElementById('bust').value}" + ${document.getElementById('bustEase').value}" ease)`,
-                anchorX: CB_Top.x,
-                anchorY: CB_Top.y,
-                width: (bustVal / 4) * scaleFactor,
-                height: backLengthVal * scaleFactor,
-                stroke: '#c25e6f',
-                fill: 'rgba(194, 94, 111, 0.06)'
-            });
-
-            if (document.getElementById('includeSleeve').value === 'yes') {
-                const sLenVal = (parseFloat(document.getElementById('sleeveLength').value) + parseFloat(document.getElementById('sleeveLengthEase').value)) * scaleFactor;
-                const bicepVal = (parseFloat(document.getElementById('bicep').value) + parseFloat(document.getElementById('bicepEase').value)) * scaleFactor;
-                pieces.push({
-                    name: `Fitted Sleeve (Bicep: ${document.getElementById('bicep').value}" + ${document.getElementById('bicepEase').value}" ease)`,
-                    anchorX: CB_Top.x + ((bustVal / 4) * scaleFactor) + 60,
-                    anchorY: CB_Top.y,
-                    width: bicepVal,
-                    height: sLenVal,
-                    stroke: '#5c524f',
-                    fill: 'rgba(92, 82, 79, 0.05)'
-                });
-            }
-
-            if (document.getElementById('includeSkirt').value === 'yes') {
-                const skirtHips = parseFloat(document.getElementById('skirtHips').value) + parseFloat(document.getElementById('skirtHipsEase').value);
-                const skirtLen = parseFloat(document.getElementById('skirtLength').value) + parseFloat(document.getElementById('skirtLengthEase').value);
-                pieces.push({
-                    name: `Skirt: ${document.getElementById('skirtStyle').value.toUpperCase()} (Hips: ${document.getElementById('skirtHips').value}")`,
-                    anchorX: CB_Top.x,
-                    anchorY: CB_Top.y + (backLengthVal * scaleFactor) + 60,
-                    width: (skirtHips / 4) * scaleFactor,
-                    height: skirtLen * scaleFactor,
-                    stroke: '#c25e6f',
-                    fill: 'rgba(194, 94, 111, 0.04)'
-                });
-            }
-
-            if (document.getElementById('includePant').value === 'yes') {
-                const thighVal = parseFloat(document.getElementById('thigh').value) + parseFloat(document.getElementById('thighEase').value);
-                const inseamVal = parseFloat(document.getElementById('inseam').value) + parseFloat(document.getElementById('inseamEase').value);
-                pieces.push({
-                    name: `Trouser Block (Rise: ${document.getElementById('pantRise').value}")`,
-                    anchorX: CB_Top.x + ((bustVal / 4) * scaleFactor) + 60,
-                    anchorY: CB_Top.y + (backLengthVal * scaleFactor) + 60,
-                    width: (thighVal / 2) * scaleFactor,
-                    height: inseamVal * scaleFactor,
-                    stroke: '#5c524f',
-                    fill: 'rgba(92, 82, 79, 0.04)'
-                });
-            }
-
-            pieces.forEach((piece) => {
-                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                rect.setAttribute('x', piece.anchorX);
-                rect.setAttribute('y', piece.anchorY);
-                rect.setAttribute('width', piece.width);
-                rect.setAttribute('height', piece.height);
-                rect.setAttribute('fill', piece.fill);
-                rect.setAttribute('stroke', piece.stroke);
-                rect.setAttribute('stroke-width', '2');
-                rect.setAttribute('stroke-dasharray', '4');
-                patternGroup.appendChild(rect);
-
-                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                text.setAttribute('x', piece.anchorX + 15);
-                text.setAttribute('y', piece.anchorY + 25);
-                text.setAttribute('fill', '#2c2524');
-                text.setAttribute('font-family', 'Montserrat');
-                text.setAttribute('font-size', '12');
-                text.setAttribute('font-weight', '600');
-                text.textContent = piece.name;
-                patternGroup.appendChild(text);
-            });
+            // Render basic draft block outline representation
+            const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            bodiceRect.setAttribute('x', 50);
+            bodiceRect.setAttribute('y', 50);
+            bodiceRect.setAttribute('width', (bustVal / 4) * s);
+            bodiceRect.setAttribute('height', backLengthVal * s);
+            bodiceRect.setAttribute('fill', 'rgba(194, 94, 111, 0.05)');
+            bodiceRect.setAttribute('stroke', 'var(--primary)');
+            bodiceRect.setAttribute('stroke-width', '2');
+            patternGroup.appendChild(bodiceRect);
         }
 
         function updateTransform() {
@@ -887,8 +806,8 @@
             wrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${currentScale})`;
         }
 
-        function adjustZoom(amount) {
-            currentScale = Math.max(0.3, Math.min(3.0, currentScale + amount));
+        function adjustZoom(delta) {
+            currentScale = Math.max(0.3, Math.min(3.5, currentScale + delta));
             updateTransform();
         }
 
@@ -899,62 +818,52 @@
             updateTransform();
         }
 
-        function downloadSVG() {
-            const svgEl = document.getElementById('pattern-svg');
-            const serializer = new XMLSerializer();
-            let source = serializer.serializeToString(svgEl);
-            if(!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
-                source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
-            }
-            const blob = new Blob([source], {type: "image/svg+xml;charset=utf-8"});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = "Lilinora_Atelier_Pattern.svg";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
         const viewport = document.getElementById('svg-scroll-viewport');
-
         viewport.addEventListener('mousedown', (e) => {
             isDragging = true;
             startMouseX = e.clientX - panX;
             startMouseY = e.clientY - panY;
         });
+
         window.addEventListener('mousemove', (e) => {
             if (!isDragging) return;
             panX = e.clientX - startMouseX;
             panY = e.clientY - startMouseY;
             updateTransform();
         });
+
         window.addEventListener('mouseup', () => { isDragging = false; });
 
         viewport.addEventListener('wheel', (e) => {
             e.preventDefault();
-            const rect = viewport.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
-
             const zoomIntensity = 0.1;
-            const oldScale = currentScale;
-            
             if (e.deltaY < 0) {
-                currentScale = Math.min(3.0, currentScale + zoomIntensity);
+                currentScale = Math.min(3.5, currentScale * (1 + zoomIntensity));
             } else {
-                currentScale = Math.max(0.3, currentScale - zoomIntensity);
+                currentScale = Math.max(0.3, currentScale / (1 + zoomIntensity));
             }
-
-            panX = mouseX - (mouseX - panX) * (currentScale / oldScale);
-            panY = mouseY - (mouseY - panY) * (currentScale / oldScale);
-
             updateTransform();
         }, { passive: false });
 
+        function downloadSVG() {
+            const svgEl = document.getElementById('pattern-svg');
+            const clone = svgEl.cloneNode(true);
+            clone.querySelectorAll('rect[fill="#ffffff"]').forEach(r => r.remove());
+            const serializer = new XMLSerializer();
+            const source = serializer.serializeToString(clone);
+            const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'lilinora_precision_pattern.svg';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
         window.onload = () => {
             initGrid();
-            updateTransform();
+            generatePattern();
         };
     </script>
 </body>
