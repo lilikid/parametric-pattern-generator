@@ -400,6 +400,10 @@
             </div>
         </div>
         <div class="header-controls">
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 600; color: #4a3f3d;">
+                <input type="checkbox" id="removeNamesToggle" onchange="generatePattern()" style="cursor: pointer;">
+                <label for="removeNamesToggle" style="cursor: pointer; margin-bottom: 0;">Remove Names</label>
+            </div>
             <button class="side-by-side-toggle" id="sideBySideToggleBtn" onclick="toggleSideBySideMode()">Show Side-by-Side</button>
             <div class="unit-selector">
                 <button class="unit-btn active" id="unit-in" onclick="setUnit('in')">Inches (in)</button>
@@ -932,6 +936,8 @@
         }
 
         function generatePattern() {
+            const removeNames = document.getElementById('removeNamesToggle').checked;
+
             // --- 1. BODICE BLOCK (CB & CF Anchor Points Established First) ---
             const bodiceGroup = document.querySelector('#svg-bodice .pattern-group-sub');
             bodiceGroup.innerHTML = '';
@@ -956,26 +962,30 @@
             pointCB.setAttribute('fill', '#0047AB');
             bodiceGroup.appendChild(pointCB);
 
-            const labelCB = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            labelCB.setAttribute('x', 60); labelCB.setAttribute('y', 42);
-            labelCB.setAttribute('font-family', 'Montserrat, sans-serif');
-            labelCB.setAttribute('font-size', '12'); labelCB.setAttribute('font-weight', 'bold');
-            labelCB.setAttribute('fill', '#0047AB');
-            labelCB.textContent = 'CB (Center Back)';
-            bodiceGroup.appendChild(labelCB);
+            if (!removeNames) {
+                const labelCB = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                labelCB.setAttribute('x', 60); labelCB.setAttribute('y', 42);
+                labelCB.setAttribute('font-family', 'Montserrat, sans-serif');
+                labelCB.setAttribute('font-size', '12'); labelCB.setAttribute('font-weight', 'bold');
+                labelCB.setAttribute('fill', '#0047AB');
+                labelCB.textContent = 'CB (Center Back)';
+                bodiceGroup.appendChild(labelCB);
+            }
 
             const pointCF = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             pointCF.setAttribute('cx', 50 + bWidth); pointCF.setAttribute('cy', 50); pointCF.setAttribute('r', 4.5);
             pointCF.setAttribute('fill', '#0047AB');
             bodiceGroup.appendChild(pointCF);
 
-            const labelCF = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            labelCF.setAttribute('x', 50 + bWidth - 110); labelCF.setAttribute('y', 42);
-            labelCF.setAttribute('font-family', 'Montserrat, sans-serif');
-            labelCF.setAttribute('font-size', '12'); labelCF.setAttribute('font-weight', 'bold');
-            labelCF.setAttribute('fill', '#0047AB');
-            labelCF.textContent = 'CF (Center Front)';
-            bodiceGroup.appendChild(labelCF);
+            if (!removeNames) {
+                const labelCF = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                labelCF.setAttribute('x', 50 + bWidth - 110); labelCF.setAttribute('y', 42);
+                labelCF.setAttribute('font-family', 'Montserrat, sans-serif');
+                labelCF.setAttribute('font-size', '12'); labelCF.setAttribute('font-weight', 'bold');
+                labelCF.setAttribute('fill', '#0047AB');
+                labelCF.textContent = 'CF (Center Front)';
+                bodiceGroup.appendChild(labelCF);
+            }
 
 
             // STEP 2: Drawing the Nape Line
@@ -991,13 +1001,15 @@
             napeLine.setAttribute('stroke-dasharray', '6 3');
             bodiceGroup.appendChild(napeLine);
 
-            const napeText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            napeText.setAttribute('x', 60); napeText.setAttribute('y', napeLineY - 6);
-            napeText.setAttribute('font-family', 'Montserrat, sans-serif');
-            napeText.setAttribute('font-size', '11'); napeText.setAttribute('font-weight', '600');
-            napeText.setAttribute('fill', '#1f7a8c');
-            napeText.textContent = `Nape Line (${napeLineDropInches.toFixed(2)}" / ${(napeLineDropInches * 2.54).toFixed(1)}cm down)`;
-            bodiceGroup.appendChild(napeText);
+            if (!removeNames) {
+                const napeText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                napeText.setAttribute('x', 60); napeText.setAttribute('y', napeLineY - 6);
+                napeText.setAttribute('font-family', 'Montserrat, sans-serif');
+                napeText.setAttribute('font-size', '11'); napeText.setAttribute('font-weight', '600');
+                napeText.setAttribute('fill', '#1f7a8c');
+                napeText.textContent = `Nape Line (${napeLineDropInches.toFixed(2)}" / ${(napeLineDropInches * 2.54).toFixed(1)}cm down)`;
+                bodiceGroup.appendChild(napeText);
+            }
 
 
             // STEP 3: Drawing the Bust Line
@@ -1013,13 +1025,15 @@
             bustLine.setAttribute('stroke-dasharray', '3 3');
             bodiceGroup.appendChild(bustLine);
 
-            const bustText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            bustText.setAttribute('x', 60); bustText.setAttribute('y', bustLineY - 6);
-            bustText.setAttribute('font-family', 'Montserrat, sans-serif');
-            bustText.setAttribute('font-size', '11'); bustText.setAttribute('font-weight', '600');
-            bustText.setAttribute('fill', '#c25e6f');
-            bustText.textContent = `Bust Line (${bustLineOffset.toFixed(2)}" down from Nape)`;
-            bodiceGroup.appendChild(bustText);
+            if (!removeNames) {
+                const bustText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                bustText.setAttribute('x', 60); bustText.setAttribute('y', bustLineY - 6);
+                bustText.setAttribute('font-family', 'Montserrat, sans-serif');
+                bustText.setAttribute('font-size', '11'); bustText.setAttribute('font-weight', '600');
+                bustText.setAttribute('fill', '#c25e6f');
+                bustText.textContent = `Bust Line (${bustLineOffset.toFixed(2)}" down from Nape)`;
+                bodiceGroup.appendChild(bustText);
+            }
 
 
             // STEP 4: Calculate Back Neck Width & Draw along Nape Line from CB
@@ -1041,15 +1055,17 @@
             neckPointCircle.setAttribute('fill', '#8b5cf6');
             bodiceGroup.appendChild(neckPointCircle);
 
-            const neckWidthText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            neckWidthText.setAttribute('x', 50);
-            neckWidthText.setAttribute('y', napeLineY + 16);
-            neckWidthText.setAttribute('font-family', 'Montserrat, sans-serif');
-            neckWidthText.setAttribute('font-size', '10');
-            neckWidthText.setAttribute('font-weight', 'bold');
-            neckWidthText.setAttribute('fill', '#8b5cf6');
-            neckWidthText.textContent = `Back Neck Width Point (${backNeckWidth.toFixed(2)}" / ${(backNeckWidth * 2.54).toFixed(1)}cm)`;
-            bodiceGroup.appendChild(neckWidthText);
+            if (!removeNames) {
+                const neckWidthText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                neckWidthText.setAttribute('x', 50);
+                neckWidthText.setAttribute('y', napeLineY + 22);
+                neckWidthText.setAttribute('font-family', 'Montserrat, sans-serif');
+                neckWidthText.setAttribute('font-size', '10');
+                neckWidthText.setAttribute('font-weight', 'bold');
+                neckWidthText.setAttribute('fill', '#8b5cf6');
+                neckWidthText.textContent = `Back Neck Width Point (${backNeckWidth.toFixed(2)}" / ${(backNeckWidth * 2.54).toFixed(1)}cm)`;
+                bodiceGroup.appendChild(neckWidthText);
+            }
 
 
             // STEP 5: Square up 3/4" (2cm) from Back Width neck point and place Back Neck Point
@@ -1072,15 +1088,31 @@
             finalNeckPointCircle.setAttribute('fill', '#0284c7');
             bodiceGroup.appendChild(finalNeckPointCircle);
 
-            const finalNeckText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            finalNeckText.setAttribute('x', finalNeckPointX + 8);
-            finalNeckText.setAttribute('y', finalNeckPointY - 4);
-            finalNeckText.setAttribute('font-family', 'Montserrat, sans-serif');
-            finalNeckText.setAttribute('font-size', '11');
-            finalNeckText.setAttribute('font-weight', 'bold');
-            finalNeckText.setAttribute('fill', '#0284c7');
-            finalNeckText.textContent = 'Back Neck Point';
-            bodiceGroup.appendChild(finalNeckText);
+            if (!removeNames) {
+                const finalNeckText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                finalNeckText.setAttribute('x', finalNeckPointX + 8);
+                finalNeckText.setAttribute('y', finalNeckPointY - 4);
+                finalNeckText.setAttribute('font-family', 'Montserrat, sans-serif');
+                finalNeckText.setAttribute('font-weight', 'bold');
+                finalNeckText.setAttribute('fill', '#0284c7');
+                finalNeckText.textContent = 'Back Neck Point';
+                bodiceGroup.appendChild(finalNeckText);
+            }
+
+
+            // STEP 6: Draw in a shallow Back Neckline curve flattening out at Centre Back connecting the Back Neck point and the intersection of the nape line with the vertical line below the Point CB.
+            const cbIntersectionX = 50;
+            const cbIntersectionY = napeLineY;
+            const neckCurvePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            // Quadratic or cubic bezier to flatten out horizontally at CB (start at cbIntersectionX, cbIntersectionY with horizontal tangent)
+            const controlPointX = cbIntersectionX + (finalNeckPointX - cbIntersectionX) * 0.4;
+            const controlPointY = cbIntersectionY; // Keep horizontal tangent at CB
+            const neckCurveData = `M ${cbIntersectionX} ${cbIntersectionY} Q ${controlPointX} ${controlPointY}, ${finalNeckPointX} ${finalNeckPointY}`;
+            neckCurvePath.setAttribute('d', neckCurveData);
+            neckCurvePath.setAttribute('stroke', '#2c2524');
+            neckCurvePath.setAttribute('stroke-width', '2');
+            neckCurvePath.setAttribute('fill', 'none');
+            bodiceGroup.appendChild(neckCurvePath);
 
 
             // Draw Bodice Pattern Box Frame
