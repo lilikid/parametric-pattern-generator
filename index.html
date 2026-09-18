@@ -468,6 +468,13 @@
                             </div>
                         </div>
                         <div class="input-section">
+                            <label>Waist to Hip Depth</label>
+                            <div class="dual-input">
+                                <input type="number" id="waistToHip" value="8.0" step="0.25">
+                                <div class="input-with-label"><span class="input-label-tag">Depth</span><span style="font-size:0.75rem; color:#7a6f6d;">Vertical</span></div>
+                            </div>
+                        </div>
+                        <div class="input-section">
                             <label>Chest Width (Front) & Ease</label>
                             <div class="dual-input">
                                 <input type="number" id="chestWidth" value="13.0" step="0.25">
@@ -921,12 +928,24 @@
         function generatePattern() {
             const bodiceGroup = document.querySelector('#svg-bodice .pattern-group-sub');
             bodiceGroup.innerHTML = '';
-            const bustVal = parseFloat(document.getElementById('bust').value) + parseFloat(document.getElementById('bustEase').value);
-            const backLengthVal = parseFloat(document.getElementById('backNeckToWaist').value) + parseFloat(document.getElementById('backNeckToWaistEase').value);
-            const bWidth = (bustVal / 4) * scaleFactor;
-            const bHeight = backLengthVal * scaleFactor;
             
-            document.getElementById('bodiceTitle').textContent = `Bodice Block (Bust: ${document.getElementById('bust').value}" + ${document.getElementById('bustEase').value}" ease)`;
+            // --- UPDATED BODICE BOX CALCULATIONS ---
+            const hipVal = parseFloat(document.getElementById('hip').value);
+            const hipEaseVal = parseFloat(document.getElementById('hipEase').value);
+            const backLengthVal = parseFloat(document.getElementById('backNeckToWaist').value);
+            const waistToHipVal = parseFloat(document.getElementById('waistToHip').value);
+
+            // Unit-dependent allowances: 2" or 5cm for width, 1" or 2.5cm for length
+            const widthAllowance = (currentUnit === 'in') ? 2.0 : 5.0;
+            const lengthAllowance = (currentUnit === 'in') ? 1.0 : 2.5;
+
+            // Width = (1/2 Hip + Hip Ease) + Allowance
+            const bWidth = (((hipVal + hipEaseVal) / 2) + widthAllowance) * scaleFactor;
+            
+            // Height = Back Waist + Waist-to-Hip + Allowance
+            const bHeight = (backLengthVal + waistToHipVal + lengthAllowance) * scaleFactor;
+            
+            document.getElementById('bodiceTitle').textContent = `Bodice Block (Hip: ${hipVal}" + ${hipEaseVal}" ease)`;
             
             const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
             bodiceRect.setAttribute('x', 50); bodiceRect.setAttribute('y', 50);
@@ -1022,7 +1041,6 @@
             document.body.removeChild(a);
         }
 
-        // Export handler function placeholder for jsPDF integration
         function exportPDF(format) {
             const { jsPDF } = window.jspdf;
             if (format === 'A0') {
