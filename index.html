@@ -1009,27 +1009,27 @@
             bodiceGroup.appendChild(napeText);
 
 
-            // STEP 3: Drawing the Bust Line (measuring down from the Nape the half Back Waist measurement plus 3/8" [1cm], and for Bust over 40" [100cm], add 5/8" [1.5cm] instead. Dotted and thin).
-            let bustAdd = (totalBust > 40) ? (5 / 8) : (3 / 8);
-            let bustLineDistance = halfBackWaistVal + bustAdd;
-            let bustLineY = napeLineY + (bustLineDistance * scaleFactor);
+            // STEP 3: Drawing the Bust Line
+            // Measure down from the Nape line: half Back Waist measurement plus 3/8" (1cm), 
+            // or plus 5/8" (1.5cm) if total bust is over 40" (100cm).
+            const halfBackWaist = backLengthVal / 2.0;
+            const extraBustAllowance = totalBust > 40.0 ? 0.625 : 0.375; // 5/8" vs 3/8"
+            const totalBustDropFromNape = halfBackWaist + extraBustAllowance;
+            const bustLineY = napeLineY + (totalBustDropFromNape * scaleFactor);
 
             const bustLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             bustLine.setAttribute('x1', 50); bustLine.setAttribute('y1', bustLineY);
             bustLine.setAttribute('x2', 50 + bWidth); bustLine.setAttribute('y2', bustLineY);
-            bustLine.setAttribute('stroke', '#c25e6f'); 
-            bustLine.setAttribute('stroke-width', '0.8'); 
-            bustLine.setAttribute('stroke-dasharray', '2 2');
+            bustLine.setAttribute('stroke', '#c25e6f'); bustLine.setAttribute('stroke-width', '2');
             bodiceGroup.appendChild(bustLine);
 
-            const bustLineText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            bustLineText.setAttribute('x', 60); bustLineText.setAttribute('y', bustLineY - 5);
-            bustLineText.setAttribute('font-family', 'Montserrat, sans-serif');
-            bustLineText.setAttribute('font-size', '11'); bustLineText.setAttribute('font-weight', '600');
-            bustLineText.setAttribute('fill', '#c25e6f');
-            bustLineText.textContent = `Bust Line (+${bustLineDistance.toFixed(3)}" from Nape)`;
-            bodiceGroup.appendChild(bustLineText);
-
+            const bustText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            bustText.setAttribute('x', 60); bustText.setAttribute('y', bustLineY - 6);
+            bustText.setAttribute('font-family', 'Montserrat, sans-serif');
+            bustText.setAttribute('font-size', '11'); bustText.setAttribute('font-weight', 'bold');
+            bustText.setAttribute('fill', '#c25e6f');
+            bustText.textContent = `Bust Line (${totalBustDropFromNape.toFixed(2)}" down from Nape)`;
+            bodiceGroup.appendChild(bustText);
 
             // Draw Bodice Pattern Box Frame
             const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
