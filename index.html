@@ -398,7 +398,7 @@
 </head>
 <body>
 
-    <header>
+    <header[cite: 6]>
         <div class="brand-container">
             <div class="brand-logo-symbol" title="Lilinora Atelier">
                 <svg viewBox="0 0 24 24">
@@ -1374,6 +1374,33 @@
             bodiceGroup.appendChild(dartLeg2);
 
             appendLabel(bodiceGroup, 'Shoulder Dart (½" / 1cm wide)', shoulderMidX, shoulderMidY - 18, '#dc2626', '10', 'bold', true);
+
+
+            // --- STEP 12: Back Hip Point ---
+            const waistLineY = napeLineY + (backLengthVal * scaleFactor);
+            const hipLineY = waistLineY + (waistToHipVal * scaleFactor);
+            const quarterHipInches = (hipVal + hipEaseVal) / 4.0;
+            const quarterHipPixels = quarterHipInches * scaleFactor;
+            const backHipPointX = 50 + quarterHipPixels;
+
+            const hipLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            hipLine.setAttribute('x1', 50); hipLine.setAttribute('y1', hipLineY);
+            hipLine.setAttribute('x2', 50 + bWidth); hipLine.setAttribute('y2', hipLineY);
+            hipLine.setAttribute('stroke', '#0047AB');
+            hipLine.setAttribute('stroke-width', '1');
+            hipLine.setAttribute('stroke-dasharray', '3 3');
+            bodiceGroup.appendChild(hipLine);
+
+            appendLabel(bodiceGroup, `Hip Line (${waistToHipVal.toFixed(1)}" below Waist)`, 60, hipLineY, '#0047AB', '11', '600', true);
+
+            const backHipPointCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            backHipPointCircle.setAttribute('cx', backHipPointX);
+            backHipPointCircle.setAttribute('cy', hipLineY);
+            backHipPointCircle.setAttribute('r', '5.5');
+            backHipPointCircle.setAttribute('fill', '#0047AB');
+            bodiceGroup.appendChild(backHipPointCircle);
+
+            appendLabel(bodiceGroup, `Step 12: Back Hip Point (${quarterHipInches.toFixed(2)}" / ${(quarterHipInches * 2.54).toFixed(1)}cm)`, backHipPointX + 10, hipLineY, '#0047AB', '11', 'bold', true);
 
 
             // Draw Bodice Pattern Box Frame
