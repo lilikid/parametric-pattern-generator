@@ -1223,7 +1223,7 @@
             appendLabel(bodiceGroup, 'Armhole Guide Line', backWidthPointX + 12, backLineY + 14, '#4f46e5', '10', 'bold', false);
 
 
-            // --- STEP 9: Back Underarm Point (Updated name per user instruction) ---
+            // --- STEP 9: Back Underarm Point ---
             const userUnderarmEaseInches = parseFloat(document.getElementById('backUnderarmEase').value) || 2.0;
             const underarmExtensionPixels = userUnderarmEaseInches * scaleFactor;
             const backUnderarmPointX = backWidthPointX + underarmExtensionPixels;
@@ -1242,16 +1242,15 @@
             backUnderarmCircle.setAttribute('fill', '#9333ea');
             bodiceGroup.appendChild(backUnderarmCircle);
 
-            appendLabel(bodiceGroup, `Step 9: underarm point (${userUnderarmEaseInches.toFixed(2)}" / ${(userUnderarmEaseInches * 2.54).toFixed(1)}cm ext)`, backUnderarmPointX + 8, bustLineY, '#9333ea', '11', 'bold', false);
+            appendLabel(bodiceGroup, `Step 9: back Underarm point (${userUnderarmEaseInches.toFixed(2)}" / ${(userUnderarmEaseInches * 2.54).toFixed(1)}cm ext)`, backUnderarmPointX + 8, bustLineY, '#9333ea', '11', 'bold', false);
 
 
-            // --- STEP 10: Point K (45º Angle Bisector from Armhole Guide & Bust Line Angle) ---
-            // At the angle made by the Armhole Guide and the Bust Line draw a guide line at 45º and measure along 1¼" (3cm) for size 34 up to 1⅝" (4cm) for larger sizes. Name point K.
+            // --- STEP 10: Point K (Direction flipped to the RIGHT side of the armhole guide line) ---
             const kDistanceInches = parseFloat(document.getElementById('cornerBisectorK').value) || 1.25;
             const kDistancePixels = kDistanceInches * scaleFactor;
-            // 45 degree angle vector pointing diagonally up-left into the armhole corner (dx = -cos(45)*dist, dy = -sin(45)*dist)
             const kAngleRad = Math.PI / 4; // 45 degrees
-            const kTargetX = backWidthPointX - (kDistancePixels * Math.cos(kAngleRad));
+            // Flipped to the right side: dx = +cos(45)*dist
+            const kTargetX = backWidthPointX + (kDistancePixels * Math.cos(kAngleRad));
             const kTargetY = bustLineY - (kDistancePixels * Math.sin(kAngleRad));
 
             const kGuideLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -1269,7 +1268,38 @@
             kPointCircle.setAttribute('fill', '#ea580c');
             bodiceGroup.appendChild(kPointCircle);
 
-            appendLabel(bodiceGroup, `Step 10: Point K (${kDistanceInches.toFixed(3)}" / ${(kDistanceInches * 2.54).toFixed(1)}cm at 45º)`, kTargetX - 110, kTargetY - 10, '#ea580c', '11', 'bold', true);
+            appendLabel(bodiceGroup, `Step 10: Point K (${kDistanceInches.toFixed(3)}" / ${(kDistanceInches * 2.54).toFixed(1)}cm at 45º right)`, kTargetX + 10, kTargetY - 10, '#ea580c', '11', 'bold', true);
+
+
+            // --- STEP 11: Back Shoulder Point ---
+            // From the Back Neck Point draw a line equal to the Shoulder Length measurement plus ⅜" (1cm) to wherever it meets the Shoulder Line. It will be beyond the armhole guide line. Label this the Shoulder Point. Make it bold blue point.
+            const baseShoulderLen = parseFloat(document.getElementById('shoulderLength').value) || 5.0;
+            const shoulderLenEaseVal = parseFloat(document.getElementById('shoulderLengthEase').value) || 0.0;
+            const shoulderPlusAllowanceInches = baseShoulderLen + shoulderLenEaseVal + 0.375; // plus 3/8" (1cm)
+            const shoulderPlusAllowancePixels = shoulderPlusAllowanceInches * scaleFactor;
+
+            // Compute intersection of arc from Back Neck Point (finalNeckPointX, finalNeckPointY) with radius shoulderPlusAllowancePixels 
+            // intersecting the horizontal Shoulder Line at Y = shoulderLineY
+            const dyShoulder = shoulderLineY - finalNeckPointY;
+            const dxShoulderVal = Math.sqrt(Math.max(0, (shoulderPlusAllowancePixels * shoulderPlusAllowancePixels) - (dyShoulder * dyShoulder)));
+            const shoulderPointX = finalNeckPointX + dxShoulderVal; // extending to the right
+            const shoulderPointY = shoulderLineY;
+
+            const shoulderPointLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            shoulderPointLine.setAttribute('x1', finalNeckPointX); shoulderPointLine.setAttribute('y1', finalNeckPointY);
+            shoulderPointLine.setAttribute('x2', shoulderPointX); shoulderPointLine.setAttribute('y2', shoulderPointY);
+            shoulderPointLine.setAttribute('stroke', '#0047AB');
+            shoulderPointLine.setAttribute('stroke-width', '2.5');
+            bodiceGroup.appendChild(shoulderPointLine);
+
+            const shoulderPointCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            shoulderPointCircle.setAttribute('cx', shoulderPointX);
+            shoulderPointCircle.setAttribute('cy', shoulderPointY);
+            shoulderPointCircle.setAttribute('r', '6');
+            shoulderPointCircle.setAttribute('fill', '#0047AB');
+            bodiceGroup.appendChild(shoulderPointCircle);
+
+            appendLabel(bodiceGroup, `Step 11: Shoulder Point (${shoulderPlusAllowanceInches.toFixed(3)}" / ${(shoulderPlusAllowanceInches * 2.54).toFixed(1)}cm)`, shoulderPointX + 10, shoulderPointY - 5, '#0047AB', '11', 'bold', true);
 
 
             // Draw Bodice Pattern Box Frame
