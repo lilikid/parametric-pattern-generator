@@ -3,868 +3,279 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lilinora | Precision Atelier Pattern Generator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <title>Parametric Pattern Generator</title>
     <style>
         :root {
-            --primary: #c25e6f;
-            --primary-hover: #a84c5c;
-            --bg-color: #f8f6f5;
-            --card-bg: #ffffff;
-            --border-color: #e2dcd9;
-            --text-color: #2c2524;
-            --heading-font: 'Playfair Display', serif;
-            --body-font: 'Montserrat', sans-serif;
+            --primary-color: #0066ff;
+            --bg-color: #f8f9fa;
+            --panel-bg: #ffffff;
+            --border-color: #e0e0e0;
+            --text-color: #333333;
         }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: var(--body-font);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            line-height: 1.5;
-            padding: 24px;
+            margin: 0;
+            padding: 20px;
         }
 
-        header {
-            max-width: 1500px;
-            margin: 0 auto 24px auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--card-bg);
-            padding: 18px 28px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 12px rgba(44, 37, 36, 0.03);
-        }
-
-        .brand-container { display: flex; align-items: center; gap: 16px; }
-
-        .brand-logo-symbol {
-            width: 44px;
-            height: 44px;
-            background: linear-gradient(135deg, #c25e6f, #e09fabb0);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            box-shadow: 0 4px 10px rgba(194, 94, 111, 0.25);
-        }
-
-        .brand-logo-symbol svg { width: 24px; height: 24px; fill: currentColor; }
-
-        .brand-titles h1 {
-            font-family: var(--heading-font);
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #1a1514;
-        }
-
-        .brand-titles p {
-            font-size: 0.8rem;
-            color: #7a6f6d;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            font-weight: 500;
-        }
-
-        .unit-selector {
-            display: flex;
-            background: #f0ebe8;
-            border-radius: 6px;
-            padding: 3px;
-        }
-
-        .unit-btn {
-            background: transparent;
-            border: none;
-            padding: 6px 14px;
-            font-size: 0.82rem;
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 4px;
-            color: #7a6f6d;
-            transition: all 0.2s;
-        }
-
-        .unit-btn.active {
-            background: white;
-            color: var(--primary);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
-        }
-
-        .workspace {
-            max-width: 1500px;
+        .app-container {
+            max-width: 1400px;
             margin: 0 auto;
-            display: grid;
-            grid-template-columns: 440px 1fr;
-            gap: 24px;
-            align-items: start;
+            background: var(--panel-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 20px;
         }
 
-        @media (max-width: 1000px) {
-            .workspace { grid-template-columns: 1fr; }
-        }
-
-        .control-panel {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 4px 12px rgba(44, 37, 36, 0.03);
-            max-height: 820px;
-            overflow-y: auto;
-        }
-
-        .section-bracket {
-            background: #faf8f7;
-            border: 1px solid #dcd3ce;
-            border-radius: 10px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-
-        .section-bracket-title {
-            font-family: var(--heading-font);
-            font-size: 1.1rem;
-            color: #1a1514;
-            margin-bottom: 12px;
-            padding-bottom: 6px;
+        /* Top Controls Bar */
+        .controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding-bottom: 15px;
             border-bottom: 1px solid var(--border-color);
+            margin-bottom: 15px;
+        }
+
+        .control-group {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-        }
-
-        .garment-module {
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            margin-bottom: 12px;
-            padding: 14px;
-        }
-
-        .garment-module-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-        }
-
-        .garment-module h3 {
-            font-family: var(--heading-font);
-            font-size: 0.95rem;
-            color: #2c2524;
-        }
-
-        .garment-module-body {
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px dashed var(--border-color);
-        }
-
-        .input-section { margin-bottom: 12px; }
-
-        .input-section label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #4a3f3d;
-        }
-
-        .dual-input {
-            display: grid;
-            grid-template-columns: 1fr 85px;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .input-with-label { position: relative; }
-
-        .input-label-tag {
-            position: absolute;
-            top: -15px;
-            right: 0;
-            font-size: 0.68rem;
-            font-weight: 600;
-            color: #8c7e7b;
-        }
-
-        input[type="number"], select {
-            width: 100%;
-            padding: 8px 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-family: var(--body-font);
-            background: #fff;
-            color: var(--text-color);
-        }
-
-        input[type="number"]:focus, select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(194, 94, 111, 0.15);
-        }
-
-        .btn-container {
-            display: flex;
-            flex-direction: column;
             gap: 10px;
-            margin-top: 20px;
         }
 
-        button.action-btn {
-            width: 100%;
-            padding: 11px 16px;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.92rem;
-            font-weight: 600;
-            font-family: var(--body-font);
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .btn-primary { background-color: var(--primary); color: white; }
-        .btn-primary:hover { background-color: var(--primary-hover); }
-        .btn-secondary { background-color: #5c524f; color: white; }
-        .btn-secondary:hover { background-color: #423a38; }
-
-        .preview-container {
-            background: var(--card-bg);
+        select, button {
+            padding: 8px 12px;
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 24px;
-            height: 820px;
+            border-radius: 4px;
+            background: #fff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        button.active-btn {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Tabs Navigation Bar */
+        .tabs-bar {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: #f1f3f5;
+            border: none;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background: var(--panel-bg);
+            color: var(--primary-color);
+            border: 1px solid var(--border-color);
+            border-bottom: 2px solid var(--panel-bg);
+            margin-bottom: -2px;
+        }
+
+        /* Pattern Display Area */
+        .pattern-container {
             display: flex;
             flex-direction: column;
-            box-shadow: 0 4px 12px rgba(44, 37, 36, 0.03);
+            gap: 20px;
+            min-height: 600px;
         }
 
-        .preview-toolbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 14px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #f0ebe8;
+        /* Side-by-side mode layout class */
+        .pattern-container.side-by-side {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 20px;
         }
 
-        .zoom-controls { display: flex; gap: 6px; align-items: center; }
-
-        .zoom-btn {
-            background: #f8f6f5;
+        .pattern-panel {
+            background: #fff;
             border: 1px solid var(--border-color);
-            width: 32px;
-            height: 32px;
             border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #4a3f3d;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
 
-        .zoom-btn:hover { background: #f0ebe8; }
+        .pattern-panel h3 {
+            margin-top: 0;
+            font-size: 16px;
+            color: #444;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+        }
 
-        #svg-scroll-viewport {
+        svg {
             width: 100%;
-            flex-grow: 1;
-            overflow: hidden;
-            position: relative;
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            cursor: grab;
+            height: 550px;
+            background: #fff;
+            border: 1px dashed #ccc;
         }
-
-        #svg-scroll-viewport:active { cursor: grabbing; }
-
-        #svg-canvas-wrapper {
-            position: absolute;
-            transform-origin: 0 0;
-            will-change: transform;
-        }
-
-        .grid-line-sub { stroke: #f0ecea; stroke-width: 0.5; vector-effect: non-scaling-stroke; }
-        .grid-line-half { stroke: #d5ccc8; stroke-width: 0.8; vector-effect: non-scaling-stroke; }
-        .grid-line-major { stroke: #b8aba5; stroke-width: 1.4; vector-effect: non-scaling-stroke; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="brand-container">
-            <div class="brand-logo-symbol" title="Lilinora Atelier">
-                <svg viewBox="0 0 24 24">
-                    <path d="M18.5,2.5 C17.5,1.5 16,1.5 15,2.5 L6,11.5 C5.4,12.1 5,12.9 5,13.8 L5,18 L9.2,18 C10.1,18 10.9,17.6 11.5,17 L20.5,8 C21.5,7 21.5,5.5 20.5,4.5 L18.5,2.5 Z M8.4,16 L7,16 L7,14.6 C7,14.3 7.1,14 7.3,13.8 L12.5,8.6 L15.4,11.5 L10.2,16.7 C10,16.9 9.7,17 9.4,17 L8.4,16 Z M19.1,6.6 L18,7.7 L16.3,6 L17.4,4.9 C17.7,4.6 18.3,4.6 18.6,4.9 L19.1,5.4 C19.4,5.7 19.4,6.3 19.1,6.6 Z"/>
-                </svg>
-            </div>
-            <div class="brand-titles">
-                <h1>Lilinora</h1>
-                <p>Precision Atelier Pattern Generator</p>
-            </div>
+<div class="app-container">
+    <!-- Top Control Bar (Units & View Mode) -->
+    <div class="controls-bar">
+        <div class="control-group">
+            <label for="unitSelect"><strong>Grid Unit:</strong></label>
+            <select id="unitSelect" onchange="updatePattern()">
+                <option value="inch">1 Inch</option>
+                <option value="cm">1 Centimeter</option>
+            </select>
         </div>
-        <div class="unit-selector">
-            <button class="unit-btn active" id="unit-in" onclick="setUnit('in')">Inches (in)</button>
-            <button class="unit-btn" id="unit-cm" onclick="setUnit('cm')">Centimeters (cm)</button>
-        </div>
-    </header>
-
-    <div class="workspace">
-        <!-- Control Panel -->
-        <div class="control-panel">
-            <h2 style="font-family:var(--heading-font); font-size:1.15rem; margin-bottom:14px;">Pattern Modules</h2>
-            
-            <!-- BRACKET 1: UPPER BODY -->
-            <div class="section-bracket">
-                <div class="section-bracket-title">
-                    <span>[ Upper Body: Bodice & Sleeve ]</span>
-                </div>
-                
-                <div class="input-section">
-                    <label for="upperStandardSize">Upper Body Standard Size Preset</label>
-                    <select id="upperStandardSize" onchange="applyUpperStandardSize()">
-                        <option value="">-- Custom Upper Sizing --</option>
-                        <option value="uk8">UK 8 / US 4</option>
-                        <option value="uk10">UK 10 / US 6</option>
-                        <option value="uk12" selected>UK 12 / US 8 (Draft Spec)</option>
-                        <option value="uk14">UK 14 / US 10</option>
-                        <option value="uk16">UK 16 / US 12</option>
-                    </select>
-                </div>
-
-                <!-- 1. BODICE WINDOW -->
-                <div class="garment-module">
-                    <div class="garment-module-header" onclick="toggleModule('bodiceBody')">
-                        <h3>1. Bodice Window</h3>
-                        <span style="font-size:0.75rem; font-weight:600; color:var(--primary);">Configure ▼</span>
-                    </div>
-                    <div id="bodiceBody" class="garment-module-body" style="display:none;">
-                        <div class="input-section">
-                            <label for="blockPreset">Fit & Ease Preset</label>
-                            <select id="blockPreset" onchange="applyPreset()">
-                                <option value="standard">Standard Woven (+2.0" Bust, +1.5" Waist)</option>
-                                <option value="fitted">Fitted (+1.0" Bust, +0.5" Waist)</option>
-                                <option value="loose">Relaxed (+3.0" Bust, +2.5" Waist)</option>
-                            </select>
-                        </div>
-                        <div class="input-section">
-                            <label>Bust & Ease</label>
-                            <div class="dual-input">
-                                <input type="number" id="bust" value="34.5" step="0.25">
-                                <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="bustEase" value="2.0" step="0.25"></div>
-                            </div>
-                        </div>
-                        <div class="input-section">
-                            <label>Waist & Ease</label>
-                            <div class="dual-input">
-                                <input type="number" id="waist" value="25.5" step="0.25">
-                                <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="waistEase" value="1.5" step="0.25"></div>
-                            </div>
-                        </div>
-                        <div class="input-section">
-                            <label>Hips & Ease</label>
-                            <div class="dual-input">
-                                <input type="number" id="hip" value="37.0" step="0.25">
-                                <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="hipEase" value="2.0" step="0.25"></div>
-                            </div>
-                        </div>
-                        <div class="input-section">
-                            <label>Chest Width (Front) & Ease</label>
-                            <div class="dual-input">
-                                <input type="number" id="chestWidth" value="13.0" step="0.25">
-                                <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="chestWidthEase" value="0" step="0.25"></div>
-                            </div>
-                        </div>
-                        <div class="input-section">
-                            <label>Back Width & Ease</label>
-                            <div class="dual-input">
-                                <input type="number" id="backWidth" value="14.0" step="0.25">
-                                <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="backWidthEase" value="0" step="0.25"></div>
-                            </div>
-                        </div>
-                        <div class="input-section">
-                            <label>Shoulder Length & Ease</label>
-                            <div class="dual-input">
-                                <input type="number" id="shoulderLength" value="5.0" step="0.25">
-                                <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="shoulderLengthEase" value="0" step="0.25"></div>
-                            </div>
-                        </div>
-                        <div class="input-section">
-                            <label>Back Waist Length & Ease</label>
-                            <div class="dual-input">
-                                <input type="number" id="backNeckToWaist" value="15.5" step="0.25">
-                                <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="backNeckToWaistEase" value="0" step="0.25"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2. SLEEVE WINDOW -->
-                <div class="garment-module" style="margin-bottom:0;">
-                    <div class="input-section" style="margin-bottom:10px;">
-                        <label for="includeSleeve">Enable Sleeve Draft</label>
-                        <select id="includeSleeve" onchange="togglePieceConfig('sleeveConfig', this.value)">
-                            <option value="yes" selected>Yes (Include Fitted Sleeve)</option>
-                            <option value="no">No (Exclude Sleeve)</option>
-                        </select>
-                    </div>
-                    <div id="sleeveConfig">
-                        <div class="garment-module-header" onclick="toggleModule('sleeveBody')">
-                            <h3>2. Sleeve Window</h3>
-                            <span style="font-size:0.75rem; font-weight:600; color:var(--primary);">Configure ▼</span>
-                        </div>
-                        <div id="sleeveBody" class="garment-module-body" style="display:none;">
-                            <div class="input-section">
-                                <label>Top Arm (Bicep) & Ease</label>
-                                <div class="dual-input">
-                                    <input type="number" id="bicep" value="11.5" step="0.25">
-                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="bicepEase" value="2.0" step="0.25"></div>
-                                </div>
-                            </div>
-                            <div class="input-section">
-                                <label>Length of Arm (Sleeve Length) & Ease</label>
-                                <div class="dual-input">
-                                    <input type="number" id="sleeveLength" value="23.0" step="0.25">
-                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="sleeveLengthEase" value="0" step="0.25"></div>
-                                </div>
-                            </div>
-                            <div class="input-section">
-                                <label>Shoulder to Elbow & Ease</label>
-                                <div class="dual-input">
-                                    <input type="number" id="shoulderToElbow" value="12.5" step="0.25">
-                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="shoulderToElbowEase" value="0" step="0.25"></div>
-                                </div>
-                            </div>
-                            <div class="input-section">
-                                <label>Wrist Circumference & Ease</label>
-                                <div class="dual-input">
-                                    <input type="number" id="wristCirc" value="6.25" step="0.25">
-                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="wristCircEase" value="0" step="0.25"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- BRACKET 2: LOWER BODY -->
-            <div class="section-bracket">
-                <div class="section-bracket-title">
-                    <span>[ Lower Body: Skirt & Trousers ]</span>
-                </div>
-                
-                <div class="input-section">
-                    <label for="lowerStandardSize">Lower Body Standard Size Preset (UK Size 12 Spec)</label>
-                    <select id="lowerStandardSize" onchange="applyLowerStandardSize()">
-                        <option value="">-- Custom Lower Sizing --</option>
-                        <option value="uk8">UK 8 / US 4</option>
-                        <option value="uk10">UK 10 / US 6</option>
-                        <option value="uk12" selected>UK 12 / US 8 (Draft Spec)</option>
-                        <option value="uk14">UK 14 / US 10</option>
-                        <option value="uk16">UK 16 / US 12</option>
-                    </select>
-                </div>
-
-                <!-- 3. SKIRT WINDOW -->
-                <div class="garment-module">
-                    <div class="input-section" style="margin-bottom:10px;">
-                        <label for="includeSkirt">Enable Skirt Draft</label>
-                        <select id="includeSkirt" onchange="togglePieceConfig('skirtConfig', this.value)">
-                            <option value="yes" selected>Yes (Include Skirt)</option>
-                            <option value="no">No (Exclude Skirt)</option>
-                        </select>
-                    </div>
-                    <div id="skirtConfig">
-                        <div class="garment-module-header" onclick="toggleModule('skirtBody')">
-                            <h3>3. Skirt Window</h3>
-                            <span style="font-size:0.75rem; font-weight:600; color:var(--primary);">Configure ▼</span>
-                        </div>
-                        <div id="skirtBody" class="garment-module-body" style="display:none;">
-                            <div class="input-section">
-                                <label for="skirtStyle">Skirt Silhouette Type</label>
-                                <select id="skirtStyle">
-                                    <option value="pencil" selected>Pencil Skirt (Fitted)</option>
-                                    <option value="full">Full / A-Line Skirt (Flared)</option>
-                                    <option value="semi">Semi-Circle Circular Skirt</option>
-                                </select>
-                            </div>
-                            <div class="input-section">
-                                <label>Waist & Ease</label>
-                                <div class="dual-input">
-                                    <input type="number" id="skirtWaist" value="26.0" step="0.25">
-                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="skirtWaistEase" value="1.0" step="0.25"></div>
-                                </div>
-                            </div>
-                            <div class="input-section">
-                                <label>Hips & Ease</label>
-                                <div class="dual-input">
-                                    <input type="number" id="skirtHips" value="36.0" step="0.25">
-                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="skirtHipsEase" value="1.75" step="0.25"></div>
-                                </div>
-                            </div>
-                            <div class="input-section">
-                                <label>Length (Waist to Hem) & Ease</label>
-                                <div class="dual-input">
-                                    <input type="number" id="skirtLength" value="38.5" step="0.25">
-                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="skirtLengthEase" value="0.0" step="0.25"></div>
-                                </div>
-                            </div>
-                            <div class="input-section">
-                                <label>Waist to Knee & Ease</label>
-                                <div class="dual-input">
-                                    <input type="number" id="skirtWaistToKnee" value="23.0" step="0.25">
-                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="skirtWaistToKneeEase" value="0.0" step="0.25"></div>
-                                </div>
-                            </div>
-                            <div class="input-section">
-                                <label>Hip Line Depth & Ease</label>
-                                <div class="dual-input">
-                                    <input type="number" id="skirtHipLine" value="8.75" step="0.25">
-                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="skirtHipLineEase" value="0.0" step="0.25"></div>
-                                </div>
-                            </div>
-                            <div class="input-section">
-                                <label>Yoke Line Depth & Ease</label>
-                                <div class="dual-input">
-                                    <input type="number" id="skirtYokeLine" value="6.0" step="0.25">
-                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="skirtYokeLineEase" value="0.0" step="0.25"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 4. PANTS WINDOW -->
-                <div class="garment-module" style="margin-bottom:0;">
-                    <div class="input-section" style="margin-bottom:10px;">
-                        <label for="includePant">Enable Trouser Draft</label>
-                        <select id="includePant" onchange="togglePieceConfig('pantConfig', this.value)">
-                            <option value="yes" selected>Yes (Include Trousers)</option>
-                            <option value="no">No (Exclude Trousers)</option>
-                        </select>
-                    </div>
-                    <div id="pantConfig">
-                        <div class="garment-module-header" onclick="toggleModule('pantsBody')">
-                            <h3>4. Trousers / Pants Window</h3>
-                            <span style="font-size:0.75rem; font-weight:600; color:var(--primary);">Configure ▼</span>
-                        </div>
-                        <div id="pantsBody" class="garment-module-body" style="display:none;">
-                            <div class="input-section">
-                                <label>Waist & Ease</label>
-                                <div class="dual-input">
-                                    <input type="number" id="pantWaist" value="26.0" step="0.25">
-                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="pantWaistEase" value="1.0" step="0.25"></div>
-                                </div>
-                            </div>
-                            <div class="input-section">
-                                <label>Hips & Ease</label>
-                                <div class="dual-input">
-                                    <input type="number" id="pantHips" value="36.0" step="0.25">
-                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="pantHipsEase" value="2.0" step="0.25"></div>
-                                </div>
-                            </div>
-                            <div class="input-section">
-                                <label>Body Rise Depth & Ease</label>
-                                <div class="dual-input">
-                                    <input type="number" id="pantRise" value="11.5" step="0.25">
-                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="pantRiseEase" value="0.5" step="0.25"></div>
-                                </div>
-                            </div>
-                            <div class="input-section">
-                                <label>Thigh Circumference & Ease</label>
-                                <div class="dual-input">
-                                    <input type="number" id="thigh" value="23.0" step="0.25">
-                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="thighEase" value="2.75" step="0.25"></div>
-                                </div>
-                            </div>
-                            <div class="input-section">
-                                <label>Knee Circumference & Ease</label>
-                                <div class="dual-input">
-                                    <input type="number" id="kneeCirc" value="13.5" step="0.25">
-                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="kneeCircEase" value="1.0" step="0.25"></div>
-                                </div>
-                            </div>
-                            <div class="input-section">
-                                <label>Inseam / Total Pant Length & Ease</label>
-                                <div class="dual-input">
-                                    <input type="number" id="inseam" value="30.0" step="0.25">
-                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="inseamEase" value="0.0" step="0.25"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="btn-container">
-                <button type="button" class="action-btn btn-primary" onclick="generatePattern()">Generate All Selected Patterns</button>
-                <button type="button" class="action-btn btn-secondary" onclick="downloadSVG()">Download Combined SVG</button>
-            </div>
-        </div>
-
-        <!-- Preview Canvas -->
-        <div class="preview-container">
-            <div class="preview-toolbar">
-                <span id="current-unit-label" style="font-size: 0.85rem; font-weight:600; color:#4a3f3d;">Grid Unit: 1 Inch</span>
-                <div class="zoom-controls">
-                    <button class="zoom-btn" onclick="adjustZoom(-0.15)" title="Zoom Out">-</button>
-                    <button class="zoom-btn" onclick="resetZoom()" style="width: 48px; font-size: 0.78rem;" title="Reset Zoom">1:1</button>
-                    <button class="zoom-btn" onclick="adjustZoom(0.15)" title="Zoom In">+</button>
-                </div>
-            </div>
-            
-            <div id="svg-scroll-viewport">
-                <div id="svg-canvas-wrapper">
-                    <svg id="pattern-svg" width="1600" height="1400" viewBox="0 0 1600 1400" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="100%" height="100%" fill="#ffffff" />
-                        <g id="grid-group"></g>
-                        <g id="pattern-group">
-                            <text x="800" y="700" text-anchor="middle" fill="#8c7e7b" font-family="Montserrat" font-size="14">Atelier Drafting Table Ready — Click "Generate All Selected Patterns"</text>
-                        </g>
-                    </svg>
-                </div>
-            </div>
+        <div class="control-group">
+            <button id="sideBySideToggleBtn" onclick="toggleSideBySide()">Show Side-by-Side</button>
         </div>
     </div>
 
-    <script>
-        let currentUnit = 'in';
-        let currentScale = 1.0;
-        let panX = 50;
-        let panY = 50;
-        let isDragging = false;
-        let startMouseX = 0;
-        let startMouseY = 0;
-        const scaleFactor = 26;
+    <!-- Tabs Navigation Bar -->
+    <div class="tabs-bar" id="tabsBar">
+        <button class="tab-btn active" onclick="switchTab('frontPanel')">Bodice Front</button>
+        <button class="tab-btn" onclick="switchTab('backPanel')">Bodice Back</button>
+    </div>
 
-        function initGrid() {
-            const gridGroup = document.getElementById('grid-group');
-            gridGroup.innerHTML = '';
-            const width = 1600, height = 1400;
+    <!-- Pattern Panels Container -->
+    <div class="pattern-container" id="patternContainer">
+        <!-- Front Panel -->
+        <div class="pattern-panel" id="frontPanel">
+            <h3>Bodice Front Piece</h3>
+            <svg id="svgFront" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
 
-            const baseStep = currentUnit === 'in' ? scaleFactor : scaleFactor / 2.54;
-            const subStep = baseStep / 2;
+        <!-- Back Panel -->
+        <div class="pattern-panel" id="backPanel" style="display: none;">
+            <h3>Bodice Back Piece</h3>
+            <svg id="svgBack" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
+    </div>
+</div>
 
-            for (let x = 0; x <= width; x += subStep) {
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', x); line.setAttribute('y1', 0);
-                line.setAttribute('x2', x); line.setAttribute('y2', height);
-                line.setAttribute('class', (x % baseStep === 0) ? 'grid-line-major' : 'grid-line-sub');
-                gridGroup.appendChild(line);
-            }
+<script>
+    let isSideBySide = false;
+    let activeTab = 'frontPanel';
 
-            for (let y = 0; y <= height; y += subStep) {
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', 0); line.setAttribute('y1', y);
-                line.setAttribute('x2', width); line.setAttribute('y2', y);
-                line.setAttribute('class', (y % baseStep === 0) ? 'grid-line-major' : 'grid-line-sub');
-                gridGroup.appendChild(line);
-            }
+    function switchTab(panelId) {
+        if (isSideBySide) return; // Ignore tabs if side-by-side mode is active
+        activeTab = panelId;
+
+        // Update tab button styles
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        // Show selected panel, hide others
+        document.getElementById('frontPanel').style.display = (panelId === 'frontPanel') ? 'block' : 'none';
+        document.getElementById('backPanel').style.display = (panelId === 'backPanel') ? 'block' : 'none';
+    }
+
+    function toggleSideBySide() {
+        isSideBySide = !isSideBySide;
+        const container = document.getElementById('patternContainer');
+        const toggleBtn = document.getElementById('sideBySideToggleBtn');
+        const tabsBar = document.getElementById('tabsBar');
+
+        if (isSideBySide) {
+            container.classList.add('side-by-side');
+            toggleBtn.classList.add('active-btn');
+            tabsBar.style.opacity = '0.5';
+            tabsBar.style.pointerEvents = 'none';
+
+            // Show both panels simultaneously
+            document.getElementById('frontPanel').style.display = 'block';
+            document.getElementById('backPanel').style.display = 'block';
+        } else {
+            container.classList.remove('side-by-side');
+            toggleBtn.classList.remove('active-btn');
+            tabsBar.style.opacity = '1';
+            tabsBar.style.pointerEvents = 'auto';
+
+            // Revert back to single active tab view
+            document.getElementById('frontPanel').style.display = (activeTab === 'frontPanel') ? 'block' : 'none';
+            document.getElementById('backPanel').style.display = (activeTab === 'backPanel') ? 'block' : 'none';
         }
+        
+        generatePattern();
+    }
 
-        function setUnit(unit) {
-            currentUnit = unit;
-            document.getElementById('unit-in').classList.toggle('active', unit === 'in');
-            document.getElementById('unit-cm').classList.toggle('active', unit === 'cm');
-            document.getElementById('current-unit-label').innerText = unit === 'in' ? 'Grid Unit: 1 Inch' : 'Grid Unit: 1 Centimeter';
-            initGrid();
-            generatePattern();
-        }
+    function drawGrid(svgElement, unit) {
+        svgElement.innerHTML = ''; // Clear previous elements
+        const s = (unit === 'inch') ? 37.8 : 14.9; // Scale factor representation
 
-        function toggleModule(id) {
-            const el = document.getElementById(id);
-            el.style.display = el.style.display === 'none' ? 'block' : 'none';
-        }
+        // Draw basic grid lines and safe anchor point examples
+        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        svgElement.appendChild(defs);
 
-        function togglePieceConfig(id, val) {
-            document.getElementById(id).style.opacity = val === 'yes' ? '1' : '0.4';
-            document.getElementById(id).style.pointerEvents = val === 'yes' ? 'auto' : 'none';
-        }
+        // Example structural anchor box (Bodice block boundary reference)
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('x', '50');
+        rect.setAttribute('y', '50');
+        rect.setAttribute('width', '400');
+        rect.setAttribute('height', '450');
+        rect.setAttribute('fill', 'none');
+        rect.setAttribute('stroke', '#ff3366');
+        rect.setAttribute('stroke-width', '2');
+        svgElement.appendChild(rect);
 
-        function applyPreset() {
-            const val = document.getElementById('blockPreset').value;
-            if (val === 'standard') {
-                document.getElementById('bustEase').value = 2.0;
-                document.getElementById('waistEase').value = 1.5;
-            } else if (val === 'fitted') {
-                document.getElementById('bustEase').value = 1.0;
-                document.getElementById('waistEase').value = 0.5;
-            } else if (val === 'loose') {
-                document.getElementById('bustEase').value = 3.0;
-                document.getElementById('waistEase').value = 2.5;
-            }
-            generatePattern();
-        }
+        // Safely anchored CB Point inside the box (using relative offset from rect x/y)
+        const markerX = 50 + (0.5 * s); 
+        const markerY = 50 + (0.5 * s); 
 
-        function applyUpperStandardSize() {
-            const size = document.getElementById('upperStandardSize').value;
-            if (!size) return;
-            const data = {
-                uk8:  { bust: 32.0, waist: 24.0, hip: 34.5, chest: 12.0, back: 13.0, shoulder: 4.75, backLen: 15.0, bicep: 10.5, sleeve: 22.25, elbow: 12.0, wrist: 6.0 },
-                uk10: { bust: 33.25, waist: 24.75, hip: 35.75, chest: 12.5, back: 13.5, shoulder: 4.87, backLen: 15.25, bicep: 11.0, sleeve: 22.5, elbow: 12.25, wrist: 6.12 },
-                uk12: { bust: 34.5, waist: 25.5, hip: 37.0, chest: 13.0, back: 14.0, shoulder: 5.0, backLen: 15.5, bicep: 11.5, sleeve: 23.0, elbow: 12.5, wrist: 6.25 },
-                uk14: { bust: 36.5, waist: 27.5, hip: 39.0, chest: 13.75, back: 14.75, shoulder: 5.2, backLen: 15.87, bicep: 12.12, sleeve: 23.37, elbow: 12.87, wrist: 6.43 },
-                uk16: { bust: 38.5, waist: 29.5, hip: 41.0, chest: 14.5, back: 15.5, shoulder: 5.4, backLen: 16.25, bicep: 12.75, sleeve: 23.75, elbow: 13.25, wrist: 6.62 }
-            }[size];
+        const cbCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        cbCircle.setAttribute('cx', markerX);
+        cbCircle.setAttribute('cy', markerY);
+        cbCircle.setAttribute('r', '4');
+        cbCircle.setAttribute('fill', '#0066ff');
+        cbCircle.setAttribute('stroke', '#ffffff');
+        cbCircle.setAttribute('stroke-width', '1.5');
+        svgElement.appendChild(cbCircle);
 
-            if (data) {
-                document.getElementById('bust').value = data.bust;
-                document.getElementById('waist').value = data.waist;
-                document.getElementById('hip').value = data.hip;
-                document.getElementById('chestWidth').value = data.chest;
-                document.getElementById('backWidth').value = data.back;
-                document.getElementById('shoulderLength').value = data.shoulder;
-                document.getElementById('backNeckToWaist').value = data.backLen;
-                document.getElementById('bicep').value = data.bicep;
-                document.getElementById('sleeveLength').value = data.sleeve;
-                document.getElementById('shoulderToElbow').value = data.elbow;
-                document.getElementById('wristCirc').value = data.wrist;
-                generatePattern();
-            }
-        }
+        const cbText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        cbText.setAttribute('x', markerX + 8);
+        cbText.setAttribute('y', markerY + 4);
+        cbText.setAttribute('fill', '#0066ff');
+        cbText.setAttribute('font-size', '12');
+        cbText.setAttribute('font-weight', 'bold');
+        cbText.textContent = 'CB';
+        svgElement.appendChild(cbText);
+    }
 
-        function applyLowerStandardSize() {
-            const size = document.getElementById('lowerStandardSize').value;
-            if (!size) return;
-            const data = {
-                uk8:  { waist: 24.0, hips: 34.5, len: 37.5, knee: 22.0, rise: 11.0, thigh: 21.5, kneeCirc: 13.0, inseam: 29.0 },
-                uk10: { waist: 24.75, hips: 35.75, len: 38.0, knee: 22.5, rise: 11.25, thigh: 22.25, kneeCirc: 13.25, inseam: 29.5 },
-                uk12: { waist: 26.0, hips: 36.0, len: 38.5, knee: 23.0, rise: 11.5, thigh: 23.0, kneeCirc: 13.5, inseam: 30.0 },
-                uk14: { waist: 28.0, hips: 38.5, len: 39.0, knee: 24.0, rise: 11.87, thigh: 24.25, kneeCirc: 14.0, inseam: 30.5 },
-                uk16: { waist: 30.0, hips: 40.5, len: 39.5, knee: 25.0, rise: 12.25, thigh: 25.5, kneeCirc: 14.5, inseam: 31.0 }
-            }[size];
+    function generatePattern() {
+        const unit = document.getElementById('unitSelect').value;
+        const svgFront = document.getElementById('svgFront');
+        const svgBack = document.getElementById('svgBack');
 
-            if (data) {
-                document.getElementById('skirtWaist').value = data.waist;
-                document.getElementById('skirtHips').value = data.hips;
-                document.getElementById('skirtLength').value = data.len;
-                document.getElementById('skirtWaistToKnee').value = data.knee;
-                document.getElementById('pantWaist').value = data.waist;
-                document.getElementById('pantHips').value = data.hips;
-                document.getElementById('pantRise').value = data.rise;
-                document.getElementById('thigh').value = data.thigh;
-                document.getElementById('kneeCirc').value = data.kneeCirc;
-                document.getElementById('inseam').value = data.inseam;
-                generatePattern();
-            }
-        }
+        // Render Front Piece
+        drawGrid(svgFront, unit);
+        
+        // Render Back Piece (with distinct adjustment if needed)
+        drawGrid(svgBack, unit);
+    }
 
-        function generatePattern() {
-            const patternGroup = document.getElementById('pattern-group');
-            patternGroup.innerHTML = '';
-            
-            const s = currentUnit === 'in' ? scaleFactor : scaleFactor / 2.54;
+    // Initial render on load
+    window.onload = function() {
+        generatePattern();
+    };
+</script>
 
-            // Add Left-aligned CB marker point (1 inch from top and 1 inch from left)
-            const inchToPx = 2.54 * s; 
-            const markerX = inchToPx;        
-            const markerY = inchToPx;        
-
-            const cbCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            cbCircle.setAttribute('cx', markerX);
-            cbCircle.setAttribute('cy', markerY);
-            cbCircle.setAttribute('r', '4');
-            cbCircle.setAttribute('fill', '#0066ff');
-            cbCircle.setAttribute('stroke', '#ffffff');
-            cbCircle.setAttribute('stroke-width', '1.5');
-            patternGroup.appendChild(cbCircle);
-
-            const cbText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            cbText.setAttribute('x', markerX + 8);
-            cbText.setAttribute('y', markerY + 4);
-            cbText.setAttribute('fill', '#0066ff');
-            cbText.setAttribute('font-size', '12');
-            cbText.setAttribute('font-weight', 'bold');
-            cbText.textContent = 'CB';
-            patternGroup.appendChild(cbText);
-
-            const bustVal = parseFloat(document.getElementById('bust').value) + parseFloat(document.getElementById('bustEase').value);
-            const backLengthVal = parseFloat(document.getElementById('backNeckToWaist').value) + parseFloat(document.getElementById('backNeckToWaistEase').value);
-            
-            // Render basic draft block outline representation
-            const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            bodiceRect.setAttribute('x', 50);
-            bodiceRect.setAttribute('y', 50);
-            bodiceRect.setAttribute('width', (bustVal / 4) * s);
-            bodiceRect.setAttribute('height', backLengthVal * s);
-            bodiceRect.setAttribute('fill', 'rgba(194, 94, 111, 0.05)');
-            bodiceRect.setAttribute('stroke', 'var(--primary)');
-            bodiceRect.setAttribute('stroke-width', '2');
-            patternGroup.appendChild(bodiceRect);
-        }
-
-        function updateTransform() {
-            const wrapper = document.getElementById('svg-canvas-wrapper');
-            wrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${currentScale})`;
-        }
-
-        function adjustZoom(delta) {
-            currentScale = Math.max(0.3, Math.min(3.5, currentScale + delta));
-            updateTransform();
-        }
-
-        function resetZoom() {
-            currentScale = 1.0;
-            panX = 50;
-            panY = 50;
-            updateTransform();
-        }
-
-        const viewport = document.getElementById('svg-scroll-viewport');
-        viewport.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            startMouseX = e.clientX - panX;
-            startMouseY = e.clientY - panY;
-        });
-
-        window.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            panX = e.clientX - startMouseX;
-            panY = e.clientY - startMouseY;
-            updateTransform();
-        });
-
-        window.addEventListener('mouseup', () => { isDragging = false; });
-
-        viewport.addEventListener('wheel', (e) => {
-            e.preventDefault();
-            const zoomIntensity = 0.1;
-            if (e.deltaY < 0) {
-                currentScale = Math.min(3.5, currentScale * (1 + zoomIntensity));
-            } else {
-                currentScale = Math.max(0.3, currentScale / (1 + zoomIntensity));
-            }
-            updateTransform();
-        }, { passive: false });
-
-        function downloadSVG() {
-            const svgEl = document.getElementById('pattern-svg');
-            const clone = svgEl.cloneNode(true);
-            clone.querySelectorAll('rect[fill="#ffffff"]').forEach(r => r.remove());
-            const serializer = new XMLSerializer();
-            const source = serializer.serializeToString(clone);
-            const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'lilinora_precision_pattern.svg';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        window.onload = () => {
-            initGrid();
-            generatePattern();
-        };
-    </script>
 </body>
 </html>
