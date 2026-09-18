@@ -644,6 +644,20 @@
                                     <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="pantRiseEase" value="0.5" step="0.25"></div>
                                 </div>
                             </div>
+                            <div class="input-section">
+                                <label>Thigh & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="thigh" value="23.0" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="thighEase" value="1.0" step="0.25"></div>
+                                </div>
+                            </div>
+                            <div class="input-section">
+                                <label>Inseam & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="inseam" value="30.0" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="inseamEase" value="0.0" step="0.25"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -686,7 +700,7 @@
                     
                     <div class="svg-panel-box" id="bodicePanelBox">
                         <h4 id="bodiceTitle">Bodice Block</h4>
-                        <svg id="svg-bodice" width="700" height="650" viewBox="0 0 700 650" xmlns="http://www.w3.org/2000/svg">
+                        <svg id="svg-bodice" width="800" height="750" viewBox="0 0 800 750" xmlns="http://www.w3.org/2000/svg">
                             <rect width="100%" height="100%" fill="#ffffff" />
                             <g class="grid-group-sub"></g>
                             <g class="pattern-group-sub"></g>
@@ -695,7 +709,7 @@
 
                     <div class="svg-panel-box" id="sleevePanelBox">
                         <h4 id="sleeveTitle">Fitted Sleeve</h4>
-                        <svg id="svg-sleeve" width="700" height="650" viewBox="0 0 700 650" xmlns="http://www.w3.org/2000/svg">
+                        <svg id="svg-sleeve" width="800" height="750" viewBox="0 0 800 750" xmlns="http://www.w3.org/2000/svg">
                             <rect width="100%" height="100%" fill="#ffffff" />
                             <g class="grid-group-sub"></g>
                             <g class="pattern-group-sub"></g>
@@ -704,7 +718,7 @@
 
                     <div class="svg-panel-box" id="skirtPanelBox">
                         <h4 id="skirtTitle">Skirt Block</h4>
-                        <svg id="svg-skirt" width="700" height="650" viewBox="0 0 700 650" xmlns="http://www.w3.org/2000/svg">
+                        <svg id="svg-skirt" width="800" height="750" viewBox="0 0 800 750" xmlns="http://www.w3.org/2000/svg">
                             <rect width="100%" height="100%" fill="#ffffff" />
                             <g class="grid-group-sub"></g>
                             <g class="pattern-group-sub"></g>
@@ -713,7 +727,7 @@
 
                     <div class="svg-panel-box" id="pantPanelBox">
                         <h4 id="pantTitle">Trouser Block</h4>
-                        <svg id="svg-pant" width="700" height="650" viewBox="0 0 700 650" xmlns="http://www.w3.org/2000/svg">
+                        <svg id="svg-pant" width="800" height="750" viewBox="0 0 800 750" xmlns="http://www.w3.org/2000/svg">
                             <rect width="100%" height="100%" fill="#ffffff" />
                             <g class="grid-group-sub"></g>
                             <g class="pattern-group-sub"></g>
@@ -738,49 +752,49 @@
         let isSideBySide = false;
         let activeTabId = 'bodicePanelBox';
 
-        function initGrids() {
-            const svgs = ['svg-bodice', 'svg-sleeve', 'svg-skirt', 'svg-pant'];
-            const width = 700, height = 650;
+        function initGrids(svgId, width, height) {
+            const svgElement = document.getElementById(svgId);
+            svgElement.setAttribute('width', width);
+            svgElement.setAttribute('height', height);
+            svgElement.setAttribute('viewBox', `0 0 ${width} ${height}`);
+            
+            const gridGroup = svgElement.querySelector('.grid-group-sub');
+            gridGroup.innerHTML = '';
+            
             const baseStep = currentUnit === 'in' ? scaleFactor : scaleFactor / 2.54;
             const subStep = baseStep / 2;
 
-            svgs.forEach(svgId => {
-                const svgElement = document.getElementById(svgId);
-                const gridGroup = svgElement.querySelector('.grid-group-sub');
-                gridGroup.innerHTML = '';
+            for (let x = 0; x <= width; x += subStep) {
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', x); line.setAttribute('y1', 0);
+                line.setAttribute('x2', x); line.setAttribute('y2', height);
 
-                for (let x = 0; x <= width; x += subStep) {
-                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    line.setAttribute('x1', x); line.setAttribute('y1', 0);
-                    line.setAttribute('x2', x); line.setAttribute('y2', height);
+                const ratio = x / baseStep;
+                const isMajor = Math.abs(ratio - Math.round(ratio)) < 0.001 && Math.round(ratio) % (currentUnit === 'in' ? 4 : 5) === 0;
+                const isHalf = Math.abs(ratio - Math.round(ratio)) < 0.001;
 
-                    const ratio = x / baseStep;
-                    const isMajor = Math.abs(ratio - Math.round(ratio)) < 0.001 && Math.round(ratio) % (currentUnit === 'in' ? 4 : 5) === 0;
-                    const isHalf = Math.abs(ratio - Math.round(ratio)) < 0.001;
+                if (isMajor) line.setAttribute('class', 'grid-line-major');
+                else if (isHalf) line.setAttribute('class', 'grid-line-half');
+                else line.setAttribute('class', 'grid-line-sub');
+                
+                gridGroup.appendChild(line);
+            }
 
-                    if (isMajor) line.setAttribute('class', 'grid-line-major');
-                    else if (isHalf) line.setAttribute('class', 'grid-line-half');
-                    else line.setAttribute('class', 'grid-line-sub');
-                    
-                    gridGroup.appendChild(line);
-                }
+            for (let y = 0; y <= height; y += subStep) {
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', 0); line.setAttribute('y1', y);
+                line.setAttribute('x2', width); line.setAttribute('y2', y);
 
-                for (let y = 0; y <= height; y += subStep) {
-                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    line.setAttribute('x1', 0); line.setAttribute('y1', y);
-                    line.setAttribute('x2', width); line.setAttribute('y2', y);
+                const ratio = y / baseStep;
+                const isMajor = Math.abs(ratio - Math.round(ratio)) < 0.001 && Math.round(ratio) % (currentUnit === 'in' ? 4 : 5) === 0;
+                const isHalf = Math.abs(ratio - Math.round(ratio)) < 0.001;
 
-                    const ratio = y / baseStep;
-                    const isMajor = Math.abs(ratio - Math.round(ratio)) < 0.001 && Math.round(ratio) % (currentUnit === 'in' ? 4 : 5) === 0;
-                    const isHalf = Math.abs(ratio - Math.round(ratio)) < 0.001;
-
-                    if (isMajor) line.setAttribute('class', 'grid-line-major');
-                    else if (isHalf) line.setAttribute('class', 'grid-line-half');
-                    else line.setAttribute('class', 'grid-line-sub');
-                    
-                    gridGroup.appendChild(line);
-                }
-            });
+                if (isMajor) line.setAttribute('class', 'grid-line-major');
+                else if (isHalf) line.setAttribute('class', 'grid-line-half');
+                else line.setAttribute('class', 'grid-line-sub');
+                
+                gridGroup.appendChild(line);
+            }
         }
 
         function setUnit(unit) {
@@ -788,7 +802,6 @@
             document.getElementById('unit-in').classList.toggle('active', unit === 'in');
             document.getElementById('unit-cm').classList.toggle('active', unit === 'cm');
             document.getElementById('current-unit-label').innerText = unit === 'in' ? 'Grid Unit: 1 Inch (0.5" Subdivisions)' : 'Grid Unit: 1 Centimeter (0.5cm Subdivisions)';
-            initGrids();
             generatePattern();
         }
 
@@ -889,11 +902,11 @@
             if (!size) return;
 
             const sizes = {
-                'uk8':  { waist: 24.0, hips: 35.0, skirtLen: 37.0, rise: 10.75, thigh: 21.5 },
-                'uk10': { waist: 24.75, hips: 36.0, skirtLen: 37.5, rise: 11.0, thigh: 22.25 },
-                'uk12': { waist: 26.0, hips: 36.0, skirtLen: 38.5, rise: 11.5, thigh: 23.0 },
-                'uk14': { waist: 28.5, hips: 40.0, skirtLen: 39.0, rise: 12.0, thigh: 24.5 },
-                'uk16': { waist: 30.5, hips: 42.0, skirtLen: 39.5, rise: 12.5, thigh: 26.0 }
+                'uk8':  { waist: 24.0, hips: 35.0, skirtLen: 37.0, rise: 10.75, thigh: 21.5, inseam: 29.0 },
+                'uk10': { waist: 24.75, hips: 36.0, skirtLen: 37.5, rise: 11.0, thigh: 22.25, inseam: 29.5 },
+                'uk12': { waist: 26.0, hips: 37.0, skirtLen: 38.5, rise: 11.5, thigh: 23.0, inseam: 30.0 },
+                'uk14': { waist: 28.5, hips: 40.0, skirtLen: 39.0, rise: 12.0, thigh: 24.5, inseam: 30.5 },
+                'uk16': { waist: 30.5, hips: 42.0, skirtLen: 39.5, rise: 12.5, thigh: 26.0, inseam: 31.0 }
             };
 
             const data = sizes[size];
@@ -905,6 +918,7 @@
                 document.getElementById('pantHips').value = data.hips;
                 document.getElementById('pantRise').value = data.rise;
                 document.getElementById('thigh').value = data.thigh;
+                document.getElementById('inseam').value = data.inseam;
             }
             generatePattern();
         }
@@ -918,6 +932,7 @@
         }
 
         function generatePattern() {
+            // --- 1. BODICE BLOCK ---
             const bodiceGroup = document.querySelector('#svg-bodice .pattern-group-sub');
             bodiceGroup.innerHTML = '';
             
@@ -926,12 +941,12 @@
             const backLengthVal = parseFloat(document.getElementById('backNeckToWaist').value);
             const waistToHipVal = parseFloat(document.getElementById('waistToHip').value);
 
-            const widthAllowance = (currentUnit === 'in') ? 2.0 : 5.0;
-            const lengthAllowance = (currentUnit === 'in') ? 1.0 : 2.5;
-
-            const bWidth = (((hipVal + hipEaseVal) / 2) + widthAllowance) * scaleFactor;
-            const bHeight = (backLengthVal + waistToHipVal + lengthAllowance) * scaleFactor;
+            const bWidth = (((hipVal + hipEaseVal) / 2) + 4.0) * scaleFactor;
+            const bHeight = (backLengthVal + waistToHipVal + 5.0) * scaleFactor;
+            const canvasBWidth = Math.max(900, bWidth + 150);
+            const canvasBHeight = Math.max(850, bHeight + 150);
             
+            initGrids('svg-bodice', canvasBWidth, canvasBHeight);
             document.getElementById('bodiceTitle').textContent = `Bodice Block (Hip: ${hipVal}" + ${hipEaseVal}" ease)`;
             
             const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -941,48 +956,46 @@
             bodiceRect.setAttribute('stroke', '#c25e6f'); bodiceRect.setAttribute('stroke-width', '2'); bodiceRect.setAttribute('stroke-dasharray', '4');
             bodiceGroup.appendChild(bodiceRect);
 
-            // --- CB (Center Back) Top-Left Corner Point & Label ---
+            // CB Corner Point & Label
             const pointCB = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            pointCB.setAttribute('cx', 50);
-            pointCB.setAttribute('cy', 50);
-            pointCB.setAttribute('r', 4.5);
+            pointCB.setAttribute('cx', 50); pointCB.setAttribute('cy', 50); pointCB.setAttribute('r', 4.5);
             pointCB.setAttribute('fill', '#0047AB');
             bodiceGroup.appendChild(pointCB);
 
             const labelCB = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            labelCB.setAttribute('x', 60);
-            labelCB.setAttribute('y', 42);
+            labelCB.setAttribute('x', 60); labelCB.setAttribute('y', 42);
             labelCB.setAttribute('font-family', 'Montserrat, sans-serif');
-            labelCB.setAttribute('font-size', '12');
-            labelCB.setAttribute('font-weight', 'bold');
+            labelCB.setAttribute('font-size', '12'); labelCB.setAttribute('font-weight', 'bold');
             labelCB.setAttribute('fill', '#0047AB');
             labelCB.textContent = 'CB (Center Back)';
             bodiceGroup.appendChild(labelCB);
 
-            // --- CF (Center Front) Top-Right Corner Point & Label ---
+            // CF Corner Point & Label
             const pointCF = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            pointCF.setAttribute('cx', 50 + bWidth);
-            pointCF.setAttribute('cy', 50);
-            pointCF.setAttribute('r', 4.5);
+            pointCF.setAttribute('cx', 50 + bWidth); pointCF.setAttribute('cy', 50); pointCF.setAttribute('r', 4.5);
             pointCF.setAttribute('fill', '#0047AB');
             bodiceGroup.appendChild(pointCF);
 
             const labelCF = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            labelCF.setAttribute('x', 50 + bWidth - 110);
-            labelCF.setAttribute('y', 42);
+            labelCF.setAttribute('x', 50 + bWidth - 110); labelCF.setAttribute('y', 42);
             labelCF.setAttribute('font-family', 'Montserrat, sans-serif');
-            labelCF.setAttribute('font-size', '12');
-            labelCF.setAttribute('font-weight', 'bold');
+            labelCF.setAttribute('font-size', '12'); labelCF.setAttribute('font-weight', 'bold');
             labelCF.setAttribute('fill', '#0047AB');
             labelCF.textContent = 'CF (Center Front)';
             bodiceGroup.appendChild(labelCF);
 
+
+            // --- 2. SLEEVE BLOCK ---
             const hasSleeve = document.getElementById('includeSleeve').value === 'yes';
             const sleeveGroup = document.querySelector('#svg-sleeve .pattern-group-sub');
             sleeveGroup.innerHTML = '';
             if (hasSleeve) {
                 const sLenVal = (parseFloat(document.getElementById('sleeveLength').value) + parseFloat(document.getElementById('sleeveLengthEase').value)) * scaleFactor;
                 const bicepVal = (parseFloat(document.getElementById('bicep').value) + parseFloat(document.getElementById('bicepEase').value)) * scaleFactor;
+                
+                const canvasSWidth = Math.max(900, bicepVal + 150);
+                const canvasSHeight = Math.max(850, sLenVal + 150);
+                initGrids('svg-sleeve', canvasSWidth, canvasSHeight);
                 
                 document.getElementById('sleeveTitle').textContent = `Fitted Sleeve (Bicep: ${document.getElementById('bicep').value}" + ${document.getElementById('bicepEase').value}" ease)`;
 
@@ -994,6 +1007,8 @@
                 sleeveGroup.appendChild(sleeveRect);
             }
 
+
+            // --- 3. SKIRT BLOCK ---
             const hasSkirt = document.getElementById('includeSkirt').value === 'yes';
             const skirtGroup = document.querySelector('#svg-skirt .pattern-group-sub');
             skirtGroup.innerHTML = '';
@@ -1001,28 +1016,43 @@
                 const skirtHips = parseFloat(document.getElementById('skirtHips').value) + parseFloat(document.getElementById('skirtHipsEase').value);
                 const skirtLen = parseFloat(document.getElementById('skirtLength').value) + parseFloat(document.getElementById('skirtLengthEase').value);
                 
+                const sWidth = (skirtHips / 4) * scaleFactor;
+                const sHeight = skirtLen * scaleFactor;
+                const canvasSkWidth = Math.max(900, sWidth + 150);
+                const canvasSkHeight = Math.max(850, sHeight + 150);
+                initGrids('svg-skirt', canvasSkWidth, canvasSkHeight);
+
                 document.getElementById('skirtTitle').textContent = `Skirt: ${document.getElementById('skirtStyle').value.toUpperCase()} (Hips: ${document.getElementById('skirtHips').value}")`;
 
                 const skirtRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
                 skirtRect.setAttribute('x', 50); skirtRect.setAttribute('y', 50);
-                skirtRect.setAttribute('width', (skirtHips / 4) * scaleFactor); skirtRect.setAttribute('height', skirtLen * scaleFactor);
+                skirtRect.setAttribute('width', sWidth); skirtRect.setAttribute('height', sHeight);
                 skirtRect.setAttribute('fill', 'rgba(194, 94, 111, 0.04)');
                 skirtRect.setAttribute('stroke', '#c25e6f'); skirtRect.setAttribute('stroke-width', '2'); skirtRect.setAttribute('stroke-dasharray', '4');
                 skirtGroup.appendChild(skirtRect);
             }
 
+
+            // --- 4. TROUSER BLOCK ---
             const hasPant = document.getElementById('includePant').value === 'yes';
             const pantGroup = document.querySelector('#svg-pant .pattern-group-sub');
             pantGroup.innerHTML = '';
             if (hasPant) {
                 const thighVal = parseFloat(document.getElementById('thigh').value) + parseFloat(document.getElementById('thighEase').value);
                 const inseamVal = parseFloat(document.getElementById('inseam').value) + parseFloat(document.getElementById('inseamEase').value);
-                
+                const riseVal = parseFloat(document.getElementById('pantRise').value) + parseFloat(document.getElementById('pantRiseEase').value);
+
+                const pWidth = thighVal * scaleFactor;
+                const pHeight = (riseVal + inseamVal) * scaleFactor;
+                const canvasPWidth = Math.max(900, pWidth + 150);
+                const canvasPHeight = Math.max(850, pHeight + 150);
+                initGrids('svg-pant', canvasPWidth, canvasPHeight);
+
                 document.getElementById('pantTitle').textContent = `Trouser Block (Rise: ${document.getElementById('pantRise').value}")`;
 
                 const pantRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
                 pantRect.setAttribute('x', 50); pantRect.setAttribute('y', 50);
-                pantRect.setAttribute('width', (thighVal / 2) * scaleFactor); pantRect.setAttribute('height', inseamVal * scaleFactor);
+                pantRect.setAttribute('width', pWidth); pantRect.setAttribute('height', pHeight);
                 pantRect.setAttribute('fill', 'rgba(92, 82, 79, 0.04)');
                 pantRect.setAttribute('stroke', '#5c524f'); pantRect.setAttribute('stroke-width', '2'); pantRect.setAttribute('stroke-dasharray', '4');
                 pantGroup.appendChild(pantRect);
@@ -1112,7 +1142,6 @@
         }, { passive: false });
 
         window.onload = () => {
-            initGrids();
             generatePattern();
             updateTransform();
             document.getElementById('sleevePanelBox').style.display = 'none';
