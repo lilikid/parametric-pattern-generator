@@ -511,6 +511,13 @@
                             </div>
                         </div>
                         <div class="input-section">
+                            <label>Back Corner Bisector K Extension (Step 10)</label>
+                            <div class="dual-input">
+                                <input type="number" id="cornerBisectorK" value="1.25" step="0.05">
+                                <div class="input-with-label"><span class="input-label-tag">Angle 45º</span><span style="font-size:0.75rem; color:#7a6f6d;">Point K</span></div>
+                            </div>
+                        </div>
+                        <div class="input-section">
                             <label>Shoulder Length & Ease</label>
                             <div class="dual-input">
                                 <input type="number" id="shoulderLength" value="5.0" step="0.25">
@@ -901,11 +908,11 @@
             if (!size) return;
 
             const sizes = {
-                'uk8':  { bust: 32.0, waist: 24.0, hip: 34.0, chest: 12.5, back: 13.5, shoulder: 4.875, bstToWst: 15.0, bicep: 10.5, sleeveLen: 22.5, wrist: 6.0, underarmEase: 2.0 },
-                'uk10': { bust: 33.25, waist: 24.75, hip: 35.5, chest: 12.75, back: 13.75, shoulder: 4.875, bstToWst: 15.25, bicep: 11.0, sleeveLen: 22.75, wrist: 6.125, underarmEase: 2.125 },
-                'uk12': { bust: 34.5, waist: 25.5, hip: 37.0, chest: 13.0, back: 14.0, shoulder: 5.0, bstToWst: 15.5, bicep: 11.5, sleeveLen: 23.0, wrist: 6.25, underarmEase: 2.25 },
-                'uk14': { bust: 37.5, waist: 28.5, hip: 39.5, chest: 13.75, back: 14.75, shoulder: 5.25, bstToWst: 16.0, bicep: 12.25, sleeveLen: 23.5, wrist: 6.5, underarmEase: 2.375 },
-                'uk16': { bust: 39.5, waist: 30.5, hip: 41.5, chest: 14.25, back: 15.25, shoulder: 5.375, bstToWst: 16.25, bicep: 13.0, sleeveLen: 24.0, wrist: 6.75, underarmEase: 2.5 }
+                'uk8':  { bust: 32.0, waist: 24.0, hip: 34.0, chest: 12.5, back: 13.5, shoulder: 4.875, bstToWst: 15.0, bicep: 10.5, sleeveLen: 22.5, wrist: 6.0, underarmEase: 2.0, kVal: 1.15 },
+                'uk10': { bust: 33.25, waist: 24.75, hip: 35.5, chest: 12.75, back: 13.75, shoulder: 4.875, bstToWst: 15.25, bicep: 11.0, sleeveLen: 22.75, wrist: 6.125, underarmEase: 2.125, kVal: 1.20 },
+                'uk12': { bust: 34.5, waist: 25.5, hip: 37.0, chest: 13.0, back: 14.0, shoulder: 5.0, bstToWst: 15.5, bicep: 11.5, sleeveLen: 23.0, wrist: 6.25, underarmEase: 2.25, kVal: 1.25 },
+                'uk14': { bust: 37.5, waist: 28.5, hip: 39.5, chest: 13.75, back: 14.75, shoulder: 5.25, bstToWst: 16.0, bicep: 12.25, sleeveLen: 23.5, wrist: 6.5, underarmEase: 2.375, kVal: 1.45 },
+                'uk16': { bust: 39.5, waist: 30.5, hip: 41.5, chest: 14.25, back: 15.25, shoulder: 5.375, bstToWst: 16.25, bicep: 13.0, sleeveLen: 24.0, wrist: 6.75, underarmEase: 2.5, kVal: 1.625 }
             };
 
             const data = sizes[size];
@@ -921,6 +928,7 @@
                 document.getElementById('sleeveLength').value = data.sleeveLen;
                 document.getElementById('wristCirc').value = data.wrist;
                 document.getElementById('backUnderarmEase').value = data.underarmEase;
+                document.getElementById('cornerBisectorK').value = data.kVal;
             }
             generatePattern();
         }
@@ -959,6 +967,7 @@
                 document.getElementById('hipEase').value = 2.0; 
                 document.getElementById('backWidthEase').value = 0.25; 
                 document.getElementById('backUnderarmEase').value = 2.0;
+                document.getElementById('cornerBisectorK').value = 1.25;
             }
             else if (preset === 'fitted') { 
                 document.getElementById('bustEase').value = 1.0; 
@@ -966,6 +975,7 @@
                 document.getElementById('hipEase').value = 1.0; 
                 document.getElementById('backWidthEase').value = 0.125; 
                 document.getElementById('backUnderarmEase').value = 1.75;
+                document.getElementById('cornerBisectorK').value = 1.15;
             }
             else if (preset === 'loose') { 
                 document.getElementById('bustEase').value = 3.0; 
@@ -973,6 +983,7 @@
                 document.getElementById('hipEase').value = 3.0; 
                 document.getElementById('backWidthEase').value = 0.5; 
                 document.getElementById('backUnderarmEase').value = 2.5;
+                document.getElementById('cornerBisectorK').value = 1.5;
             }
             generatePattern();
         }
@@ -980,11 +991,13 @@
         function applySleevelessAdjustment() {
             const reductionMode = document.getElementById('sleevelessReduction').value;
             let currentVal = parseFloat(document.getElementById('backUnderarmEase').value) || 2.0;
+            let currentK = parseFloat(document.getElementById('cornerBisectorK').value) || 1.25;
             if (reductionMode === 'reduce') {
-                // Professional pattern drafting reduces armhole width/underarm extension for sleeveless styles to prevent gaping
                 document.getElementById('backUnderarmEase').value = Math.max(1.5, currentVal - 0.25);
+                document.getElementById('cornerBisectorK').value = Math.max(1.0, currentK - 0.125);
             } else {
                 document.getElementById('backUnderarmEase').value = Math.min(2.5, currentVal + 0.25);
+                document.getElementById('cornerBisectorK').value = Math.min(1.625, currentK + 0.125);
             }
             generatePattern();
         }
@@ -1210,9 +1223,7 @@
             appendLabel(bodiceGroup, 'Armhole Guide Line', backWidthPointX + 12, backLineY + 14, '#4f46e5', '10', 'bold', false);
 
 
-            // --- STEP 9: Back Underarm Point ---
-            // Where the armhole guide line meets the Bust Line extend the line out 2" (5cm) and label Back Underarm Point. 
-            // Increases to maximum 2½" (6.5cm) in larger sizes depending on user input field.
+            // --- STEP 9: Back Underarm Point (Updated name per user instruction) ---
             const userUnderarmEaseInches = parseFloat(document.getElementById('backUnderarmEase').value) || 2.0;
             const underarmExtensionPixels = userUnderarmEaseInches * scaleFactor;
             const backUnderarmPointX = backWidthPointX + underarmExtensionPixels;
@@ -1231,7 +1242,34 @@
             backUnderarmCircle.setAttribute('fill', '#9333ea');
             bodiceGroup.appendChild(backUnderarmCircle);
 
-            appendLabel(bodiceGroup, `Step 9: Back Underarm Point (${userUnderarmEaseInches.toFixed(2)}" / ${(userUnderarmEaseInches * 2.54).toFixed(1)}cm ext)`, backUnderarmPointX + 8, bustLineY, '#9333ea', '11', 'bold', false);
+            appendLabel(bodiceGroup, `Step 9: underarm point (${userUnderarmEaseInches.toFixed(2)}" / ${(userUnderarmEaseInches * 2.54).toFixed(1)}cm ext)`, backUnderarmPointX + 8, bustLineY, '#9333ea', '11', 'bold', false);
+
+
+            // --- STEP 10: Point K (45º Angle Bisector from Armhole Guide & Bust Line Angle) ---
+            // At the angle made by the Armhole Guide and the Bust Line draw a guide line at 45º and measure along 1¼" (3cm) for size 34 up to 1⅝" (4cm) for larger sizes. Name point K.
+            const kDistanceInches = parseFloat(document.getElementById('cornerBisectorK').value) || 1.25;
+            const kDistancePixels = kDistanceInches * scaleFactor;
+            // 45 degree angle vector pointing diagonally up-left into the armhole corner (dx = -cos(45)*dist, dy = -sin(45)*dist)
+            const kAngleRad = Math.PI / 4; // 45 degrees
+            const kTargetX = backWidthPointX - (kDistancePixels * Math.cos(kAngleRad));
+            const kTargetY = bustLineY - (kDistancePixels * Math.sin(kAngleRad));
+
+            const kGuideLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            kGuideLine.setAttribute('x1', backWidthPointX); kGuideLine.setAttribute('y1', bustLineY);
+            kGuideLine.setAttribute('x2', kTargetX); kGuideLine.setAttribute('y2', kTargetY);
+            kGuideLine.setAttribute('stroke', '#ea580c');
+            kGuideLine.setAttribute('stroke-width', '2');
+            kGuideLine.setAttribute('stroke-dasharray', '3 3');
+            bodiceGroup.appendChild(kGuideLine);
+
+            const kPointCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            kPointCircle.setAttribute('cx', kTargetX);
+            kPointCircle.setAttribute('cy', kTargetY);
+            kPointCircle.setAttribute('r', '5');
+            kPointCircle.setAttribute('fill', '#ea580c');
+            bodiceGroup.appendChild(kPointCircle);
+
+            appendLabel(bodiceGroup, `Step 10: Point K (${kDistanceInches.toFixed(3)}" / ${(kDistanceInches * 2.54).toFixed(1)}cm at 45º)`, kTargetX - 110, kTargetY - 10, '#ea580c', '11', 'bold', true);
 
 
             // Draw Bodice Pattern Box Frame
