@@ -388,11 +388,11 @@
         .pattern-label {
             cursor: pointer;
             user-select: none;
-            transition: fill 0.2s ease, opacity 0.2s ease;
+            transition: opacity 0.2s ease;
             pointer-events: auto;
         }
         .pattern-label:hover {
-            opacity: 0.75;
+            opacity: 0.6;
         }
     </style>
 </head>
@@ -412,7 +412,7 @@
         </div>
         <div class="header-controls">
             <div style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 600; color: #4a3f3d;">
-                <input type="checkbox" id="removeNamesToggle" onchange="resetAllLabelsOpacity()" style="cursor: pointer;">
+                <input type="checkbox" id="removeNamesToggle" onchange="resetAllLabelsVisibility()" style="cursor: pointer;">
                 <label for="removeNamesToggle" style="cursor: pointer; margin-bottom: 0;">Remove Name</label>
             </div>
             <button class="side-by-side-toggle" id="sideBySideToggleBtn" onclick="toggleSideBySideMode()">Show Side-by-Side</button>
@@ -961,7 +961,7 @@
             generatePattern();
         }
 
-        // Helper function to append interactive labels cleanly with click-to-fade behavior and support for the 'Remove Name' checkbox
+        // Helper function to append interactive labels with click-to-hide/show behavior
         function appendLabel(parentGroup, textString, x, y, defaultColor, fontSize = '11', fontWeight = '600', isAboveLine = true) {
             const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             const adjustedY = isAboveLine ? y - 8 : y + 16;
@@ -975,23 +975,23 @@
             label.setAttribute('class', 'pattern-label');
             label.textContent = textString;
 
-            // Direct individual click toggle for fading or resetting text color
-            let isFaded = false;
+            // Direct individual click toggle for hiding or showing text
+            let isHidden = false;
             label.addEventListener('click', (e) => {
                 e.stopPropagation();
-                isFaded = !isFaded;
-                label.style.opacity = isFaded ? '0.15' : '1.0';
+                isHidden = !isHidden;
+                label.style.display = isHidden ? 'none' : 'block';
             });
 
             parentGroup.appendChild(label);
             return label;
         }
 
-        // Global function to fade or show all labels when the 'Remove Name' checkbox is toggled
-        function resetAllLabelsOpacity() {
+        // Global function to hide or show all labels when the 'Remove Name' checkbox is toggled
+        function resetAllLabelsVisibility() {
             const removeNames = document.getElementById('removeNamesToggle').checked;
             document.querySelectorAll('.pattern-label').forEach(lbl => {
-                lbl.style.opacity = removeNames ? '0.15' : '1.0';
+                lbl.style.display = removeNames ? 'none' : 'block';
             });
         }
 
@@ -1266,8 +1266,8 @@
                 pantGroup.appendChild(pantRect);
             }
 
-            // Sync up any existing label opacities with the current checkbox state after redraw
-            resetAllLabelsOpacity();
+            // Sync up any existing label visibility with the current checkbox state after redraw
+            resetAllLabelsVisibility();
         }
 
         function updateTransform() {
