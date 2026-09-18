@@ -941,25 +941,39 @@
             bodiceRect.setAttribute('stroke', '#c25e6f'); bodiceRect.setAttribute('stroke-width', '2'); bodiceRect.setAttribute('stroke-dasharray', '4');
             bodiceGroup.appendChild(bodiceRect);
 
-            // CB (Center Back) Top-Left Corner Label
+            // --- CB (Center Back) Top-Left Corner Point & Label ---
+            const pointCB = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pointCB.setAttribute('cx', 50);
+            pointCB.setAttribute('cy', 50);
+            pointCB.setAttribute('r', 4.5);
+            pointCB.setAttribute('fill', '#0047AB');
+            bodiceGroup.appendChild(pointCB);
+
             const labelCB = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            labelCB.setAttribute('x', 55);
+            labelCB.setAttribute('x', 60);
             labelCB.setAttribute('y', 42);
             labelCB.setAttribute('font-family', 'Montserrat, sans-serif');
             labelCB.setAttribute('font-size', '12');
-            labelCB.setAttribute('font-weight', '600');
-            labelCB.setAttribute('fill', '#c25e6f');
+            labelCB.setAttribute('font-weight', 'bold');
+            labelCB.setAttribute('fill', '#0047AB');
             labelCB.textContent = 'CB (Center Back)';
             bodiceGroup.appendChild(labelCB);
 
-            // CF (Center Front) Top-Right Corner Label
+            // --- CF (Center Front) Top-Right Corner Point & Label ---
+            const pointCF = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pointCF.setAttribute('cx', 50 + bWidth);
+            pointCF.setAttribute('cy', 50);
+            pointCF.setAttribute('r', 4.5);
+            pointCF.setAttribute('fill', '#0047AB');
+            bodiceGroup.appendChild(pointCF);
+
             const labelCF = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             labelCF.setAttribute('x', 50 + bWidth - 110);
             labelCF.setAttribute('y', 42);
             labelCF.setAttribute('font-family', 'Montserrat, sans-serif');
             labelCF.setAttribute('font-size', '12');
-            labelCF.setAttribute('font-weight', '600');
-            labelCF.setAttribute('fill', '#c25e6f');
+            labelCF.setAttribute('font-weight', 'bold');
+            labelCF.setAttribute('fill', '#0047AB');
             labelCF.textContent = 'CF (Center Front)';
             bodiceGroup.appendChild(labelCF);
 
