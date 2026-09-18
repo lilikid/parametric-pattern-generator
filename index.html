@@ -389,6 +389,7 @@
             cursor: pointer;
             user-select: none;
             transition: fill 0.2s ease, opacity 0.2s ease;
+            pointer-events: auto;
         }
         .pattern-label:hover {
             opacity: 0.75;
@@ -412,7 +413,7 @@
         <div class="header-controls">
             <div style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 600; color: #4a3f3d;">
                 <input type="checkbox" id="removeNamesToggle" onchange="resetAllLabelsOpacity()" style="cursor: pointer;">
-                <label for="removeNamesToggle" style="cursor: pointer; margin-bottom: 0;">show/Remove Lable</label>
+                <label for="removeNamesToggle" style="cursor: pointer; margin-bottom: 0;">Remove Name</label>
             </div>
             <button class="side-by-side-toggle" id="sideBySideToggleBtn" onclick="toggleSideBySideMode()">Show Side-by-Side</button>
             <div class="unit-selector">
@@ -960,7 +961,7 @@
             generatePattern();
         }
 
-        // Helper function to append labels cleanly with non-overlapping staggering, click-to-fade behavior, and checkbox visibility mapping
+        // Helper function to append interactive labels cleanly with click-to-fade behavior and support for the 'Remove Name' checkbox
         function appendLabel(parentGroup, textString, x, y, defaultColor, fontSize = '11', fontWeight = '600', isAboveLine = true) {
             const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             const adjustedY = isAboveLine ? y - 8 : y + 16;
@@ -974,7 +975,7 @@
             label.setAttribute('class', 'pattern-label');
             label.textContent = textString;
 
-            // Click listener for fading or resetting text color
+            // Direct individual click toggle for fading or resetting text color
             let isFaded = false;
             label.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -986,12 +987,11 @@
             return label;
         }
 
-        // Global function to reset label opacities and toggle global display based on 'show/Remove Lable' checkbox
+        // Global function to fade or show all labels when the 'Remove Name' checkbox is toggled
         function resetAllLabelsOpacity() {
-            const showLabels = document.getElementById('removeNamesToggle').checked;
+            const removeNames = document.getElementById('removeNamesToggle').checked;
             document.querySelectorAll('.pattern-label').forEach(lbl => {
-                lbl.style.display = showLabels ? 'none' : 'block';
-                lbl.style.opacity = '1.0';
+                lbl.style.opacity = removeNames ? '0.15' : '1.0';
             });
         }
 
@@ -1105,7 +1105,7 @@
             appendLabel(bodiceGroup, 'Back Neck Point', finalNeckPointX + 12, finalNeckPointY, '#0284c7', '11', 'bold', true);
 
 
-            // STEP 6 & 7 Updates: Remove black neck curve, update red flattened Neck curve transition to meet the nape line 1.25 inch before the intersection point with the vertical line below the CB point
+            // STEP 6 & 7: Red flattened Neck curve transition to meet the nape line 1.25 inch before the intersection point
             const cbIntersectionX = 50;
             const cbIntersectionY = napeLineY;
             
@@ -1141,8 +1141,8 @@
             appendLabel(bodiceGroup, 'Shoulder Line (1¼" down from Nape Line)', 60, shoulderLineY, '#10b981', '11', '600', true);
 
 
-            // --- NEW SEQUENTIAL ADDITIONS REQUESTED ---
-            // 1. Find the mid point between Shoulder Line and Bust Line Square across a guide line and label it the Back Line with equation value
+            // --- SEQUENTIAL ADDITIONS ---
+            // 1. Find the mid point between Shoulder Line and Bust Line, name it "Back Line" with the location equation number value
             const backLineY = shoulderLineY + (bustLineY - shoulderLineY) / 2;
             const backLineEquationValue = ((bustLineY - shoulderLineY) / 2 / scaleFactor).toFixed(2);
 
@@ -1154,7 +1154,6 @@
             backLine.setAttribute('stroke-dasharray', '4 2');
             bodiceGroup.appendChild(backLine);
 
-            // Updated Back Line name to include shorter title and the equation value for location
             appendLabel(bodiceGroup, `Back Line (${backLineEquationValue}")`, 60, backLineY, '#d97706', '11', '600', true);
 
             // 2. Measure along the Back Line half the Back Width plus Back Width ease
@@ -1173,7 +1172,7 @@
 
             appendLabel(bodiceGroup, `Back Width Point (${halfBackWidthVal.toFixed(2)}" + ${backWidthEaseVal.toFixed(3)}" ease)`, backWidthPointX + 12, backLineY, '#d97706', '10', 'bold', true);
 
-            // 3. From this point, square down to the Bust Line and up to the Shoulder Line This is the Armhole Guide Line.
+            // 3. Square down to the Bust Line and up to the Shoulder Line (Armhole Guide Line)
             const armholeGuideLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             armholeGuideLine.setAttribute('x1', backWidthPointX); armholeGuideLine.setAttribute('y1', shoulderLineY);
             armholeGuideLine.setAttribute('x2', backWidthPointX); armholeGuideLine.setAttribute('y2', bustLineY);
@@ -1183,7 +1182,6 @@
             bodiceGroup.appendChild(armholeGuideLine);
 
             appendLabel(bodiceGroup, 'Armhole Guide Line', backWidthPointX + 12, backLineY + 14, '#4f46e5', '10', 'bold', false);
-            // --- END OF NEW SEQUENTIAL ADDITIONS ---
 
 
             // Draw Bodice Pattern Box Frame
@@ -1268,7 +1266,7 @@
                 pantGroup.appendChild(pantRect);
             }
 
-            // Sync visibility and opacities according to checkbox status
+            // Sync up any existing label opacities with the current checkbox state after redraw
             resetAllLabelsOpacity();
         }
 
