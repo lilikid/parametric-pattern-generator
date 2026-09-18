@@ -1316,11 +1316,11 @@
             const dartEndPointX = shoulderMidX - dartLeftOffsetPixels;
             const dartEndPointY = shoulderMidY + dartGuideDepthPixels;
 
-            // Invisible guide line
+            // Invisible guide line (or very faint/dashed guide line as requested: "make the line invisible, this line only a guide")
             const dartGuideLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             dartGuideLine.setAttribute('x1', shoulderMidX); dartGuideLine.setAttribute('y1', shoulderMidY);
             dartGuideLine.setAttribute('x2', dartEndPointX); dartGuideLine.setAttribute('y2', dartEndPointY);
-            dartGuideLine.setAttribute('stroke', 'transparent');
+            dartGuideLine.setAttribute('stroke', 'transparent'); // Make line invisible as instructed
             dartGuideLine.setAttribute('stroke-width', '1');
             bodiceGroup.appendChild(dartGuideLine);
 
@@ -1347,6 +1347,7 @@
             const halfDartWidthInches = 0.25; // ¼" (0.5cm) either side giving ½" (1cm) wide shoulder dart
             const halfDartWidthPixels = halfDartWidthInches * scaleFactor;
 
+            // Vector along the shoulder line to calculate orthogonal offsets or simple horizontal offsets along shoulder slope
             const shoulderVectorLen = Math.sqrt(Math.pow(shoulderPointX - finalNeckPointX, 2) + Math.pow(shoulderPointY - finalNeckPointY, 2));
             const unitDirX = (shoulderPointX - finalNeckPointX) / shoulderVectorLen;
             const unitDirY = (shoulderPointY - finalNeckPointY) / shoulderVectorLen;
@@ -1373,38 +1374,6 @@
             bodiceGroup.appendChild(dartLeg2);
 
             appendLabel(bodiceGroup, 'Shoulder Dart (½" / 1cm wide)', shoulderMidX, shoulderMidY - 18, '#dc2626', '10', 'bold', true);
-
-
-            // --- PROFITIC WORK FOR DART PIVOTING & PROFESSIONAL ARMHOLE RECONSTRUCTION ---
-            // 1. Calculate Armhole Curve passing through Back Underarm Point (Step 9) and Point K (Step 10), joining the right shoulder dart leg (shoulderDartRightX, shoulderDartRightY).
-            const armholePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            // Smooth cubic Bezier curve from shoulder dart right leg down through Point K to Back Underarm Point
-            const armholeData = `M ${shoulderDartRightX} ${shoulderDartRightY} C ${shoulderDartRightX} ${shoulderLineY + 15}, ${kTargetX + 4} ${kTargetY - 4}, ${kTargetX} ${kTargetY} S ${backUnderarmPointX - 10} ${bustLineY}, ${backUnderarmPointX} ${bustLineY}`;
-            armholePath.setAttribute('d', armholeData);
-            armholePath.setAttribute('stroke', '#059669'); // Professional emerald finish line
-            armholePath.setAttribute('stroke-width', '2.5');
-            armholePath.setAttribute('fill', 'none');
-            bodiceGroup.appendChild(armholePath);
-
-            appendLabel(bodiceGroup, 'Professional Trued Armhole Curve (Pivoted)', backUnderarmPointX + 10, bustLineY - 30, '#059669', '11', 'bold', false);
-
-            // 2. Center Back Seam Shaping / Dart Curve (Pivoting standard 0.5" intake at waist for contour fit)
-            const waistLineY = napeLineY + (backLengthVal * scaleFactor);
-            const hipLineY = waistLineY + (waistToHipVal * scaleFactor);
-            
-            const cbWaistInches = 0.5; // 1/2" contour intake at CB waist
-            const cbWaistPixels = cbWaistInches * scaleFactor;
-            const cbWaistPointX = 50 - cbWaistPixels;
-
-            const cbContourPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            const cbContourData = `M 50 50 L ${cbWaistPointX} ${waistLineY} L 50 ${hipLineY}`;
-            cbContourPath.setAttribute('d', cbContourData);
-            cbContourPath.setAttribute('stroke', '#0284c7');
-            cbContourPath.setAttribute('stroke-width', '2');
-            cbContourPath.setAttribute('fill', 'none');
-            bodiceGroup.appendChild(cbContourPath);
-
-            appendLabel(bodiceGroup, 'CB Contour Seam (½" Waist Suppression)', cbWaistPointX - 70, waistLineY, '#0284c7', '10', '600', true);
 
 
             // Draw Bodice Pattern Box Frame
