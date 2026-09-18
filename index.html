@@ -650,12 +650,9 @@
             gridGroup.innerHTML = '';
             const width = 1600, height = 1400;
 
-            // Unit base step (1 inch or 1 cm)
             const baseStep = currentUnit === 'in' ? scaleFactor : scaleFactor / 2.54;
-            // Subdivisions: 0.5 unit intervals for half-unit clarity
             const subStep = baseStep / 2;
 
-            // Draw vertical grid lines
             for (let x = 0; x <= width; x += subStep) {
                 const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
                 line.setAttribute('x1', x); line.setAttribute('y1', 0);
@@ -675,7 +672,6 @@
                 gridGroup.appendChild(line);
             }
 
-            // Draw horizontal grid lines
             for (let y = 0; y <= height; y += subStep) {
                 const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
                 line.setAttribute('x1', 0); line.setAttribute('y1', y);
@@ -794,36 +790,26 @@
         function generatePattern() {
             const patternGroup = document.getElementById('pattern-group');
             patternGroup.innerHTML = '';
-// Add CB marker point: 1 inch from top and 1 inch from left
-const inchToPx = 2.54 * s; // 1 inch converted to pixels (2.54 cm * 10px)
-const markerX = inchToPx;        // Exactly 1 inch inward from the left edge (X = 0)
-const markerY = inchToPx;        // 1 inch down from the top edge (Y = 0)
 
-// Create the blue dot (circle)
-const cbCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-cbCircle.setAttribute('cx', markerX);
-cbCircle.setAttribute('cy', markerY);
-cbCircle.setAttribute('r', '4');
-cbCircle.setAttribute('fill', '#0066ff');
-cbCircle.setAttribute('stroke', '#ffffff');
-cbCircle.setAttribute('stroke-width', '1.5');
-patternLayer.appendChild(cbCircle);
+            // --- SEQUENTIAL INDEPENDENT & DEPENDENT POINT DEFINITIONS ---
+            // Point 1: Center Back (CB) Top Anchor Origin
+            const CB_Top = {
+                label: "CB",
+                description: "Center Back Top Corner (Anchor Origin)",
+                x: 50,
+                y: 50,
+                isIndependent: true
+            };
 
-// Create the "CB" text label next to the dot
-const cbText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-cbText.setAttribute('x', markerX + 8);
-cbText.setAttribute('y', markerY + 4);
-cbText.setAttribute('fill', '#0066ff');
-cbText.setAttribute('font-size', '12');
-cbText.setAttribute('font-weight', 'bold');
-cbText.textContent = 'CB';
-patternLayer.appendChild(cbText);
             const pieces = [];
 
             const bustVal = parseFloat(document.getElementById('bust').value) + parseFloat(document.getElementById('bustEase').value);
             const backLengthVal = parseFloat(document.getElementById('backNeckToWaist').value) + parseFloat(document.getElementById('backNeckToWaistEase').value);
+            
             pieces.push({
-                name: `Bodice Block (Bust: ${document.getElementById('bust').value}" + ${document.getElementById('bustEase').value}" ease)`,
+                name: `Bodice Block [${CB_Top.label}] (Bust: ${document.getElementById('bust').value}" + ${document.getElementById('bustEase').value}" ease)`,
+                anchorX: CB_Top.x,
+                anchorY: CB_Top.y,
                 width: (bustVal / 4) * scaleFactor,
                 height: backLengthVal * scaleFactor,
                 stroke: '#c25e6f',
@@ -835,6 +821,8 @@ patternLayer.appendChild(cbText);
                 const bicepVal = (parseFloat(document.getElementById('bicep').value) + parseFloat(document.getElementById('bicepEase').value)) * scaleFactor;
                 pieces.push({
                     name: `Fitted Sleeve (Bicep: ${document.getElementById('bicep').value}" + ${document.getElementById('bicepEase').value}" ease)`,
+                    anchorX: CB_Top.x + ((bustVal / 4) * scaleFactor) + 60,
+                    anchorY: CB_Top.y,
                     width: bicepVal,
                     height: sLenVal,
                     stroke: '#5c524f',
@@ -847,6 +835,8 @@ patternLayer.appendChild(cbText);
                 const skirtLen = parseFloat(document.getElementById('skirtLength').value) + parseFloat(document.getElementById('skirtLengthEase').value);
                 pieces.push({
                     name: `Skirt: ${document.getElementById('skirtStyle').value.toUpperCase()} (Hips: ${document.getElementById('skirtHips').value}")`,
+                    anchorX: CB_Top.x,
+                    anchorY: CB_Top.y + (backLengthVal * scaleFactor) + 60,
                     width: (skirtHips / 4) * scaleFactor,
                     height: skirtLen * scaleFactor,
                     stroke: '#c25e6f',
@@ -859,6 +849,8 @@ patternLayer.appendChild(cbText);
                 const inseamVal = parseFloat(document.getElementById('inseam').value) + parseFloat(document.getElementById('inseamEase').value);
                 pieces.push({
                     name: `Trouser Block (Rise: ${document.getElementById('pantRise').value}")`,
+                    anchorX: CB_Top.x + ((bustVal / 4) * scaleFactor) + 60,
+                    anchorY: CB_Top.y + (backLengthVal * scaleFactor) + 60,
                     width: (thighVal / 2) * scaleFactor,
                     height: inseamVal * scaleFactor,
                     stroke: '#5c524f',
@@ -866,28 +858,10 @@ patternLayer.appendChild(cbText);
                 });
             }
 
-            const originX = 50;
-            const originY = 50;
-            const gapX = 60;
-            const gapY = 60;
-            const maxPerRow = 2;
-
-            let currentX = originX;
-            let currentY = originY;
-            let rowMaxHeight = 0;
-            let colIndex = 0;
-
             pieces.forEach((piece) => {
-                if (colIndex >= maxPerRow) {
-                    currentX = originX;
-                    currentY += rowMaxHeight + gapY;
-                    rowMaxHeight = 0;
-                    colIndex = 0;
-                }
-
                 const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                rect.setAttribute('x', currentX);
-                rect.setAttribute('y', currentY);
+                rect.setAttribute('x', piece.anchorX);
+                rect.setAttribute('y', piece.anchorY);
                 rect.setAttribute('width', piece.width);
                 rect.setAttribute('height', piece.height);
                 rect.setAttribute('fill', piece.fill);
@@ -897,21 +871,14 @@ patternLayer.appendChild(cbText);
                 patternGroup.appendChild(rect);
 
                 const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                text.setAttribute('x', currentX + 15);
-                text.setAttribute('y', currentY + 25);
+                text.setAttribute('x', piece.anchorX + 15);
+                text.setAttribute('y', piece.anchorY + 25);
                 text.setAttribute('fill', '#2c2524');
                 text.setAttribute('font-family', 'Montserrat');
                 text.setAttribute('font-size', '12');
                 text.setAttribute('font-weight', '600');
                 text.textContent = piece.name;
                 patternGroup.appendChild(text);
-
-                if (piece.height > rowMaxHeight) {
-                    rowMaxHeight = piece.height;
-                }
-
-                currentX += piece.width + gapX;
-                colIndex++;
             });
         }
 
