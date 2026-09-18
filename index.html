@@ -484,7 +484,7 @@
                             <label>Back Width & Ease</label>
                             <div class="dual-input">
                                 <input type="number" id="backWidth" value="14.0" step="0.25">
-                                <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="backWidthEase" value="0" step="0.25"></div>
+                                <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="backWidthEase" value="0.25" step="0.25"></div>
                             </div>
                         </div>
                         <div class="input-section">
@@ -929,9 +929,24 @@
 
         function applyPreset() {
             const preset = document.getElementById('blockPreset').value;
-            if (preset === 'standard') { document.getElementById('bustEase').value = 2.0; document.getElementById('waistEase').value = 1.5; document.getElementById('hipEase').value = 2.0; }
-            else if (preset === 'fitted') { document.getElementById('bustEase').value = 1.0; document.getElementById('waistEase').value = 0.5; document.getElementById('hipEase').value = 1.0; }
-            else if (preset === 'loose') { document.getElementById('bustEase').value = 3.0; document.getElementById('waistEase').value = 2.5; document.getElementById('hipEase').value = 3.0; }
+            if (preset === 'standard') { 
+                document.getElementById('bustEase').value = 2.0; 
+                document.getElementById('waistEase').value = 1.5; 
+                document.getElementById('hipEase').value = 2.0; 
+                document.getElementById('backWidthEase').value = 0.25; 
+            }
+            else if (preset === 'fitted') { 
+                document.getElementById('bustEase').value = 1.0; 
+                document.getElementById('waistEase').value = 0.5; 
+                document.getElementById('hipEase').value = 1.0; 
+                document.getElementById('backWidthEase').value = 0.125; 
+            }
+            else if (preset === 'loose') { 
+                document.getElementById('bustEase').value = 3.0; 
+                document.getElementById('waistEase').value = 2.5; 
+                document.getElementById('hipEase').value = 3.0; 
+                document.getElementById('backWidthEase').value = 0.5; 
+            }
             generatePattern();
         }
 
@@ -1013,7 +1028,6 @@
 
 
             // STEP 3: Drawing the Bust Line
-            // Measure down from Nape: half Back Waist measurement plus 3/8" (1cm), and for Bust over 40" (100cm), add 5/8" (1.5cm) instead.
             const halfBackWaist = backLengthVal / 2.0;
             const bustLineOffset = (totalBust > 40.0) ? (halfBackWaist + (5.0 / 8.0)) : (halfBackWaist + (3.0 / 8.0));
             const bustLineY = napeLineY + (bustLineOffset * scaleFactor);
@@ -1037,7 +1051,6 @@
 
 
             // STEP 4: Calculate Back Neck Width & Draw along Nape Line from CB
-            // Divide Bust measurement by 8, add 1 1/4" (3cm), and halve the result for the Back Neck Width.
             const backNeckWidth = ((totalBust / 8.0) + 1.25) / 2.0;
             const backNeckWidthPixels = backNeckWidth * scaleFactor;
 
@@ -1069,7 +1082,7 @@
 
 
             // STEP 5: Square up 3/4" (2cm) from Back Width neck point and place Back Neck Point
-            const squareUpInches = 0.75; // 3/4 inch
+            const squareUpInches = 0.75;
             const squareUpPixels = squareUpInches * scaleFactor;
             const finalNeckPointY = napeLineY - squareUpPixels;
             const finalNeckPointX = 50 + backNeckWidthPixels;
@@ -1114,15 +1127,11 @@
             bodiceGroup.appendChild(neckCurvePath);
 
 
-            // STEP 7 (including the flattening transition right after Step 6):
-            // Start flattening the neck curve that was drawn in step six (the curve connecting the Back Neck point with the intersection of the Nape Line with the line below the Point CB), 
-            // this curve should start flattening from middle of the back neck width line then move smoothly to meet the nape line and overlay with the nape line just at the middle of the back Neck width line.
+            // STEP 7: Flattening transition right after Step 6
             const midNeckWidthX = 50 + (backNeckWidthPixels / 2);
             const midNeckWidthY = napeLineY;
 
             const flattenedCurvePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            // Path overlaying/flattening along the Nape Line from CB (50, napeLineY) to the middle of the back neck width line (midNeckWidthX, midNeckWidthY), 
-            // and then transitioning smoothly up to the Back Neck Point (finalNeckPointX, finalNeckPointY).
             const flatCurveData = `M ${cbIntersectionX} ${cbIntersectionY} L ${midNeckWidthX} ${midNeckWidthY} Q ${midNeckWidthX + (finalNeckPointX - midNeckWidthX)*0.5} ${midNeckWidthY}, ${finalNeckPointX} ${finalNeckPointY}`;
             flattenedCurvePath.setAttribute('d', flatCurveData);
             flattenedCurvePath.setAttribute('stroke', '#e11d48');
@@ -1142,18 +1151,18 @@
                 bodiceGroup.appendChild(flatCurveText);
             }
 
-            // Step 7: Draw the horizontal Back shoulder line by: Measuring 1¼" (3cm) down from the Nape Line Square across a guide line of about 10" (25cm) and label it the Shoulder Line. Make it sharp dotted line.
-            const shoulderLineDropInches = 1.25; // 1 1/4" (3cm)
+            // Step 8: Draw the horizontal Back shoulder line
+            const shoulderLineDropInches = 1.25;
             const shoulderLineDropPixels = shoulderLineDropInches * scaleFactor;
             const shoulderLineY = napeLineY + shoulderLineDropPixels;
-            const shoulderLineWidthPixels = 10.0 * scaleFactor; // 10" guide line (~25cm)
+            const shoulderLineWidthPixels = 10.0 * scaleFactor;
 
             const backShoulderLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             backShoulderLine.setAttribute('x1', 50); backShoulderLine.setAttribute('y1', shoulderLineY);
             backShoulderLine.setAttribute('x2', 50 + shoulderLineWidthPixels); backShoulderLine.setAttribute('y2', shoulderLineY);
             backShoulderLine.setAttribute('stroke', '#10b981');
             backShoulderLine.setAttribute('stroke-width', '1.5');
-            backShoulderLine.setAttribute('stroke-dasharray', '2 4'); // sharp dotted line appearance
+            backShoulderLine.setAttribute('stroke-dasharray', '2 4');
             bodiceGroup.appendChild(backShoulderLine);
 
             if (!removeNames) {
@@ -1167,6 +1176,79 @@
                 shoulderLineText.textContent = 'Shoulder Line (1¼" down from Nape Line)';
                 bodiceGroup.appendChild(shoulderLineText);
             }
+
+
+            // --- NEW SEQUENTIAL ADDITIONS REQUESTED ---
+            // 1. Find the mid point between Shoulder Line and Bust Line Square across a guide line and label it the Back Line
+            const backLineY = shoulderLineY + (bustLineY - shoulderLineY) / 2;
+
+            const backLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            backLine.setAttribute('x1', 50); backLine.setAttribute('y1', backLineY);
+            backLine.setAttribute('x2', 50 + bWidth); backLine.setAttribute('y2', backLineY);
+            backLine.setAttribute('stroke', '#d97706'); 
+            backLine.setAttribute('stroke-width', '1.25');
+            backLine.setAttribute('stroke-dasharray', '4 2');
+            bodiceGroup.appendChild(backLine);
+
+            if (!removeNames) {
+                const backLineText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                backLineText.setAttribute('x', 60);
+                backLineText.setAttribute('y', backLineY - 6);
+                backLineText.setAttribute('font-family', 'Montserrat, sans-serif');
+                backLineText.setAttribute('font-size', '11');
+                backLineText.setAttribute('font-weight', '600');
+                backLineText.setAttribute('fill', '#d97706');
+                backLineText.textContent = 'Back Line (Midpoint between Shoulder & Bust Line)';
+                bodiceGroup.appendChild(backLineText);
+            }
+
+            // 2. Measure along the Back Line half the Back Width plus Back Width ease
+            const rawBackWidth = parseFloat(document.getElementById('backWidth').value);
+            const backWidthEaseVal = parseFloat(document.getElementById('backWidthEase').value);
+            const halfBackWidthVal = rawBackWidth / 2.0;
+            const measuredBackWidthDistance = (halfBackWidthVal + backWidthEaseVal) * scaleFactor;
+            const backWidthPointX = 50 + measuredBackWidthDistance;
+
+            const backWidthMark = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            backWidthMark.setAttribute('cx', backWidthPointX);
+            backWidthMark.setAttribute('cy', backLineY);
+            backWidthMark.setAttribute('r', '4.5');
+            backWidthMark.setAttribute('fill', '#d97706');
+            bodiceGroup.appendChild(backWidthMark);
+
+            if (!removeNames) {
+                const bwMeasureText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                bwMeasureText.setAttribute('x', backWidthPointX + 8);
+                bwMeasureText.setAttribute('y', backLineY - 6);
+                bwMeasureText.setAttribute('font-family', 'Montserrat, sans-serif');
+                bwMeasureText.setAttribute('font-size', '10');
+                bwMeasureText.setAttribute('font-weight', 'bold');
+                bwMeasureText.setAttribute('fill', '#d97706');
+                bwMeasureText.textContent = `Back Width Point (${halfBackWidthVal.toFixed(2)}" + ${backWidthEaseVal.toFixed(3)}" ease)`;
+                bodiceGroup.appendChild(bwMeasureText);
+            }
+
+            // 3. From this point, square down to the Bust Line and up to the Shoulder Line This is the Armhole Guide Line.
+            const armholeGuideLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            armholeGuideLine.setAttribute('x1', backWidthPointX); armholeGuideLine.setAttribute('y1', shoulderLineY);
+            armholeGuideLine.setAttribute('x2', backWidthPointX); armholeGuideLine.setAttribute('y2', bustLineY);
+            armholeGuideLine.setAttribute('stroke', '#4f46e5');
+            armholeGuideLine.setAttribute('stroke-width', '1.5');
+            armholeGuideLine.setAttribute('stroke-dasharray', '5 3');
+            bodiceGroup.appendChild(armholeGuideLine);
+
+            if (!removeNames) {
+                const armholeGuideText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                armholeGuideText.setAttribute('x', backWidthPointX + 8);
+                armholeGuideText.setAttribute('y', backLineY + 16);
+                armholeGuideText.setAttribute('font-family', 'Montserrat, sans-serif');
+                armholeGuideText.setAttribute('font-size', '10');
+                armholeGuideText.setAttribute('font-weight', 'bold');
+                armholeGuideText.setAttribute('fill', '#4f46e5');
+                armholeGuideText.textContent = 'Armhole Guide Line';
+                bodiceGroup.appendChild(armholeGuideText);
+            }
+            // --- END OF NEW SEQUENTIAL ADDITIONS ---
 
 
             // Draw Bodice Pattern Box Frame
