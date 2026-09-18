@@ -383,6 +383,16 @@
         .grid-line-sub { stroke: #f0ecea; stroke-width: 0.5; vector-effect: non-scaling-stroke; }
         .grid-line-half { stroke: #d5ccc8; stroke-width: 0.8; vector-effect: non-scaling-stroke; }
         .grid-line-major { stroke: #b8aba5; stroke-width: 1.4; vector-effect: non-scaling-stroke; }
+
+        /* Interactive label style */
+        .pattern-label {
+            cursor: pointer;
+            user-select: none;
+            transition: fill 0.2s ease, opacity 0.2s ease;
+        }
+        .pattern-label:hover {
+            opacity: 0.75;
+        }
     </style>
 </head>
 <body>
@@ -402,7 +412,7 @@
         <div class="header-controls">
             <div style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 600; color: #4a3f3d;">
                 <input type="checkbox" id="removeNamesToggle" onchange="generatePattern()" style="cursor: pointer;">
-                <label for="removeNamesToggle" style="cursor: pointer; margin-bottom: 0;">Remove Names</label>
+                <label for="removeNamesToggle" style="cursor: pointer; margin-bottom: 0;">Show/Remove Lable</label>
             </div>
             <button class="side-by-side-toggle" id="sideBySideToggleBtn" onclick="toggleSideBySideMode()">Show Side-by-Side</button>
             <div class="unit-selector">
@@ -950,8 +960,42 @@
             generatePattern();
         }
 
+        // Helper function to append labels cleanly with non-overlapping staggering and click-to-fade behavior
+        function appendLabel(parentGroup, textString, x, y, defaultColor, fontSize = '11', fontWeight = '600', isAboveLine = true) {
+            const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            // Stagger labels vertically relative to the line position to avoid crowding/overlapping
+            const adjustedY = isAboveLine ? y - 8 : y + 16;
+            
+            label.setAttribute('x', x);
+            label.setAttribute('y', adjustedY);
+            label.setAttribute('font-family', 'Montserrat, sans-serif');
+            label.setAttribute('font-size', fontSize);
+            label.setAttribute('font-weight', fontWeight);
+            label.setAttribute('fill', defaultColor);
+            label.setAttribute('class', 'pattern-label');
+            label.textContent = textString;
+
+            // Click listener for fading or resetting text color
+            let isFaded = false;
+            label.addEventListener('click', (e) => {
+                e.stopPropagation();
+                isFaded = !isFaded;
+                label.style.opacity = isFaded ? '0.15' : '1.0';
+            });
+
+            parentGroup.appendChild(label);
+            return label;
+        }
+
+        // Global function to reset label opacities when clicking Show/Remove Lable toggle
+        function resetAllLabelsOpacity() {
+            document.querySelectorAll('.pattern-label').forEach(lbl => {
+                lbl.style.opacity = '1.0';
+            });
+        }
+
         function generatePattern() {
-            const removeNames = document.getElementById('removeNamesToggle').checked;
+            const showLabels = document.getElementById('removeNamesToggle').checked;
 
             // --- 1. BODICE BLOCK (CB & CF Anchor Points Established First) ---
             const bodiceGroup = document.querySelector('#svg-bodice .pattern-group-sub');
@@ -977,14 +1021,8 @@
             pointCB.setAttribute('fill', '#0047AB');
             bodiceGroup.appendChild(pointCB);
 
-            if (!removeNames) {
-                const labelCB = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                labelCB.setAttribute('x', 60); labelCB.setAttribute('y', 42);
-                labelCB.setAttribute('font-family', 'Montserrat, sans-serif');
-                labelCB.setAttribute('font-size', '12'); labelCB.setAttribute('font-weight', 'bold');
-                labelCB.setAttribute('fill', '#0047AB');
-                labelCB.textContent = 'CB (Center Back)';
-                bodiceGroup.appendChild(labelCB);
+            if (showLabels) {
+                appendLabel(bodiceGroup, 'CB (Center Back)', 60, 42, '#0047AB', '12', 'bold', true);
             }
 
             const pointCF = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -992,14 +1030,8 @@
             pointCF.setAttribute('fill', '#0047AB');
             bodiceGroup.appendChild(pointCF);
 
-            if (!removeNames) {
-                const labelCF = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                labelCF.setAttribute('x', 50 + bWidth - 145); labelCF.setAttribute('y', 42);
-                labelCF.setAttribute('font-family', 'Montserrat, sans-serif');
-                labelCF.setAttribute('font-size', '12'); labelCF.setAttribute('font-weight', 'bold');
-                labelCF.setAttribute('fill', '#0047AB');
-                labelCF.textContent = 'CF (Center Front)';
-                bodiceGroup.appendChild(labelCF);
+            if (showLabels) {
+                appendLabel(bodiceGroup, 'CF (Center Front)', 50 + bWidth - 145, 42, '#0047AB', '12', 'bold', true);
             }
 
 
@@ -1016,14 +1048,8 @@
             napeLine.setAttribute('stroke-dasharray', '6 3');
             bodiceGroup.appendChild(napeLine);
 
-            if (!removeNames) {
-                const napeText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                napeText.setAttribute('x', 60); napeText.setAttribute('y', napeLineY - 6);
-                napeText.setAttribute('font-family', 'Montserrat, sans-serif');
-                napeText.setAttribute('font-size', '11'); napeText.setAttribute('font-weight', '600');
-                napeText.setAttribute('fill', '#1f7a8c');
-                napeText.textContent = `Nape Line (${napeLineDropInches.toFixed(2)}" / ${(napeLineDropInches * 2.54).toFixed(1)}cm down)`;
-                bodiceGroup.appendChild(napeText);
+            if (showLabels) {
+                appendLabel(bodiceGroup, `Nape Line (${napeLineDropInches.toFixed(2)}" / ${(napeLineDropInches * 2.54).toFixed(1)}cm down)`, 60, napeLineY, '#1f7a8c', '11', '600', true);
             }
 
 
@@ -1039,14 +1065,8 @@
             bustLine.setAttribute('stroke-dasharray', '3 3');
             bodiceGroup.appendChild(bustLine);
 
-            if (!removeNames) {
-                const bustText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                bustText.setAttribute('x', 60); bustText.setAttribute('y', bustLineY - 6);
-                bustText.setAttribute('font-family', 'Montserrat, sans-serif');
-                bustText.setAttribute('font-size', '11'); bustText.setAttribute('font-weight', '600');
-                bustText.setAttribute('fill', '#c25e6f');
-                bustText.textContent = `Bust Line (${bustLineOffset.toFixed(2)}" down from Nape)`;
-                bodiceGroup.appendChild(bustText);
+            if (showLabels) {
+                appendLabel(bodiceGroup, `Bust Line (${bustLineOffset.toFixed(2)}" down from Nape)`, 60, bustLineY, '#c25e6f', '11', '600', true);
             }
 
 
@@ -1068,16 +1088,8 @@
             neckPointCircle.setAttribute('fill', '#8b5cf6');
             bodiceGroup.appendChild(neckPointCircle);
 
-            if (!removeNames) {
-                const neckWidthText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                neckWidthText.setAttribute('x', 60);
-                neckWidthText.setAttribute('y', napeLineY + 38);
-                neckWidthText.setAttribute('font-family', 'Montserrat, sans-serif');
-                neckWidthText.setAttribute('font-size', '10');
-                neckWidthText.setAttribute('font-weight', 'bold');
-                neckWidthText.setAttribute('fill', '#8b5cf6');
-                neckWidthText.textContent = `Back Neck Width Point (${backNeckWidth.toFixed(2)}" / ${(backNeckWidth * 2.54).toFixed(1)}cm)`;
-                bodiceGroup.appendChild(neckWidthText);
+            if (showLabels) {
+                appendLabel(bodiceGroup, `Back Neck Width Point (${backNeckWidth.toFixed(2)}" / ${(backNeckWidth * 2.54).toFixed(1)}cm)`, 60, napeLineY + 20, '#8b5cf6', '10', 'bold', false);
             }
 
 
@@ -1101,15 +1113,8 @@
             finalNeckPointCircle.setAttribute('fill', '#0284c7');
             bodiceGroup.appendChild(finalNeckPointCircle);
 
-            if (!removeNames) {
-                const finalNeckText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                finalNeckText.setAttribute('x', finalNeckPointX + 12);
-                finalNeckText.setAttribute('y', finalNeckPointY - 4);
-                finalNeckText.setAttribute('font-family', 'Montserrat, sans-serif');
-                finalNeckText.setAttribute('font-weight', 'bold');
-                finalNeckText.setAttribute('fill', '#0284c7');
-                finalNeckText.textContent = 'Back Neck Point';
-                bodiceGroup.appendChild(finalNeckText);
+            if (showLabels) {
+                appendLabel(bodiceGroup, 'Back Neck Point', finalNeckPointX + 12, finalNeckPointY, '#0284c7', '11', 'bold', true);
             }
 
 
@@ -1130,16 +1135,8 @@
             flattenedCurvePath.setAttribute('fill', 'none');
             bodiceGroup.appendChild(flattenedCurvePath);
 
-            if (!removeNames) {
-                const flatCurveText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                flatCurveText.setAttribute('x', transitionMeetX + 10);
-                flatCurveText.setAttribute('y', napeLineY + 22);
-                flatCurveText.setAttribute('font-family', 'Montserrat, sans-serif');
-                flatCurveText.setAttribute('font-size', '10');
-                flatCurveText.setAttribute('font-weight', '600');
-                flatCurveText.setAttribute('fill', '#e11d48');
-                flatCurveText.textContent = 'Flattened Neck Curve Transition (Meets 1.25" from CB)';
-                bodiceGroup.appendChild(flatCurveText);
+            if (showLabels) {
+                appendLabel(bodiceGroup, 'Flattened Neck Curve Transition (Meets 1.25" from CB)', transitionMeetX + 5, napeLineY + 12, '#e11d48', '10', '600', false);
             }
 
             // Step 8: Draw the horizontal Back shoulder line
@@ -1156,16 +1153,8 @@
             backShoulderLine.setAttribute('stroke-dasharray', '2 4');
             bodiceGroup.appendChild(backShoulderLine);
 
-            if (!removeNames) {
-                const shoulderLineText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                shoulderLineText.setAttribute('x', 60);
-                shoulderLineText.setAttribute('y', shoulderLineY - 18);
-                shoulderLineText.setAttribute('font-family', 'Montserrat, sans-serif');
-                shoulderLineText.setAttribute('font-size', '11');
-                shoulderLineText.setAttribute('font-weight', '600');
-                shoulderLineText.setAttribute('fill', '#10b981');
-                shoulderLineText.textContent = 'Shoulder Line (1¼" down from Nape Line)';
-                bodiceGroup.appendChild(shoulderLineText);
+            if (showLabels) {
+                appendLabel(bodiceGroup, 'Shoulder Line (1¼" down from Nape Line)', 60, shoulderLineY, '#10b981', '11', '600', true);
             }
 
 
@@ -1181,16 +1170,8 @@
             backLine.setAttribute('stroke-dasharray', '4 2');
             bodiceGroup.appendChild(backLine);
 
-            if (!removeNames) {
-                const backLineText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                backLineText.setAttribute('x', 60);
-                backLineText.setAttribute('y', backLineY - 6);
-                backLineText.setAttribute('font-family', 'Montserrat, sans-serif');
-                backLineText.setAttribute('font-size', '11');
-                backLineText.setAttribute('font-weight', '600');
-                backLineText.setAttribute('fill', '#d97706');
-                backLineText.textContent = 'Back Line (Midpoint between Shoulder & Bust Line)';
-                bodiceGroup.appendChild(backLineText);
+            if (showLabels) {
+                appendLabel(bodiceGroup, 'Back Line (Midpoint between Shoulder & Bust Line)', 60, backLineY, '#d97706', '11', '600', true);
             }
 
             // 2. Measure along the Back Line half the Back Width plus Back Width ease
@@ -1207,16 +1188,8 @@
             backWidthMark.setAttribute('fill', '#d97706');
             bodiceGroup.appendChild(backWidthMark);
 
-            if (!removeNames) {
-                const bwMeasureText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                bwMeasureText.setAttribute('x', backWidthPointX + 12);
-                bwMeasureText.setAttribute('y', backLineY - 6);
-                bwMeasureText.setAttribute('font-family', 'Montserrat, sans-serif');
-                bwMeasureText.setAttribute('font-size', '10');
-                bwMeasureText.setAttribute('font-weight', 'bold');
-                bwMeasureText.setAttribute('fill', '#d97706');
-                bwMeasureText.textContent = `Back Width Point (${halfBackWidthVal.toFixed(2)}" + ${backWidthEaseVal.toFixed(3)}" ease)`;
-                bodiceGroup.appendChild(bwMeasureText);
+            if (showLabels) {
+                appendLabel(bodiceGroup, `Back Width Point (${halfBackWidthVal.toFixed(2)}" + ${backWidthEaseVal.toFixed(3)}" ease)`, backWidthPointX + 12, backLineY, '#d97706', '10', 'bold', true);
             }
 
             // 3. From this point, square down to the Bust Line and up to the Shoulder Line This is the Armhole Guide Line.
@@ -1228,16 +1201,8 @@
             armholeGuideLine.setAttribute('stroke-dasharray', '5 3');
             bodiceGroup.appendChild(armholeGuideLine);
 
-            if (!removeNames) {
-                const armholeGuideText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                armholeGuideText.setAttribute('x', backWidthPointX + 12);
-                armholeGuideText.setAttribute('y', backLineY + 20);
-                armholeGuideText.setAttribute('font-family', 'Montserrat, sans-serif');
-                armholeGuideText.setAttribute('font-size', '10');
-                armholeGuideText.setAttribute('font-weight', 'bold');
-                armholeGuideText.setAttribute('fill', '#4f46e5');
-                armholeGuideText.textContent = 'Armhole Guide Line';
-                bodiceGroup.appendChild(armholeGuideText);
+            if (showLabels) {
+                appendLabel(bodiceGroup, 'Armhole Guide Line', backWidthPointX + 12, backLineY + 14, '#4f46e5', '10', 'bold', false);
             }
             // --- END OF NEW SEQUENTIAL ADDITIONS ---
 
@@ -1323,6 +1288,9 @@
                 pantRect.setAttribute('stroke', '#5c524f'); pantRect.setAttribute('stroke-width', '2'); pantRect.setAttribute('stroke-dasharray', '4');
                 pantGroup.appendChild(pantRect);
             }
+
+            // Ensure label opacities are fresh on re-render if checked
+            resetAllLabelsOpacity();
         }
 
         function updateTransform() {
