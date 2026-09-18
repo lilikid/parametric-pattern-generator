@@ -936,6 +936,7 @@
             const bodiceGroup = document.querySelector('#svg-bodice .pattern-group-sub');
             bodiceGroup.innerHTML = '';
             
+            const totalBust = parseFloat(document.getElementById('bust').value) + parseFloat(document.getElementById('bustEase').value);
             const hipVal = parseFloat(document.getElementById('hip').value);
             const hipEaseVal = parseFloat(document.getElementById('hipEase').value);
             const backLengthVal = parseFloat(document.getElementById('backNeckToWaist').value);
@@ -947,9 +948,9 @@
             const canvasBHeight = Math.max(850, bHeight + 150);
             
             initGrids('svg-bodice', canvasBWidth, canvasBHeight);
-            document.getElementById('bodiceTitle').textContent = `Bodice Block (Hip: ${hipVal}" + ${hipEaseVal}" ease)`;
+            document.getElementById('bodiceTitle').textContent = `Bodice Block (Bust: ${totalBust}" | Hip: ${hipVal + hipEaseVal}")`;
 
-            // FIRST STEP: Place Point CB (Center Back) & Point CF (Center Front) Anchor Points
+            // STEP 1: Place Point CB (Center Back) & Point CF (Center Front) Anchor Points at Top Corners
             const pointCB = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             pointCB.setAttribute('cx', 50); pointCB.setAttribute('cy', 50); pointCB.setAttribute('r', 4.5);
             pointCB.setAttribute('fill', '#0047AB');
@@ -976,11 +977,37 @@
             labelCF.textContent = 'CF (Center Front)';
             bodiceGroup.appendChild(labelCF);
 
+
+            // STEP 2: Drawing the Nape Line
+            // Base UK 12 bust is 34.5 (or base 34.5" = 1.0 inch drop). 
+            // Difference from base 34.5 bust, scaled by 3/16" (0.1875") per 2 sizes (approx 2" difference in total bust steps).
+            const baseBustSpec = 34.5;
+            const bustDifference = totalBust - baseBustSpec;
+            // 3/16 inch per 2 sizes translates to 3/32 inch (0.09375") per 1 inch of bust change
+            const napeLineDropInches = 1.0 + (bustDifference * (0.1875 / 2.0));
+            const napeLineY = 50 + (napeLineDropInches * scaleFactor);
+
+            const napeLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            napeLine.setAttribute('x1', 50); napeLine.setAttribute('y1', napeLineY);
+            napeLine.setAttribute('x2', 50 + bWidth); napeLine.setAttribute('y2', napeLineY);
+            napeLine.setAttribute('stroke', '#1f7a8c'); napeLine.setAttribute('stroke-width', '1.5');
+            napeLine.setAttribute('stroke-dasharray', '6 3');
+            bodiceGroup.appendChild(napeLine);
+
+            const napeText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            napeText.setAttribute('x', 60); napeText.setAttribute('y', napeLineY - 6);
+            napeText.setAttribute('font-family', 'Montserrat, sans-serif');
+            napeText.setAttribute('font-size', '11'); napeText.setAttribute('font-weight', '600');
+            napeText.setAttribute('fill', '#1f7a8c');
+            napeText.textContent = `Nape Line (${napeLineDropInches.toFixed(2)}" / ${(napeLineDropInches * 2.54).toFixed(1)}cm down)`;
+            bodiceGroup.appendChild(napeText);
+
+
             // Draw Bodice Pattern Box Frame
             const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
             bodiceRect.setAttribute('x', 50); bodiceRect.setAttribute('y', 50);
             bodiceRect.setAttribute('width', bWidth); bodiceRect.setAttribute('height', bHeight);
-            bodiceRect.setAttribute('fill', 'rgba(194, 94, 111, 0.06)');
+            bodiceRect.setAttribute('fill', 'rgba(194, 94, 111, 0.04)');
             bodiceRect.setAttribute('stroke', '#c25e6f'); bodiceRect.setAttribute('stroke-width', '2'); bodiceRect.setAttribute('stroke-dasharray', '4');
             bodiceGroup.appendChild(bodiceRect);
 
