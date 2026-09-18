@@ -932,7 +932,7 @@
         }
 
         function generatePattern() {
-            // --- 1. BODICE BLOCK ---
+            // --- 1. BODICE BLOCK (CB & CF Anchor Points Established First) ---
             const bodiceGroup = document.querySelector('#svg-bodice .pattern-group-sub');
             bodiceGroup.innerHTML = '';
             
@@ -948,15 +948,8 @@
             
             initGrids('svg-bodice', canvasBWidth, canvasBHeight);
             document.getElementById('bodiceTitle').textContent = `Bodice Block (Hip: ${hipVal}" + ${hipEaseVal}" ease)`;
-            
-            const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            bodiceRect.setAttribute('x', 50); bodiceRect.setAttribute('y', 50);
-            bodiceRect.setAttribute('width', bWidth); bodiceRect.setAttribute('height', bHeight);
-            bodiceRect.setAttribute('fill', 'rgba(194, 94, 111, 0.06)');
-            bodiceRect.setAttribute('stroke', '#c25e6f'); bodiceRect.setAttribute('stroke-width', '2'); bodiceRect.setAttribute('stroke-dasharray', '4');
-            bodiceGroup.appendChild(bodiceRect);
 
-            // CB Corner Point & Label
+            // FIRST STEP: Place Point CB (Center Back) & Point CF (Center Front) Anchor Points
             const pointCB = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             pointCB.setAttribute('cx', 50); pointCB.setAttribute('cy', 50); pointCB.setAttribute('r', 4.5);
             pointCB.setAttribute('fill', '#0047AB');
@@ -970,7 +963,6 @@
             labelCB.textContent = 'CB (Center Back)';
             bodiceGroup.appendChild(labelCB);
 
-            // CF Corner Point & Label
             const pointCF = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             pointCF.setAttribute('cx', 50 + bWidth); pointCF.setAttribute('cy', 50); pointCF.setAttribute('r', 4.5);
             pointCF.setAttribute('fill', '#0047AB');
@@ -983,6 +975,14 @@
             labelCF.setAttribute('fill', '#0047AB');
             labelCF.textContent = 'CF (Center Front)';
             bodiceGroup.appendChild(labelCF);
+
+            // Draw Bodice Pattern Box Frame
+            const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            bodiceRect.setAttribute('x', 50); bodiceRect.setAttribute('y', 50);
+            bodiceRect.setAttribute('width', bWidth); bodiceRect.setAttribute('height', bHeight);
+            bodiceRect.setAttribute('fill', 'rgba(194, 94, 111, 0.06)');
+            bodiceRect.setAttribute('stroke', '#c25e6f'); bodiceRect.setAttribute('stroke-width', '2'); bodiceRect.setAttribute('stroke-dasharray', '4');
+            bodiceGroup.appendChild(bodiceRect);
 
 
             // --- 2. SLEEVE BLOCK ---
