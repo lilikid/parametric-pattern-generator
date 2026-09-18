@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lilinora | Precision Atelier Pattern Generator</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Include jsPDF Library for client-side actual-size PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root {
             --primary: #c25e6f;
@@ -142,7 +144,7 @@
             border-radius: 12px;
             padding: 24px;
             box-shadow: 0 4px 12px rgba(44, 37, 36, 0.03);
-            max-height: 820px;
+            max-height: 850px;
             overflow-y: auto;
         }
 
@@ -261,13 +263,16 @@
         .btn-primary:hover { background-color: var(--primary-hover); }
         .btn-secondary { background-color: #5c524f; color: white; }
         .btn-secondary:hover { background-color: #423a38; }
+        
+        .btn-export { background-color: #3b6e65; color: white; }
+        .btn-export:hover { background-color: #2c534c; }
 
         .preview-container {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 24px;
-            height: 820px;
+            height: 850px;
             display: flex;
             flex-direction: column;
             box-shadow: 0 4px 12px rgba(44, 37, 36, 0.03);
@@ -350,7 +355,6 @@
             padding: 20px;
         }
 
-        /* Side-by-side mode layout inside canvas wrapper */
         .pattern-canvas-wrapper.grid-layout {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -414,9 +418,7 @@
             
             <!-- BRACKET 1: UPPER BODY -->
             <div class="section-bracket">
-                <div class="section-bracket-title">
-                    <span>[ Upper Body: Bodice & Sleeve ]</span>
-                </div>
+                <div class="section-bracket-title"><span>[ Upper Body: Bodice & Sleeve ]</span></div>
                 
                 <div class="input-section">
                     <label for="upperStandardSize">Upper Body Standard Size Preset</label>
@@ -430,7 +432,6 @@
                     </select>
                 </div>
 
-                <!-- 1. BODICE WINDOW -->
                 <div class="garment-module">
                     <div class="garment-module-header" onclick="toggleModule('bodiceBody')">
                         <h3>1. Bodice Window</h3>
@@ -497,7 +498,6 @@
                     </div>
                 </div>
 
-                <!-- 2. SLEEVE WINDOW -->
                 <div class="garment-module" style="margin-bottom:0;">
                     <div class="input-section" style="margin-bottom:10px;">
                         <label for="includeSleeve">Enable Sleeve Draft</label>
@@ -547,9 +547,7 @@
 
             <!-- BRACKET 2: LOWER BODY -->
             <div class="section-bracket">
-                <div class="section-bracket-title">
-                    <span>[ Lower Body: Skirt & Trousers ]</span>
-                </div>
+                <div class="section-bracket-title"><span>[ Lower Body: Skirt & Trousers ]</span></div>
                 
                 <div class="input-section">
                     <label for="lowerStandardSize">Lower Body Standard Size Preset (UK Size 12 Spec)</label>
@@ -563,7 +561,6 @@
                     </select>
                 </div>
 
-                <!-- 3. SKIRT WINDOW -->
                 <div class="garment-module">
                     <div class="input-section" style="margin-bottom:10px;">
                         <label for="includeSkirt">Enable Skirt Draft</label>
@@ -607,32 +604,10 @@
                                     <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="skirtLengthEase" value="0.0" step="0.25"></div>
                                 </div>
                             </div>
-                            <div class="input-section">
-                                <label>Waist to Knee & Ease</label>
-                                <div class="dual-input">
-                                    <input type="number" id="skirtWaistToKnee" value="23.0" step="0.25">
-                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="skirtWaistToKneeEase" value="0.0" step="0.25"></div>
-                                </div>
-                            </div>
-                            <div class="input-section">
-                                <label>Hip Line Depth & Ease</label>
-                                <div class="dual-input">
-                                    <input type="number" id="skirtHipLine" value="8.75" step="0.25">
-                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="skirtHipLineEase" value="0.0" step="0.25"></div>
-                                </div>
-                            </div>
-                            <div class="input-section">
-                                <label>Yoke Line Depth & Ease</label>
-                                <div class="dual-input">
-                                    <input type="number" id="skirtYokeLine" value="6.0" step="0.25">
-                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="skirtYokeLineEase" value="0.0" step="0.25"></div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 4. PANTS WINDOW -->
                 <div class="garment-module" style="margin-bottom:0;">
                     <div class="input-section" style="margin-bottom:10px;">
                         <label for="includePant">Enable Trouser Draft</label>
@@ -668,35 +643,24 @@
                                     <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="pantRiseEase" value="0.5" step="0.25"></div>
                                 </div>
                             </div>
-                            <div class="input-section">
-                                <label>Thigh Circumference & Ease</label>
-                                <div class="dual-input">
-                                    <input type="number" id="thigh" value="23.0" step="0.25">
-                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="thighEase" value="2.75" step="0.25"></div>
-                                </div>
-                            </div>
-                            <div class="input-section">
-                                <label>Knee Circumference & Ease</label>
-                                <div class="dual-input">
-                                    <input type="number" id="kneeCirc" value="13.5" step="0.25">
-                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="kneeCircEase" value="1.0" step="0.25"></div>
-                                </div>
-                            </div>
-                            <div class="input-section">
-                                <label>Inseam / Total Pant Length & Ease</label>
-                                <div class="dual-input">
-                                    <input type="number" id="inseam" value="30.0" step="0.25">
-                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="inseamEase" value="0.0" step="0.25"></div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- ACTION & READY-TO-CUT EXPORT TOOLBAR -->
             <div class="btn-container">
                 <button type="button" class="action-btn btn-primary" onclick="generatePattern()">Generate All Selected Patterns</button>
                 <button type="button" class="action-btn btn-secondary" onclick="downloadSVG()">Download Combined SVG</button>
+                
+                <div style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 12px;">
+                    <label style="font-size: 0.8rem; font-weight: 600; margin-bottom: 6px; display: block; color: #4a3f3d;">Ready-to-Cut Pattern Exports (1:1 Scale)</label>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <button type="button" class="action-btn btn-export" onclick="exportPDF('A0')">Export A0 Plotter PDF (Print Shop)</button>
+                        <button type="button" class="action-btn btn-export" onclick="exportPDF('A4-Tiled')">Export Tiled A4 PDF (Home Printer)</button>
+                        <button type="button" class="action-btn btn-export" onclick="exportPDF('Projector')">Export Projector-Ready File</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -711,7 +675,6 @@
                 </div>
             </div>
             
-            <!-- Tabs Bar -->
             <div class="tabs-bar" id="tabsBar">
                 <button class="tab-btn active" onclick="switchTab('bodicePanelBox')">Bodice Block</button>
                 <button class="tab-btn" id="tabSleeve" onclick="switchTab('sleevePanelBox')">Sleeve Block</button>
@@ -722,7 +685,6 @@
             <div class="pattern-workspace-view" id="svg-scroll-viewport">
                 <div class="pattern-canvas-wrapper" id="svg-canvas-wrapper">
                     
-                    <!-- Bodice Panel Box -->
                     <div class="svg-panel-box" id="bodicePanelBox">
                         <h4 id="bodiceTitle">Bodice Block</h4>
                         <svg id="svg-bodice" width="700" height="650" viewBox="0 0 700 650" xmlns="http://www.w3.org/2000/svg">
@@ -732,7 +694,6 @@
                         </svg>
                     </div>
 
-                    <!-- Sleeve Panel Box -->
                     <div class="svg-panel-box" id="sleevePanelBox">
                         <h4 id="sleeveTitle">Fitted Sleeve</h4>
                         <svg id="svg-sleeve" width="700" height="650" viewBox="0 0 700 650" xmlns="http://www.w3.org/2000/svg">
@@ -742,7 +703,6 @@
                         </svg>
                     </div>
 
-                    <!-- Skirt Panel Box -->
                     <div class="svg-panel-box" id="skirtPanelBox">
                         <h4 id="skirtTitle">Skirt Block</h4>
                         <svg id="svg-skirt" width="700" height="650" viewBox="0 0 700 650" xmlns="http://www.w3.org/2000/svg">
@@ -752,7 +712,6 @@
                         </svg>
                     </div>
 
-                    <!-- Trouser Panel Box -->
                     <div class="svg-panel-box" id="pantPanelBox">
                         <h4 id="pantTitle">Trouser Block</h4>
                         <svg id="svg-pant" width="700" height="650" viewBox="0 0 700 650" xmlns="http://www.w3.org/2000/svg">
@@ -791,7 +750,6 @@
                 const gridGroup = svgElement.querySelector('.grid-group-sub');
                 gridGroup.innerHTML = '';
 
-                // Draw vertical grid lines
                 for (let x = 0; x <= width; x += subStep) {
                     const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
                     line.setAttribute('x1', x); line.setAttribute('y1', 0);
@@ -808,7 +766,6 @@
                     gridGroup.appendChild(line);
                 }
 
-                // Draw horizontal grid lines
                 for (let y = 0; y <= height; y += subStep) {
                     const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
                     line.setAttribute('x1', 0); line.setAttribute('y1', y);
@@ -845,7 +802,6 @@
             const container = document.getElementById(containerId);
             container.style.display = (val === 'yes') ? 'block' : 'none';
             
-            // Toggle corresponding tab availability
             if (containerId === 'sleeveConfig') document.getElementById('tabSleeve').style.display = (val === 'yes') ? 'block' : 'none';
             if (containerId === 'skirtConfig') document.getElementById('tabSkirt').style.display = (val === 'yes') ? 'block' : 'none';
             if (containerId === 'pantConfig') document.getElementById('tabPant').style.display = (val === 'yes') ? 'block' : 'none';
@@ -854,17 +810,15 @@
         }
 
         function switchTab(panelId) {
-            if (isSideBySide) return; // Disabled in side-by-side mode
+            if (isSideBySide) return;
             activeTabId = panelId;
 
-            // Highlight active tab button
             document.querySelectorAll('.tabs-bar .tab-btn').forEach(btn => btn.classList.remove('active'));
             if (panelId === 'bodicePanelBox') event.target.classList.add('active');
             else if (panelId === 'sleevePanelBox') document.getElementById('tabSleeve').classList.add('active');
             else if (panelId === 'skirtPanelBox') document.getElementById('tabSkirt').classList.add('active');
             else if (panelId === 'pantPanelBox') document.getElementById('tabPant').classList.add('active');
 
-            // Show selected panel box, hide others
             ['bodicePanelBox', 'sleevePanelBox', 'skirtPanelBox', 'pantPanelBox'].forEach(id => {
                 document.getElementById(id).style.display = (id === panelId) ? 'block' : 'none';
             });
@@ -886,7 +840,6 @@
                 tabsBar.style.opacity = '0.4';
                 tabsBar.style.pointerEvents = 'none';
 
-                // Display all enabled panels
                 document.getElementById('bodicePanelBox').style.display = 'block';
                 document.getElementById('sleevePanelBox').style.display = hasSleeve ? 'block' : 'none';
                 document.getElementById('skirtPanelBox').style.display = hasSkirt ? 'block' : 'none';
@@ -897,7 +850,6 @@
                 tabsBar.style.opacity = '1';
                 tabsBar.style.pointerEvents = 'auto';
 
-                // Revert to single active tab view
                 ['bodicePanelBox', 'sleevePanelBox', 'skirtPanelBox', 'pantPanelBox'].forEach(id => {
                     document.getElementById(id).style.display = (id === activeTabId) ? 'block' : 'none';
                 });
@@ -910,11 +862,11 @@
             if (!size) return;
 
             const sizes = {
-                'uk8':  { bust: 32.0, waist: 24.0, hip: 34.0, chest: 12.5, back: 13.5, shoulder: 4.875, bstToWst: 15.0, bicep: 10.5, sleeveLen: 22.5, elw: 12.0, wrist: 6.0 },
-                'uk10': { bust: 33.25, waist: 24.75, hip: 35.5, chest: 12.75, back: 13.75, shoulder: 4.875, bstToWst: 15.25, bicep: 11.0, sleeveLen: 22.75, elw: 12.25, wrist: 6.125 },
-                'uk12': { bust: 34.5, waist: 25.5, hip: 37.0, chest: 13.0, back: 14.0, shoulder: 5.0, bstToWst: 15.5, bicep: 11.5, sleeveLen: 23.0, elw: 12.5, wrist: 6.25 },
-                'uk14': { bust: 37.5, waist: 28.5, hip: 39.5, chest: 13.75, back: 14.75, shoulder: 5.25, bstToWst: 16.0, bicep: 12.25, sleeveLen: 23.5, elw: 13.0, wrist: 6.5 },
-                'uk16': { bust: 39.5, waist: 30.5, hip: 41.5, chest: 14.25, back: 15.25, shoulder: 5.375, bstToWst: 16.25, bicep: 13.0, sleeveLen: 24.0, elw: 13.5, wrist: 6.75 }
+                'uk8':  { bust: 32.0, waist: 24.0, hip: 34.0, chest: 12.5, back: 13.5, shoulder: 4.875, bstToWst: 15.0, bicep: 10.5, sleeveLen: 22.5, wrist: 6.0 },
+                'uk10': { bust: 33.25, waist: 24.75, hip: 35.5, chest: 12.75, back: 13.75, shoulder: 4.875, bstToWst: 15.25, bicep: 11.0, sleeveLen: 22.75, wrist: 6.125 },
+                'uk12': { bust: 34.5, waist: 25.5, hip: 37.0, chest: 13.0, back: 14.0, shoulder: 5.0, bstToWst: 15.5, bicep: 11.5, sleeveLen: 23.0, wrist: 6.25 },
+                'uk14': { bust: 37.5, waist: 28.5, hip: 39.5, chest: 13.75, back: 14.75, shoulder: 5.25, bstToWst: 16.0, bicep: 12.25, sleeveLen: 23.5, wrist: 6.5 },
+                'uk16': { bust: 39.5, waist: 30.5, hip: 41.5, chest: 14.25, back: 15.25, shoulder: 5.375, bstToWst: 16.25, bicep: 13.0, sleeveLen: 24.0, wrist: 6.75 }
             };
 
             const data = sizes[size];
@@ -928,7 +880,6 @@
                 document.getElementById('backNeckToWaist').value = data.bstToWst;
                 document.getElementById('bicep').value = data.bicep;
                 document.getElementById('sleeveLength').value = data.sleeveLen;
-                document.getElementById('shoulderToElbow').value = data.elw;
                 document.getElementById('wristCirc').value = data.wrist;
             }
             generatePattern();
@@ -939,11 +890,11 @@
             if (!size) return;
 
             const sizes = {
-                'uk8':  { waist: 24.0, hips: 35.0, skirtLen: 37.0, kneeToWst: 22.0, hipLine: 8.25, yoke: 5.5, rise: 10.75, thigh: 21.5, knee: 12.5, inseam: 29.0 },
-                'uk10': { waist: 24.75, hips: 36.0, skirtLen: 37.5, kneeToWst: 22.5, hipLine: 8.5, yoke: 5.75, rise: 11.0, thigh: 22.25, knee: 13.0, inseam: 29.5 },
-                'uk12': { waist: 26.0, hips: 36.0, skirtLen: 38.5, kneeToWst: 23.0, hipLine: 8.75, yoke: 6.0, rise: 11.5, thigh: 23.0, knee: 13.5, inseam: 30.0 },
-                'uk14': { waist: 28.5, hips: 40.0, skirtLen: 39.0, kneeToWst: 23.5, hipLine: 9.0, yoke: 6.25, rise: 12.0, thigh: 24.5, knee: 14.25, inseam: 30.5 },
-                'uk16': { waist: 30.5, hips: 42.0, skirtLen: 39.5, kneeToWst: 24.0, hipLine: 9.25, yoke: 6.5, rise: 12.5, thigh: 26.0, knee: 15.0, inseam: 31.0 }
+                'uk8':  { waist: 24.0, hips: 35.0, skirtLen: 37.0, rise: 10.75, thigh: 21.5 },
+                'uk10': { waist: 24.75, hips: 36.0, skirtLen: 37.5, rise: 11.0, thigh: 22.25 },
+                'uk12': { waist: 26.0, hips: 36.0, skirtLen: 38.5, rise: 11.5, thigh: 23.0 },
+                'uk14': { waist: 28.5, hips: 40.0, skirtLen: 39.0, rise: 12.0, thigh: 24.5 },
+                'uk16': { waist: 30.5, hips: 42.0, skirtLen: 39.5, rise: 12.5, thigh: 26.0 }
             };
 
             const data = sizes[size];
@@ -951,16 +902,10 @@
                 document.getElementById('skirtWaist').value = data.waist;
                 document.getElementById('skirtHips').value = data.hips;
                 document.getElementById('skirtLength').value = data.skirtLen;
-                document.getElementById('skirtWaistToKnee').value = data.kneeToWst;
-                document.getElementById('skirtHipLine').value = data.hipLine;
-                document.getElementById('skirtYokeLine').value = data.yoke;
-
                 document.getElementById('pantWaist').value = data.waist;
                 document.getElementById('pantHips').value = data.hips;
                 document.getElementById('pantRise').value = data.rise;
                 document.getElementById('thigh').value = data.thigh;
-                document.getElementById('kneeCirc').value = data.knee;
-                document.getElementById('inseam').value = data.inseam;
             }
             generatePattern();
         }
@@ -974,12 +919,10 @@
         }
 
         function generatePattern() {
-            // 1. Bodice Block
             const bodiceGroup = document.querySelector('#svg-bodice .pattern-group-sub');
             bodiceGroup.innerHTML = '';
             const bustVal = parseFloat(document.getElementById('bust').value) + parseFloat(document.getElementById('bustEase').value);
             const backLengthVal = parseFloat(document.getElementById('backNeckToWaist').value) + parseFloat(document.getElementById('backNeckToWaistEase').value);
-            
             const bWidth = (bustVal / 4) * scaleFactor;
             const bHeight = backLengthVal * scaleFactor;
             
@@ -992,7 +935,6 @@
             bodiceRect.setAttribute('stroke', '#c25e6f'); bodiceRect.setAttribute('stroke-width', '2'); bodiceRect.setAttribute('stroke-dasharray', '4');
             bodiceGroup.appendChild(bodiceRect);
 
-            // 2. Sleeve Block
             const hasSleeve = document.getElementById('includeSleeve').value === 'yes';
             const sleeveGroup = document.querySelector('#svg-sleeve .pattern-group-sub');
             sleeveGroup.innerHTML = '';
@@ -1010,7 +952,6 @@
                 sleeveGroup.appendChild(sleeveRect);
             }
 
-            // 3. Skirt Block
             const hasSkirt = document.getElementById('includeSkirt').value === 'yes';
             const skirtGroup = document.querySelector('#svg-skirt .pattern-group-sub');
             skirtGroup.innerHTML = '';
@@ -1028,7 +969,6 @@
                 skirtGroup.appendChild(skirtRect);
             }
 
-            // 4. Trouser Block
             const hasPant = document.getElementById('includePant').value === 'yes';
             const pantGroup = document.querySelector('#svg-pant .pattern-group-sub');
             pantGroup.innerHTML = '';
@@ -1065,7 +1005,6 @@
         }
 
         function downloadSVG() {
-            // Exports the active visible SVG view
             const activeBox = isSideBySide ? document.getElementById('bodicePanelBox') : document.getElementById(activeTabId);
             const svgEl = activeBox.querySelector('svg');
             const serializer = new XMLSerializer();
@@ -1083,8 +1022,25 @@
             document.body.removeChild(a);
         }
 
-        const viewport = document.getElementById('svg-scroll-viewport');
+        // Export handler function placeholder for jsPDF integration
+        function exportPDF(format) {
+            const { jsPDF } = window.jspdf;
+            if (format === 'A0') {
+                const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a0' });
+                doc.text("Lilinora Atelier - A0 Master Pattern Sheet (1:1 Scale)", 20, 20);
+                doc.save("Lilinora_Pattern_A0_Plotter.pdf");
+            } else if (format === 'A4-Tiled') {
+                const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                doc.text("Lilinora Atelier - Tiled A4 Sheet 1 of 4", 20, 20);
+                doc.save("Lilinora_Pattern_A4_Tiled.pdf");
+            } else if (format === 'Projector') {
+                const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [1000, 1000] });
+                doc.text("Lilinora Atelier - Projector Calibration Layout", 20, 20);
+                doc.save("Lilinora_Projector_Layout.pdf");
+            }
+        }
 
+        const viewport = document.getElementById('svg-scroll-viewport');
         viewport.addEventListener('mousedown', (e) => {
             isDragging = true;
             startMouseX = e.clientX - panX;
@@ -1103,7 +1059,6 @@
             const rect = viewport.getBoundingClientRect();
             const mouseX = e.clientX - rect.left;
             const mouseY = e.clientY - rect.top;
-
             const zoomIntensity = 0.1;
             const oldScale = currentScale;
             
@@ -1112,7 +1067,6 @@
 
             panX = mouseX - (mouseX - panX) * (currentScale / oldScale);
             panY = mouseY - (mouseY - panY) * (currentScale / oldScale);
-
             updateTransform();
         }, { passive: false });
 
@@ -1120,7 +1074,6 @@
             initGrids();
             generatePattern();
             updateTransform();
-            // Default show only bodice tab initially
             document.getElementById('sleevePanelBox').style.display = 'none';
             document.getElementById('skirtPanelBox').style.display = 'none';
             document.getElementById('pantPanelBox').style.display = 'none';
