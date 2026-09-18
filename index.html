@@ -1249,7 +1249,6 @@
             const kDistanceInches = parseFloat(document.getElementById('cornerBisectorK').value) || 1.25;
             const kDistancePixels = kDistanceInches * scaleFactor;
             const kAngleRad = Math.PI / 4; // 45 degrees
-            // Flipped to the right side: dx = +cos(45)*dist
             const kTargetX = backWidthPointX + (kDistancePixels * Math.cos(kAngleRad));
             const kTargetY = bustLineY - (kDistancePixels * Math.sin(kAngleRad));
 
@@ -1271,20 +1270,22 @@
             appendLabel(bodiceGroup, `Step 10: Point K (${kDistanceInches.toFixed(3)}" / ${(kDistanceInches * 2.54).toFixed(1)}cm at 45º right)`, kTargetX + 10, kTargetY - 10, '#ea580c', '11', 'bold', true);
 
 
-            // --- STEP 11: Back Shoulder Point ---
-            // From the Back Neck Point draw a line equal to the Shoulder Length measurement plus ⅜" (1cm) to wherever it meets the Shoulder Line. It will be beyond the armhole guide line. Label this the Shoulder Point. Make it bold blue point.
+            // --- STEP 11: Back Shoulder Point & Shoulder Dart ---
             const baseShoulderLen = parseFloat(document.getElementById('shoulderLength').value) || 5.0;
             const shoulderLenEaseVal = parseFloat(document.getElementById('shoulderLengthEase').value) || 0.0;
-            const shoulderPlusAllowanceInches = baseShoulderLen + shoulderLenEaseVal + 0.375; // plus 3/8" (1cm)
-            const shoulderPlusAllowancePixels = shoulderPlusAllowanceInches * scaleFactor;
+            const standardShoulderSpan = baseShoulderLen + shoulderLenEaseVal;
+            
+            // Total span for shoulder seam includes the 1/2" (1cm) dart width
+            const dartWidthInches = 0.5; // 1/2" wide shoulder dart
+            const shoulderPlusDartInches = standardShoulderSpan + dartWidthInches;
+            const shoulderPlusDartPixels = shoulderPlusDartInches * scaleFactor;
 
-            // Compute intersection of arc from Back Neck Point (finalNeckPointX, finalNeckPointY) with radius shoulderPlusAllowancePixels 
-            // intersecting the horizontal Shoulder Line at Y = shoulderLineY
             const dyShoulder = shoulderLineY - finalNeckPointY;
-            const dxShoulderVal = Math.sqrt(Math.max(0, (shoulderPlusAllowancePixels * shoulderPlusAllowancePixels) - (dyShoulder * dyShoulder)));
-            const shoulderPointX = finalNeckPointX + dxShoulderVal; // extending to the right
+            const dxShoulderVal = Math.sqrt(Math.max(0, (shoulderPlusDartPixels * shoulderPlusDartPixels) - (dyShoulder * dyShoulder)));
+            const shoulderPointX = finalNeckPointX + dxShoulderVal;
             const shoulderPointY = shoulderLineY;
 
+            // Draw full base shoulder line before dart inclusion
             const shoulderPointLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             shoulderPointLine.setAttribute('x1', finalNeckPointX); shoulderPointLine.setAttribute('y1', finalNeckPointY);
             shoulderPointLine.setAttribute('x2', shoulderPointX); shoulderPointLine.setAttribute('y2', shoulderPointY);
@@ -1299,7 +1300,80 @@
             shoulderPointCircle.setAttribute('fill', '#0047AB');
             bodiceGroup.appendChild(shoulderPointCircle);
 
-            appendLabel(bodiceGroup, `Step 11: Shoulder Point (${shoulderPlusAllowanceInches.toFixed(3)}" / ${(shoulderPlusAllowanceInches * 2.54).toFixed(1)}cm)`, shoulderPointX + 10, shoulderPointY - 5, '#0047AB', '11', 'bold', true);
+            appendLabel(bodiceGroup, `Step 11: Shoulder Point`, shoulderPointX + 10, shoulderPointY - 5, '#0047AB', '11', 'bold', true);
+
+            // --- STEP 11 Dart Implementation ---
+            // Find the middle of the shoulder line segment (between finalNeckPoint and shoulderPoint)
+            const shoulderMidX = (finalNeckPointX + shoulderPointX) / 2;
+            const shoulderMidY = (finalNeckPointY + shoulderPointY) / 2;
+
+            // Draw a vertical guide line down 2½" (6cm) and measure ⅜" (1cm) to the left
+            const dartGuideDepthInches = 2.5; // 2½" (6cm)
+            const dartGuideDepthPixels = dartGuideDepthInches * scaleFactor;
+            const dartLeftOffsetInches = 0.375; // ⅜" (1cm) to the left
+            const dartLeftOffsetPixels = dartLeftOffsetInches * scaleFactor;
+
+            const dartEndPointX = shoulderMidX - dartLeftOffsetPixels;
+            const dartEndPointY = shoulderMidY + dartGuideDepthPixels;
+
+            // Invisible guide line (or very faint/dashed guide line as requested: "make the line invisible, this line only a guide")
+            const dartGuideLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            dartGuideLine.setAttribute('x1', shoulderMidX); dartGuideLine.setAttribute('y1', shoulderMidY);
+            dartGuideLine.setAttribute('x2', dartEndPointX); dartGuideLine.setAttribute('y2', dartEndPointY);
+            dartGuideLine.setAttribute('stroke', 'transparent'); // Make line invisible as instructed
+            dartGuideLine.setAttribute('stroke-width', '1');
+            bodiceGroup.appendChild(dartGuideLine);
+
+            // Back shoulder dart point: bold red point
+            const dartPointCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            dartPointCircle.setAttribute('cx', dartEndPointX);
+            dartPointCircle.setAttribute('cy', dartEndPointY);
+            dartPointCircle.setAttribute('r', '5.5');
+            dartPointCircle.setAttribute('fill', '#dc2626'); // Red
+            bodiceGroup.appendChild(dartPointCircle);
+
+            appendLabel(bodiceGroup, 'Back shoulder dart point', dartEndPointX + 10, dartEndPointY, '#dc2626', '11', 'bold', true);
+
+            // Dotted thin line back up to the shoulder mid point (dart centre line)
+            const dartCentreLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            dartCentreLine.setAttribute('x1', dartEndPointX); dartCentreLine.setAttribute('y1', dartEndPointY);
+            dartCentreLine.setAttribute('x2', shoulderMidX); dartCentreLine.setAttribute('y2', shoulderMidY);
+            dartCentreLine.setAttribute('stroke', '#dc2626');
+            dartCentreLine.setAttribute('stroke-width', '1');
+            dartCentreLine.setAttribute('stroke-dasharray', '2 2');
+            bodiceGroup.appendChild(dartCentreLine);
+
+            // Draw the dart lines from the back shoulder dart point up to the shoulder line seam ¼" (0.5cm) either side of the mid point
+            const halfDartWidthInches = 0.25; // ¼" (0.5cm) either side giving ½" (1cm) wide shoulder dart
+            const halfDartWidthPixels = halfDartWidthInches * scaleFactor;
+
+            // Vector along the shoulder line to calculate orthogonal offsets or simple horizontal offsets along shoulder slope
+            const shoulderVectorLen = Math.sqrt(Math.pow(shoulderPointX - finalNeckPointX, 2) + Math.pow(shoulderPointY - finalNeckPointY, 2));
+            const unitDirX = (shoulderPointX - finalNeckPointX) / shoulderVectorLen;
+            const unitDirY = (shoulderPointY - finalNeckPointY) / shoulderVectorLen;
+
+            const shoulderDartLeftX = shoulderMidX - (unitDirX * halfDartWidthPixels);
+            const shoulderDartLeftY = shoulderMidY - (unitDirY * halfDartWidthPixels);
+            const shoulderDartRightX = shoulderMidX + (unitDirX * halfDartWidthPixels);
+            const shoulderDartRightY = shoulderMidY + (unitDirY * halfDartWidthPixels);
+
+            // Left leg of dart
+            const dartLeg1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            dartLeg1.setAttribute('x1', dartEndPointX); dartLeg1.setAttribute('y1', dartEndPointY);
+            dartLeg1.setAttribute('x2', shoulderDartLeftX); dartLeg1.setAttribute('y2', shoulderDartLeftY);
+            dartLeg1.setAttribute('stroke', '#dc2626');
+            dartLeg1.setAttribute('stroke-width', '1.5');
+            bodiceGroup.appendChild(dartLeg1);
+
+            // Right leg of dart
+            const dartLeg2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            dartLeg2.setAttribute('x1', dartEndPointX); dartLeg2.setAttribute('y1', dartEndPointY);
+            dartLeg2.setAttribute('x2', shoulderDartRightX); dartLeg2.setAttribute('y2', shoulderDartRightY);
+            dartLeg2.setAttribute('stroke', '#dc2626');
+            dartLeg2.setAttribute('stroke-width', '1.5');
+            bodiceGroup.appendChild(dartLeg2);
+
+            appendLabel(bodiceGroup, 'Shoulder Dart (½" / 1cm wide)', shoulderMidX, shoulderMidY - 18, '#dc2626', '10', 'bold', true);
 
 
             // Draw Bodice Pattern Box Frame
