@@ -1022,6 +1022,36 @@
             bodiceGroup.appendChild(bustText);
 
 
+            // STEP 4: Calculate Back Neck Width & Draw along Nape Line from CB
+            // Divide Bust measurement by 8, add 1 1/4" (3cm), and halve the result for the Back Neck Width.
+            const backNeckWidth = ((totalBust / 8.0) + 1.25) / 2.0;
+            const backNeckWidthPixels = backNeckWidth * scaleFactor;
+
+            const neckWidthLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            neckWidthLine.setAttribute('x1', 50); neckWidthLine.setAttribute('y1', napeLineY);
+            neckWidthLine.setAttribute('x2', 50 + backNeckWidthPixels); neckWidthLine.setAttribute('y2', napeLineY);
+            neckWidthLine.setAttribute('stroke', '#8b5cf6');
+            neckWidthLine.setAttribute('stroke-width', '2.5');
+            bodiceGroup.appendChild(neckWidthLine);
+
+            const neckPointCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            neckPointCircle.setAttribute('cx', 50 + backNeckWidthPixels);
+            neckPointCircle.setAttribute('cy', napeLineY);
+            neckPointCircle.setAttribute('r', '4.5');
+            neckPointCircle.setAttribute('fill', '#8b5cf6');
+            bodiceGroup.appendChild(neckPointCircle);
+
+            const neckWidthText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            neckWidthText.setAttribute('x', 50 + backNeckWidthPixels - 10);
+            neckWidthText.setAttribute('y', napeLineY - 10);
+            neckWidthText.setAttribute('font-family', 'Montserrat, sans-serif');
+            neckWidthText.setAttribute('font-size', '11');
+            neckWidthText.setAttribute('font-weight', 'bold');
+            neckWidthText.setAttribute('fill', '#8b5cf6');
+            neckWidthText.textContent = `Point Back Neck Width (${backNeckWidth.toFixed(2)}" / ${(backNeckWidth * 2.54).toFixed(1)}cm)`;
+            bodiceGroup.appendChild(neckWidthText);
+
+
             // Draw Bodice Pattern Box Frame
             const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
             bodiceRect.setAttribute('x', 50); bodiceRect.setAttribute('y', 50);
