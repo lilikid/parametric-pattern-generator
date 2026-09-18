@@ -470,6 +470,13 @@
                             </div>
                         </div>
                         <div class="input-section">
+                            <label>Half Back Waist Measurement</label>
+                            <div class="dual-input">
+                                <input type="number" id="halfBackWaist" value="15.5" step="0.25">
+                                <div class="input-with-label"><span class="input-label-tag">Length</span><span style="font-size:0.75rem; color:#7a6f6d;">Vertical</span></div>
+                            </div>
+                        </div>
+                        <div class="input-section">
                             <label>Chest Width (Front) & Ease</label>
                             <div class="dual-input">
                                 <input type="number" id="chestWidth" value="13.0" step="0.25">
@@ -874,11 +881,11 @@
             if (!size) return;
 
             const sizes = {
-                'uk8':  { bust: 32.0, waist: 24.0, hip: 34.0, chest: 12.5, back: 13.5, shoulder: 4.875, bstToWst: 15.0, bicep: 10.5, sleeveLen: 22.5, wrist: 6.0 },
-                'uk10': { bust: 33.25, waist: 24.75, hip: 35.5, chest: 12.75, back: 13.75, shoulder: 4.875, bstToWst: 15.25, bicep: 11.0, sleeveLen: 22.75, wrist: 6.125 },
-                'uk12': { bust: 34.5, waist: 25.5, hip: 37.0, chest: 13.0, back: 14.0, shoulder: 5.0, bstToWst: 15.5, bicep: 11.5, sleeveLen: 23.0, wrist: 6.25 },
-                'uk14': { bust: 37.5, waist: 28.5, hip: 39.5, chest: 13.75, back: 14.75, shoulder: 5.25, bstToWst: 16.0, bicep: 12.25, sleeveLen: 23.5, wrist: 6.5 },
-                'uk16': { bust: 39.5, waist: 30.5, hip: 41.5, chest: 14.25, back: 15.25, shoulder: 5.375, bstToWst: 16.25, bicep: 13.0, sleeveLen: 24.0, wrist: 6.75 }
+                'uk8':  { bust: 32.0, waist: 24.0, hip: 34.0, chest: 12.5, back: 13.5, shoulder: 4.875, bstToWst: 15.0, halfBack: 15.0, bicep: 10.5, sleeveLen: 22.5, wrist: 6.0 },
+                'uk10': { bust: 33.25, waist: 24.75, hip: 35.5, chest: 12.75, back: 13.75, shoulder: 4.875, bstToWst: 15.25, halfBack: 15.25, bicep: 11.0, sleeveLen: 22.75, wrist: 6.125 },
+                'uk12': { bust: 34.5, waist: 25.5, hip: 37.0, chest: 13.0, back: 14.0, shoulder: 5.0, bstToWst: 15.5, halfBack: 15.5, bicep: 11.5, sleeveLen: 23.0, wrist: 6.25 },
+                'uk14': { bust: 37.5, waist: 28.5, hip: 39.5, chest: 13.75, back: 14.75, shoulder: 5.25, bstToWst: 16.0, halfBack: 16.0, bicep: 12.25, sleeveLen: 23.5, wrist: 6.5 },
+                'uk16': { bust: 39.5, waist: 30.5, hip: 41.5, chest: 14.25, back: 15.25, shoulder: 5.375, bstToWst: 16.25, halfBack: 16.25, bicep: 13.0, sleeveLen: 24.0, wrist: 6.75 }
             };
 
             const data = sizes[size];
@@ -886,6 +893,7 @@
                 document.getElementById('bust').value = data.bust;
                 document.getElementById('waist').value = data.waist;
                 document.getElementById('hip').value = data.hip;
+                document.getElementById('halfBackWaist').value = data.halfBack;
                 document.getElementById('chestWidth').value = data.chest;
                 document.getElementById('backWidth').value = data.back;
                 document.getElementById('shoulderLength').value = data.shoulder;
@@ -941,6 +949,7 @@
             const hipEaseVal = parseFloat(document.getElementById('hipEase').value);
             const backLengthVal = parseFloat(document.getElementById('backNeckToWaist').value);
             const waistToHipVal = parseFloat(document.getElementById('waistToHip').value);
+            const halfBackWaistVal = parseFloat(document.getElementById('halfBackWaist').value);
 
             const bWidth = (((hipVal + hipEaseVal) / 2) + 4.0) * scaleFactor;
             const bHeight = (backLengthVal + waistToHipVal + 5.0) * scaleFactor;
@@ -979,11 +988,8 @@
 
 
             // STEP 2: Drawing the Nape Line
-            // Base UK 12 bust is 34.5 (or base 34.5" = 1.0 inch drop). 
-            // Difference from base 34.5 bust, scaled by 3/16" (0.1875") per 2 sizes (approx 2" difference in total bust steps).
             const baseBustSpec = 34.5;
             const bustDifference = totalBust - baseBustSpec;
-            // 3/16 inch per 2 sizes translates to 3/32 inch (0.09375") per 1 inch of bust change
             const napeLineDropInches = 1.0 + (bustDifference * (0.1875 / 2.0));
             const napeLineY = 50 + (napeLineDropInches * scaleFactor);
 
@@ -1001,6 +1007,28 @@
             napeText.setAttribute('fill', '#1f7a8c');
             napeText.textContent = `Nape Line (${napeLineDropInches.toFixed(2)}" / ${(napeLineDropInches * 2.54).toFixed(1)}cm down)`;
             bodiceGroup.appendChild(napeText);
+
+
+            // STEP 3: Drawing the Bust Line (measuring down from the Nape the half Back Waist measurement plus 3/8" [1cm], and for Bust over 40" [100cm], add 5/8" [1.5cm] instead. Dotted and thin).
+            let bustAdd = (totalBust > 40) ? (5 / 8) : (3 / 8);
+            let bustLineDistance = halfBackWaistVal + bustAdd;
+            let bustLineY = napeLineY + (bustLineDistance * scaleFactor);
+
+            const bustLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            bustLine.setAttribute('x1', 50); bustLine.setAttribute('y1', bustLineY);
+            bustLine.setAttribute('x2', 50 + bWidth); bustLine.setAttribute('y2', bustLineY);
+            bustLine.setAttribute('stroke', '#c25e6f'); 
+            bustLine.setAttribute('stroke-width', '0.8'); 
+            bustLine.setAttribute('stroke-dasharray', '2 2');
+            bodiceGroup.appendChild(bustLine);
+
+            const bustLineText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            bustLineText.setAttribute('x', 60); bustLineText.setAttribute('y', bustLineY - 5);
+            bustLineText.setAttribute('font-family', 'Montserrat, sans-serif');
+            bustLineText.setAttribute('font-size', '11'); bustLineText.setAttribute('font-weight', '600');
+            bustLineText.setAttribute('fill', '#c25e6f');
+            bustLineText.textContent = `Bust Line (+${bustLineDistance.toFixed(3)}" from Nape)`;
+            bodiceGroup.appendChild(bustLineText);
 
 
             // Draw Bodice Pattern Box Frame
