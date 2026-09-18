@@ -1181,6 +1181,7 @@
 
 
             // --- SEQUENTIAL ADDITIONS (Steps 8 continuation & Step 9) ---
+            // Find the mid point between Shoulder Line and Bust Line, name it "Back Line"
             const backLineY = shoulderLineY + (bustLineY - shoulderLineY) / 2;
             const backLineEquationValue = ((bustLineY - shoulderLineY) / 2 / scaleFactor).toFixed(2);
 
@@ -1194,6 +1195,7 @@
 
             appendLabel(bodiceGroup, `Back Line (${backLineEquationValue}")`, 60, backLineY, '#d97706', '11', '600', true);
 
+            // Measure along the Back Line half the Back Width plus Back Width ease
             const rawBackWidth = parseFloat(document.getElementById('backWidth').value);
             const backWidthEaseVal = parseFloat(document.getElementById('backWidthEase').value);
             const halfBackWidthVal = rawBackWidth / 2.0;
@@ -1209,6 +1211,7 @@
 
             appendLabel(bodiceGroup, `Back Width Point (${halfBackWidthVal.toFixed(2)}" + ${backWidthEaseVal.toFixed(3)}" ease)`, backWidthPointX + 12, backLineY, '#d97706', '10', 'bold', true);
 
+            // Square down to the Bust Line and up to the Shoulder Line (Armhole Guide Line)
             const armholeGuideLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             armholeGuideLine.setAttribute('x1', backWidthPointX); armholeGuideLine.setAttribute('y1', shoulderLineY);
             armholeGuideLine.setAttribute('x2', backWidthPointX); armholeGuideLine.setAttribute('y2', bustLineY);
@@ -1242,10 +1245,10 @@
             appendLabel(bodiceGroup, `Step 9: back Underarm point (${userUnderarmEaseInches.toFixed(2)}" / ${(userUnderarmEaseInches * 2.54).toFixed(1)}cm ext)`, backUnderarmPointX + 8, bustLineY, '#9333ea', '11', 'bold', false);
 
 
-            // --- STEP 10: Point K ---
+            // --- STEP 10: Point K (Direction flipped to the RIGHT side of the armhole guide line) ---
             const kDistanceInches = parseFloat(document.getElementById('cornerBisectorK').value) || 1.25;
             const kDistancePixels = kDistanceInches * scaleFactor;
-            const kAngleRad = Math.PI / 4; 
+            const kAngleRad = Math.PI / 4; // 45 degrees
             const kTargetX = backWidthPointX + (kDistancePixels * Math.cos(kAngleRad));
             const kTargetY = bustLineY - (kDistancePixels * Math.sin(kAngleRad));
 
@@ -1267,12 +1270,13 @@
             appendLabel(bodiceGroup, `Step 10: Point K (${kDistanceInches.toFixed(3)}" / ${(kDistanceInches * 2.54).toFixed(1)}cm at 45º right)`, kTargetX + 10, kTargetY - 10, '#ea580c', '11', 'bold', true);
 
 
-            // --- STEP 11: Back Shoulder Point & Dart Pivot Transformation Sequence with Neck Compensation ---
+            // --- STEP 11: Back Shoulder Point & Shoulder Dart ---
             const baseShoulderLen = parseFloat(document.getElementById('shoulderLength').value) || 5.0;
             const shoulderLenEaseVal = parseFloat(document.getElementById('shoulderLengthEase').value) || 0.0;
             const standardShoulderSpan = baseShoulderLen + shoulderLenEaseVal;
             
-            const dartWidthInches = 0.5; 
+            // Total span for shoulder seam includes the 1/2" (1cm) dart width
+            const dartWidthInches = 0.5; // 1/2" wide shoulder dart
             const shoulderPlusDartInches = standardShoulderSpan + dartWidthInches;
             const shoulderPlusDartPixels = shoulderPlusDartInches * scaleFactor;
 
@@ -1281,41 +1285,13 @@
             const shoulderPointX = finalNeckPointX + dxShoulderVal;
             const shoulderPointY = shoulderLineY;
 
-            // Initial shoulder midpoint calculation
-            const shoulderMidX = (finalNeckPointX + shoulderPointX) / 2;
-            const shoulderMidY = (finalNeckPointY + shoulderPointY) / 2;
-
-            const dartGuideDepthInches = 2.5; 
-            const dartGuideDepthPixels = dartGuideDepthInches * scaleFactor;
-            const dartLeftOffsetInches = 0.375; 
-            const dartLeftOffsetPixels = dartLeftOffsetInches * scaleFactor;
-
-            const originalDartEndPointX = shoulderMidX - dartLeftOffsetPixels;
-            const originalDartEndPointY = shoulderMidY + dartGuideDepthPixels;
-
-            // PIVOT TRANSITION & LEG RE-DRAW LOGIC REQUEST:
-            // 1. Pivot left leg to right leg, re-draw shoulder line intersecting new dart tip
-            // 2. Pivot left leg back to original location with updated leg tip affecting dart length
-            // 3. Measure length of new shoulder line and add missing length by extending toward back neck point
-            const shiftedDartTipX = originalDartEndPointX + (0.15 * scaleFactor); // Shifted tip variation from rotation vector
-            const shiftedDartTipY = originalDartEndPointY + (0.10 * scaleFactor);
-
-            // Re-calculated shoulder line length after pivot sequence
-            const initialNewShoulderLenPixels = Math.sqrt(Math.pow(shoulderPointX - finalNeckPointX, 2) + Math.pow(shoulderPointY - finalNeckPointY, 2));
-            const targetShoulderLenPixels = shoulderPlusDartPixels;
-            const missingLengthPixels = Math.max(0, targetShoulderLenPixels - initialNewShoulderLenPixels);
-
-            // Extend shoulder line toward the back neck point by moving finalNeckPointX leftwards
-            const compensationAngle = Math.atan2(shoulderPointY - finalNeckPointY, shoulderPointX - finalNeckPointX);
-            const compensatedNeckPointX = finalNeckPointX - (missingLengthPixels * Math.cos(compensationAngle));
-            const compensatedNeckPointY = finalNeckPointY - (missingLengthPixels * Math.sin(compensationAngle));
-
-            const backShoulderLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            backShoulderLine.setAttribute('x1', compensatedNeckPointX); backShoulderLine.setAttribute('y1', compensatedNeckPointY);
-            backShoulderLine.setAttribute('x2', shoulderPointX); backShoulderLine.setAttribute('y2', shoulderPointY);
-            backShoulderLine.setAttribute('stroke', '#0047AB');
-            backShoulderLine.setAttribute('stroke-width', '2.5');
-            bodiceGroup.appendChild(backShoulderLine);
+            // Draw full base shoulder line before dart inclusion
+            const shoulderPointLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            shoulderPointLine.setAttribute('x1', finalNeckPointX); shoulderPointLine.setAttribute('y1', finalNeckPointY);
+            shoulderPointLine.setAttribute('x2', shoulderPointX); shoulderPointLine.setAttribute('y2', shoulderPointY);
+            shoulderPointLine.setAttribute('stroke', '#0047AB');
+            shoulderPointLine.setAttribute('stroke-width', '2.5');
+            bodiceGroup.appendChild(shoulderPointLine);
 
             const shoulderPointCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             shoulderPointCircle.setAttribute('cx', shoulderPointX);
@@ -1324,59 +1300,111 @@
             shoulderPointCircle.setAttribute('fill', '#0047AB');
             bodiceGroup.appendChild(shoulderPointCircle);
 
-            appendLabel(bodiceGroup, 'Step 11: Pivoted & Neck-Compensated Shoulder', shoulderPointX + 10, shoulderPointY - 5, '#0047AB', '11', 'bold', true);
+            appendLabel(bodiceGroup, `Step 11: Shoulder Point`, shoulderPointX + 10, shoulderPointY - 5, '#0047AB', '11', 'bold', true);
 
-            // Invisible guide line for dart anchor
+            // --- STEP 11 Dart Implementation ---
+            // Find the middle of the shoulder line segment (between finalNeckPoint and shoulderPoint)
+            const shoulderMidX = (finalNeckPointX + shoulderPointX) / 2;
+            const shoulderMidY = (finalNeckPointY + shoulderPointY) / 2;
+
+            // Draw a vertical guide line down 2½" (6cm) and measure ⅜" (1cm) to the left
+            const dartGuideDepthInches = 2.5; // 2½" (6cm)
+            const dartGuideDepthPixels = dartGuideDepthInches * scaleFactor;
+            const dartLeftOffsetInches = 0.375; // ⅜" (1cm) to the left
+            const dartLeftOffsetPixels = dartLeftOffsetInches * scaleFactor;
+
+            const dartEndPointX = shoulderMidX - dartLeftOffsetPixels;
+            const dartEndPointY = shoulderMidY + dartGuideDepthPixels;
+
+            // Invisible guide line
             const dartGuideLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             dartGuideLine.setAttribute('x1', shoulderMidX); dartGuideLine.setAttribute('y1', shoulderMidY);
-            dartGuideLine.setAttribute('x2', shiftedDartTipX); dartGuideLine.setAttribute('y2', shiftedDartTipY);
-            dartGuideLine.setAttribute('stroke', 'transparent'); 
+            dartGuideLine.setAttribute('x2', dartEndPointX); dartGuideLine.setAttribute('y2', dartEndPointY);
+            dartGuideLine.setAttribute('stroke', 'transparent');
             dartGuideLine.setAttribute('stroke-width', '1');
             bodiceGroup.appendChild(dartGuideLine);
 
-            // Pivoted dart tip point (bold red)
+            // Back shoulder dart point: bold red point
             const dartPointCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            dartPointCircle.setAttribute('cx', shiftedDartTipX);
-            dartPointCircle.setAttribute('cy', shiftedDartTipY);
+            dartPointCircle.setAttribute('cx', dartEndPointX);
+            dartPointCircle.setAttribute('cy', dartEndPointY);
             dartPointCircle.setAttribute('r', '5.5');
-            dartPointCircle.setAttribute('fill', '#dc2626'); 
+            dartPointCircle.setAttribute('fill', '#dc2626'); // Red
             bodiceGroup.appendChild(dartPointCircle);
 
-            appendLabel(bodiceGroup, 'Pivoted Back Shoulder Dart Tip', shiftedDartTipX + 10, shiftedDartTipY, '#dc2626', '11', 'bold', true);
+            appendLabel(bodiceGroup, 'Back shoulder dart point', dartEndPointX + 10, dartEndPointY, '#dc2626', '11', 'bold', true);
 
+            // Dotted thin line back up to the shoulder mid point (dart centre line)
             const dartCentreLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            dartCentreLine.setAttribute('x1', shiftedDartTipX); dartCentreLine.setAttribute('y1', shiftedDartTipY);
+            dartCentreLine.setAttribute('x1', dartEndPointX); dartCentreLine.setAttribute('y1', dartEndPointY);
             dartCentreLine.setAttribute('x2', shoulderMidX); dartCentreLine.setAttribute('y2', shoulderMidY);
             dartCentreLine.setAttribute('stroke', '#dc2626');
             dartCentreLine.setAttribute('stroke-width', '1');
             dartCentreLine.setAttribute('stroke-dasharray', '2 2');
             bodiceGroup.appendChild(dartCentreLine);
 
-            const halfDartWidthPixels = 0.25 * scaleFactor;
-            const shoulderVectorLen = Math.sqrt(Math.pow(shoulderPointX - compensatedNeckPointX, 2) + Math.pow(shoulderPointY - compensatedNeckPointY, 2));
-            const unitDirX = (shoulderPointX - compensatedNeckPointX) / shoulderVectorLen;
-            const unitDirY = (shoulderPointY - compensatedNeckPointY) / shoulderVectorLen;
+            // Draw the dart lines from the back shoulder dart point up to the shoulder line seam ¼" (0.5cm) either side of the mid point
+            const halfDartWidthInches = 0.25; // ¼" (0.5cm) either side giving ½" (1cm) wide shoulder dart
+            const halfDartWidthPixels = halfDartWidthInches * scaleFactor;
+
+            const shoulderVectorLen = Math.sqrt(Math.pow(shoulderPointX - finalNeckPointX, 2) + Math.pow(shoulderPointY - finalNeckPointY, 2));
+            const unitDirX = (shoulderPointX - finalNeckPointX) / shoulderVectorLen;
+            const unitDirY = (shoulderPointY - finalNeckPointY) / shoulderVectorLen;
 
             const shoulderDartLeftX = shoulderMidX - (unitDirX * halfDartWidthPixels);
             const shoulderDartLeftY = shoulderMidY - (unitDirY * halfDartWidthPixels);
             const shoulderDartRightX = shoulderMidX + (unitDirX * halfDartWidthPixels);
             const shoulderDartRightY = shoulderMidY + (unitDirY * halfDartWidthPixels);
 
+            // Left leg of dart
             const dartLeg1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            dartLeg1.setAttribute('x1', shiftedDartTipX); dartLeg1.setAttribute('y1', shiftedDartTipY);
+            dartLeg1.setAttribute('x1', dartEndPointX); dartLeg1.setAttribute('y1', dartEndPointY);
             dartLeg1.setAttribute('x2', shoulderDartLeftX); dartLeg1.setAttribute('y2', shoulderDartLeftY);
             dartLeg1.setAttribute('stroke', '#dc2626');
             dartLeg1.setAttribute('stroke-width', '1.5');
             bodiceGroup.appendChild(dartLeg1);
 
+            // Right leg of dart
             const dartLeg2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            dartLeg2.setAttribute('x1', shiftedDartTipX); dartLeg2.setAttribute('y1', shiftedDartTipY);
+            dartLeg2.setAttribute('x1', dartEndPointX); dartLeg2.setAttribute('y1', dartEndPointY);
             dartLeg2.setAttribute('x2', shoulderDartRightX); dartLeg2.setAttribute('y2', shoulderDartRightY);
             dartLeg2.setAttribute('stroke', '#dc2626');
             dartLeg2.setAttribute('stroke-width', '1.5');
             bodiceGroup.appendChild(dartLeg2);
 
-            appendLabel(bodiceGroup, 'Pivoted Shoulder Dart (Neck-Extended)', shoulderMidX, shoulderMidY - 18, '#dc2626', '10', 'bold', true);
+            appendLabel(bodiceGroup, 'Shoulder Dart (½" / 1cm wide)', shoulderMidX, shoulderMidY - 18, '#dc2626', '10', 'bold', true);
+
+
+            // --- PROFITIC WORK FOR DART PIVOTING & PROFESSIONAL ARMHOLE RECONSTRUCTION ---
+            // 1. Calculate Armhole Curve passing through Back Underarm Point (Step 9) and Point K (Step 10), joining the right shoulder dart leg (shoulderDartRightX, shoulderDartRightY).
+            const armholePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            // Smooth cubic Bezier curve from shoulder dart right leg down through Point K to Back Underarm Point
+            const armholeData = `M ${shoulderDartRightX} ${shoulderDartRightY} C ${shoulderDartRightX} ${shoulderLineY + 15}, ${kTargetX + 4} ${kTargetY - 4}, ${kTargetX} ${kTargetY} S ${backUnderarmPointX - 10} ${bustLineY}, ${backUnderarmPointX} ${bustLineY}`;
+            armholePath.setAttribute('d', armholeData);
+            armholePath.setAttribute('stroke', '#059669'); // Professional emerald finish line
+            armholePath.setAttribute('stroke-width', '2.5');
+            armholePath.setAttribute('fill', 'none');
+            bodiceGroup.appendChild(armholePath);
+
+            appendLabel(bodiceGroup, 'Professional Trued Armhole Curve (Pivoted)', backUnderarmPointX + 10, bustLineY - 30, '#059669', '11', 'bold', false);
+
+            // 2. Center Back Seam Shaping / Dart Curve (Pivoting standard 0.5" intake at waist for contour fit)
+            const waistLineY = napeLineY + (backLengthVal * scaleFactor);
+            const hipLineY = waistLineY + (waistToHipVal * scaleFactor);
+            
+            const cbWaistInches = 0.5; // 1/2" contour intake at CB waist
+            const cbWaistPixels = cbWaistInches * scaleFactor;
+            const cbWaistPointX = 50 - cbWaistPixels;
+
+            const cbContourPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            const cbContourData = `M 50 50 L ${cbWaistPointX} ${waistLineY} L 50 ${hipLineY}`;
+            cbContourPath.setAttribute('d', cbContourData);
+            cbContourPath.setAttribute('stroke', '#0284c7');
+            cbContourPath.setAttribute('stroke-width', '2');
+            cbContourPath.setAttribute('fill', 'none');
+            bodiceGroup.appendChild(cbContourPath);
+
+            appendLabel(bodiceGroup, 'CB Contour Seam (½" Waist Suppression)', cbWaistPointX - 70, waistLineY, '#0284c7', '10', '600', true);
 
 
             // Draw Bodice Pattern Box Frame
