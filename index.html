@@ -38,6 +38,8 @@
             border-radius: 12px;
             border: 1px solid var(--border-color);
             box-shadow: 0 4px 12px rgba(44, 37, 36, 0.03);
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .brand-container { display: flex; align-items: center; gap: 16px; }
@@ -71,6 +73,13 @@
             font-weight: 500;
         }
 
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
         .unit-selector {
             display: flex;
             background: #f0ebe8;
@@ -94,6 +103,24 @@
             background: white;
             color: var(--primary);
             box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+        }
+
+        .side-by-side-toggle {
+            background: #f8f6f5;
+            border: 1px solid var(--border-color);
+            padding: 7px 14px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px;
+            color: #4a3f3d;
+            transition: all 0.2s;
+        }
+
+        .side-by-side-toggle.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
         }
 
         .workspace {
@@ -250,9 +277,36 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             padding-bottom: 10px;
             border-bottom: 1px solid #f0ebe8;
+        }
+
+        /* Tabs Navigation Bar */
+        .tabs-bar {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .tab-btn {
+            background: #f8f6f5;
+            border: 1px solid var(--border-color);
+            padding: 6px 14px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px;
+            color: #7a6f6d;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
         }
 
         .zoom-controls { display: flex; gap: 6px; align-items: center; }
@@ -273,7 +327,8 @@
 
         .zoom-btn:hover { background: #f0ebe8; }
 
-        #svg-scroll-viewport {
+        /* Pattern display viewport area */
+        .pattern-workspace-view {
             width: 100%;
             flex-grow: 1;
             overflow: hidden;
@@ -284,12 +339,44 @@
             cursor: grab;
         }
 
-        #svg-scroll-viewport:active { cursor: grabbing; }
+        .pattern-workspace-view:active { cursor: grabbing; }
 
-        #svg-canvas-wrapper {
+        .pattern-canvas-wrapper {
             position: absolute;
             transform-origin: 0 0;
             will-change: transform;
+            display: flex;
+            gap: 40px;
+            padding: 20px;
+        }
+
+        /* Side-by-side mode layout inside canvas wrapper */
+        .pattern-canvas-wrapper.grid-layout {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+
+        .svg-panel-box {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .svg-panel-box h4 {
+            font-family: var(--heading-font);
+            font-size: 0.9rem;
+            color: #4a3f3d;
+            margin-bottom: 8px;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 4px;
+        }
+
+        svg {
+            background: #ffffff;
+            display: block;
         }
 
         .grid-line-sub { stroke: #f0ecea; stroke-width: 0.5; vector-effect: non-scaling-stroke; }
@@ -311,9 +398,12 @@
                 <p>Precision Atelier Pattern Generator</p>
             </div>
         </div>
-        <div class="unit-selector">
-            <button class="unit-btn active" id="unit-in" onclick="setUnit('in')">Inches (in)</button>
-            <button class="unit-btn" id="unit-cm" onclick="setUnit('cm')">Centimeters (cm)</button>
+        <div class="header-controls">
+            <button class="side-by-side-toggle" id="sideBySideToggleBtn" onclick="toggleSideBySideMode()">Show Side-by-Side</button>
+            <div class="unit-selector">
+                <button class="unit-btn active" id="unit-in" onclick="setUnit('in')">Inches (in)</button>
+                <button class="unit-btn" id="unit-cm" onclick="setUnit('cm')">Centimeters (cm)</button>
+            </div>
         </div>
     </header>
 
@@ -613,7 +703,7 @@
         <!-- Preview Canvas -->
         <div class="preview-container">
             <div class="preview-toolbar">
-                <span id="current-unit-label" style="font-size: 0.85rem; font-weight:600; color:#4a3f3d;">Grid Unit: 1 Inch</span>
+                <span id="current-unit-label" style="font-size: 0.85rem; font-weight:600; color:#4a3f3d;">Grid Unit: 1 Inch (0.5" Subdivisions)</span>
                 <div class="zoom-controls">
                     <button class="zoom-btn" onclick="adjustZoom(-0.15)" title="Zoom Out">-</button>
                     <button class="zoom-btn" onclick="resetZoom()" style="width: 48px; font-size: 0.78rem;" title="Reset Zoom">1:1</button>
@@ -621,15 +711,57 @@
                 </div>
             </div>
             
-            <div id="svg-scroll-viewport">
-                <div id="svg-canvas-wrapper">
-                    <svg id="pattern-svg" width="1600" height="1400" viewBox="0 0 1600 1400" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="100%" height="100%" fill="#ffffff" />
-                        <g id="grid-group"></g>
-                        <g id="pattern-group">
-                            <text x="800" y="700" text-anchor="middle" fill="#8c7e7b" font-family="Montserrat" font-size="14">Atelier Drafting Table Ready — Click "Generate All Selected Patterns"</text>
-                        </g>
-                    </svg>
+            <!-- Tabs Bar -->
+            <div class="tabs-bar" id="tabsBar">
+                <button class="tab-btn active" onclick="switchTab('bodicePanelBox')">Bodice Block</button>
+                <button class="tab-btn" id="tabSleeve" onclick="switchTab('sleevePanelBox')">Sleeve Block</button>
+                <button class="tab-btn" id="tabSkirt" onclick="switchTab('skirtPanelBox')">Skirt Block</button>
+                <button class="tab-btn" id="tabPant" onclick="switchTab('pantPanelBox')">Trouser Block</button>
+            </div>
+
+            <div class="pattern-workspace-view" id="svg-scroll-viewport">
+                <div class="pattern-canvas-wrapper" id="svg-canvas-wrapper">
+                    
+                    <!-- Bodice Panel Box -->
+                    <div class="svg-panel-box" id="bodicePanelBox">
+                        <h4 id="bodiceTitle">Bodice Block</h4>
+                        <svg id="svg-bodice" width="700" height="650" viewBox="0 0 700 650" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="100%" height="100%" fill="#ffffff" />
+                            <g class="grid-group-sub"></g>
+                            <g class="pattern-group-sub"></g>
+                        </svg>
+                    </div>
+
+                    <!-- Sleeve Panel Box -->
+                    <div class="svg-panel-box" id="sleevePanelBox">
+                        <h4 id="sleeveTitle">Fitted Sleeve</h4>
+                        <svg id="svg-sleeve" width="700" height="650" viewBox="0 0 700 650" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="100%" height="100%" fill="#ffffff" />
+                            <g class="grid-group-sub"></g>
+                            <g class="pattern-group-sub"></g>
+                        </svg>
+                    </div>
+
+                    <!-- Skirt Panel Box -->
+                    <div class="svg-panel-box" id="skirtPanelBox">
+                        <h4 id="skirtTitle">Skirt Block</h4>
+                        <svg id="svg-skirt" width="700" height="650" viewBox="0 0 700 650" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="100%" height="100%" fill="#ffffff" />
+                            <g class="grid-group-sub"></g>
+                            <g class="pattern-group-sub"></g>
+                        </svg>
+                    </div>
+
+                    <!-- Trouser Panel Box -->
+                    <div class="svg-panel-box" id="pantPanelBox">
+                        <h4 id="pantTitle">Trouser Block</h4>
+                        <svg id="svg-pant" width="700" height="650" viewBox="0 0 700 650" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="100%" height="100%" fill="#ffffff" />
+                            <g class="grid-group-sub"></g>
+                            <g class="pattern-group-sub"></g>
+                        </svg>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -638,68 +770,137 @@
     <script>
         let currentUnit = 'in';
         let currentScale = 1.0;
-        let panX = 50;
-        let panY = 50;
+        let panX = 20;
+        let panY = 20;
         let isDragging = false;
         let startMouseX = 0;
         let startMouseY = 0;
         const scaleFactor = 26;
+        
+        let isSideBySide = false;
+        let activeTabId = 'bodicePanelBox';
 
-        function initGrid() {
-            const gridGroup = document.getElementById('grid-group');
-            gridGroup.innerHTML = '';
-            const width = 1600, height = 1400;
-
+        function initGrids() {
+            const svgs = ['svg-bodice', 'svg-sleeve', 'svg-skirt', 'svg-pant'];
+            const width = 700, height = 650;
             const baseStep = currentUnit === 'in' ? scaleFactor : scaleFactor / 2.54;
             const subStep = baseStep / 2;
 
-            for (let x = 0; x <= width; x += subStep) {
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', x); line.setAttribute('y1', 0);
-                line.setAttribute('x2', x); line.setAttribute('y2', height);
-                line.setAttribute('class', (x % baseStep === 0) ? 'grid-line-major' : 'grid-line-sub');
-                gridGroup.appendChild(line);
-            }
+            svgs.forEach(svgId => {
+                const svgElement = document.getElementById(svgId);
+                const gridGroup = svgElement.querySelector('.grid-group-sub');
+                gridGroup.innerHTML = '';
 
-            for (let y = 0; y <= height; y += subStep) {
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', 0); line.setAttribute('y1', y);
-                line.setAttribute('x2', width); line.setAttribute('y2', y);
-                line.setAttribute('class', (y % baseStep === 0) ? 'grid-line-major' : 'grid-line-sub');
-                gridGroup.appendChild(line);
-            }
+                // Draw vertical grid lines
+                for (let x = 0; x <= width; x += subStep) {
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', x); line.setAttribute('y1', 0);
+                    line.setAttribute('x2', x); line.setAttribute('y2', height);
+
+                    const ratio = x / baseStep;
+                    const isMajor = Math.abs(ratio - Math.round(ratio)) < 0.001 && Math.round(ratio) % (currentUnit === 'in' ? 4 : 5) === 0;
+                    const isHalf = Math.abs(ratio - Math.round(ratio)) < 0.001;
+
+                    if (isMajor) line.setAttribute('class', 'grid-line-major');
+                    else if (isHalf) line.setAttribute('class', 'grid-line-half');
+                    else line.setAttribute('class', 'grid-line-sub');
+                    
+                    gridGroup.appendChild(line);
+                }
+
+                // Draw horizontal grid lines
+                for (let y = 0; y <= height; y += subStep) {
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', 0); line.setAttribute('y1', y);
+                    line.setAttribute('x2', width); line.setAttribute('y2', y);
+
+                    const ratio = y / baseStep;
+                    const isMajor = Math.abs(ratio - Math.round(ratio)) < 0.001 && Math.round(ratio) % (currentUnit === 'in' ? 4 : 5) === 0;
+                    const isHalf = Math.abs(ratio - Math.round(ratio)) < 0.001;
+
+                    if (isMajor) line.setAttribute('class', 'grid-line-major');
+                    else if (isHalf) line.setAttribute('class', 'grid-line-half');
+                    else line.setAttribute('class', 'grid-line-sub');
+                    
+                    gridGroup.appendChild(line);
+                }
+            });
         }
 
         function setUnit(unit) {
             currentUnit = unit;
             document.getElementById('unit-in').classList.toggle('active', unit === 'in');
             document.getElementById('unit-cm').classList.toggle('active', unit === 'cm');
-            document.getElementById('current-unit-label').innerText = unit === 'in' ? 'Grid Unit: 1 Inch' : 'Grid Unit: 1 Centimeter';
-            initGrid();
+            document.getElementById('current-unit-label').innerText = unit === 'in' ? 'Grid Unit: 1 Inch (0.5" Subdivisions)' : 'Grid Unit: 1 Centimeter (0.5cm Subdivisions)';
+            initGrids();
             generatePattern();
         }
 
         function toggleModule(id) {
             const el = document.getElementById(id);
-            el.style.display = el.style.display === 'none' ? 'block' : 'none';
+            el.style.display = (el.style.display === 'none') ? 'block' : 'none';
         }
 
-        function togglePieceConfig(id, val) {
-            document.getElementById(id).style.opacity = val === 'yes' ? '1' : '0.4';
-            document.getElementById(id).style.pointerEvents = val === 'yes' ? 'auto' : 'none';
+        function togglePieceConfig(containerId, val) {
+            const container = document.getElementById(containerId);
+            container.style.display = (val === 'yes') ? 'block' : 'none';
+            
+            // Toggle corresponding tab availability
+            if (containerId === 'sleeveConfig') document.getElementById('tabSleeve').style.display = (val === 'yes') ? 'block' : 'none';
+            if (containerId === 'skirtConfig') document.getElementById('tabSkirt').style.display = (val === 'yes') ? 'block' : 'none';
+            if (containerId === 'pantConfig') document.getElementById('tabPant').style.display = (val === 'yes') ? 'block' : 'none';
+            
+            generatePattern();
         }
 
-        function applyPreset() {
-            const val = document.getElementById('blockPreset').value;
-            if (val === 'standard') {
-                document.getElementById('bustEase').value = 2.0;
-                document.getElementById('waistEase').value = 1.5;
-            } else if (val === 'fitted') {
-                document.getElementById('bustEase').value = 1.0;
-                document.getElementById('waistEase').value = 0.5;
-            } else if (val === 'loose') {
-                document.getElementById('bustEase').value = 3.0;
-                document.getElementById('waistEase').value = 2.5;
+        function switchTab(panelId) {
+            if (isSideBySide) return; // Disabled in side-by-side mode
+            activeTabId = panelId;
+
+            // Highlight active tab button
+            document.querySelectorAll('.tabs-bar .tab-btn').forEach(btn => btn.classList.remove('active'));
+            if (panelId === 'bodicePanelBox') event.target.classList.add('active');
+            else if (panelId === 'sleevePanelBox') document.getElementById('tabSleeve').classList.add('active');
+            else if (panelId === 'skirtPanelBox') document.getElementById('tabSkirt').classList.add('active');
+            else if (panelId === 'pantPanelBox') document.getElementById('tabPant').classList.add('active');
+
+            // Show selected panel box, hide others
+            ['bodicePanelBox', 'sleevePanelBox', 'skirtPanelBox', 'pantPanelBox'].forEach(id => {
+                document.getElementById(id).style.display = (id === panelId) ? 'block' : 'none';
+            });
+        }
+
+        function toggleSideBySideMode() {
+            isSideBySide = !isSideBySide;
+            const toggleBtn = document.getElementById('sideBySideToggleBtn');
+            const wrapper = document.getElementById('svg-canvas-wrapper');
+            const tabsBar = document.getElementById('tabsBar');
+
+            const hasSleeve = document.getElementById('includeSleeve').value === 'yes';
+            const hasSkirt = document.getElementById('includeSkirt').value === 'yes';
+            const hasPant = document.getElementById('includePant').value === 'yes';
+
+            if (isSideBySide) {
+                toggleBtn.classList.add('active');
+                wrapper.classList.add('grid-layout');
+                tabsBar.style.opacity = '0.4';
+                tabsBar.style.pointerEvents = 'none';
+
+                // Display all enabled panels
+                document.getElementById('bodicePanelBox').style.display = 'block';
+                document.getElementById('sleevePanelBox').style.display = hasSleeve ? 'block' : 'none';
+                document.getElementById('skirtPanelBox').style.display = hasSkirt ? 'block' : 'none';
+                document.getElementById('pantPanelBox').style.display = hasPant ? 'block' : 'none';
+            } else {
+                toggleBtn.classList.remove('active');
+                wrapper.classList.remove('grid-layout');
+                tabsBar.style.opacity = '1';
+                tabsBar.style.pointerEvents = 'auto';
+
+                // Revert to single active tab view
+                ['bodicePanelBox', 'sleevePanelBox', 'skirtPanelBox', 'pantPanelBox'].forEach(id => {
+                    document.getElementById(id).style.display = (id === activeTabId) ? 'block' : 'none';
+                });
             }
             generatePattern();
         }
@@ -707,14 +908,16 @@
         function applyUpperStandardSize() {
             const size = document.getElementById('upperStandardSize').value;
             if (!size) return;
-            const data = {
-                uk8:  { bust: 32.0, waist: 24.0, hip: 34.5, chest: 12.0, back: 13.0, shoulder: 4.75, backLen: 15.0, bicep: 10.5, sleeve: 22.25, elbow: 12.0, wrist: 6.0 },
-                uk10: { bust: 33.25, waist: 24.75, hip: 35.75, chest: 12.5, back: 13.5, shoulder: 4.87, backLen: 15.25, bicep: 11.0, sleeve: 22.5, elbow: 12.25, wrist: 6.12 },
-                uk12: { bust: 34.5, waist: 25.5, hip: 37.0, chest: 13.0, back: 14.0, shoulder: 5.0, backLen: 15.5, bicep: 11.5, sleeve: 23.0, elbow: 12.5, wrist: 6.25 },
-                uk14: { bust: 36.5, waist: 27.5, hip: 39.0, chest: 13.75, back: 14.75, shoulder: 5.2, backLen: 15.87, bicep: 12.12, sleeve: 23.37, elbow: 12.87, wrist: 6.43 },
-                uk16: { bust: 38.5, waist: 29.5, hip: 41.0, chest: 14.5, back: 15.5, shoulder: 5.4, backLen: 16.25, bicep: 12.75, sleeve: 23.75, elbow: 13.25, wrist: 6.62 }
-            }[size];
 
+            const sizes = {
+                'uk8':  { bust: 32.0, waist: 24.0, hip: 34.0, chest: 12.5, back: 13.5, shoulder: 4.875, bstToWst: 15.0, bicep: 10.5, sleeveLen: 22.5, elw: 12.0, wrist: 6.0 },
+                'uk10': { bust: 33.25, waist: 24.75, hip: 35.5, chest: 12.75, back: 13.75, shoulder: 4.875, bstToWst: 15.25, bicep: 11.0, sleeveLen: 22.75, elw: 12.25, wrist: 6.125 },
+                'uk12': { bust: 34.5, waist: 25.5, hip: 37.0, chest: 13.0, back: 14.0, shoulder: 5.0, bstToWst: 15.5, bicep: 11.5, sleeveLen: 23.0, elw: 12.5, wrist: 6.25 },
+                'uk14': { bust: 37.5, waist: 28.5, hip: 39.5, chest: 13.75, back: 14.75, shoulder: 5.25, bstToWst: 16.0, bicep: 12.25, sleeveLen: 23.5, elw: 13.0, wrist: 6.5 },
+                'uk16': { bust: 39.5, waist: 30.5, hip: 41.5, chest: 14.25, back: 15.25, shoulder: 5.375, bstToWst: 16.25, bicep: 13.0, sleeveLen: 24.0, elw: 13.5, wrist: 6.75 }
+            };
+
+            const data = sizes[size];
             if (data) {
                 document.getElementById('bust').value = data.bust;
                 document.getElementById('waist').value = data.waist;
@@ -722,83 +925,126 @@
                 document.getElementById('chestWidth').value = data.chest;
                 document.getElementById('backWidth').value = data.back;
                 document.getElementById('shoulderLength').value = data.shoulder;
-                document.getElementById('backNeckToWaist').value = data.backLen;
+                document.getElementById('backNeckToWaist').value = data.bstToWst;
                 document.getElementById('bicep').value = data.bicep;
-                document.getElementById('sleeveLength').value = data.sleeve;
-                document.getElementById('shoulderToElbow').value = data.elbow;
+                document.getElementById('sleeveLength').value = data.sleeveLen;
+                document.getElementById('shoulderToElbow').value = data.elw;
                 document.getElementById('wristCirc').value = data.wrist;
-                generatePattern();
             }
+            generatePattern();
         }
 
         function applyLowerStandardSize() {
             const size = document.getElementById('lowerStandardSize').value;
             if (!size) return;
-            const data = {
-                uk8:  { waist: 24.0, hips: 34.5, len: 37.5, knee: 22.0, rise: 11.0, thigh: 21.5, kneeCirc: 13.0, inseam: 29.0 },
-                uk10: { waist: 24.75, hips: 35.75, len: 38.0, knee: 22.5, rise: 11.25, thigh: 22.25, kneeCirc: 13.25, inseam: 29.5 },
-                uk12: { waist: 26.0, hips: 36.0, len: 38.5, knee: 23.0, rise: 11.5, thigh: 23.0, kneeCirc: 13.5, inseam: 30.0 },
-                uk14: { waist: 28.0, hips: 38.5, len: 39.0, knee: 24.0, rise: 11.87, thigh: 24.25, kneeCirc: 14.0, inseam: 30.5 },
-                uk16: { waist: 30.0, hips: 40.5, len: 39.5, knee: 25.0, rise: 12.25, thigh: 25.5, kneeCirc: 14.5, inseam: 31.0 }
-            }[size];
 
+            const sizes = {
+                'uk8':  { waist: 24.0, hips: 35.0, skirtLen: 37.0, kneeToWst: 22.0, hipLine: 8.25, yoke: 5.5, rise: 10.75, thigh: 21.5, knee: 12.5, inseam: 29.0 },
+                'uk10': { waist: 24.75, hips: 36.0, skirtLen: 37.5, kneeToWst: 22.5, hipLine: 8.5, yoke: 5.75, rise: 11.0, thigh: 22.25, knee: 13.0, inseam: 29.5 },
+                'uk12': { waist: 26.0, hips: 36.0, skirtLen: 38.5, kneeToWst: 23.0, hipLine: 8.75, yoke: 6.0, rise: 11.5, thigh: 23.0, knee: 13.5, inseam: 30.0 },
+                'uk14': { waist: 28.5, hips: 40.0, skirtLen: 39.0, kneeToWst: 23.5, hipLine: 9.0, yoke: 6.25, rise: 12.0, thigh: 24.5, knee: 14.25, inseam: 30.5 },
+                'uk16': { waist: 30.5, hips: 42.0, skirtLen: 39.5, kneeToWst: 24.0, hipLine: 9.25, yoke: 6.5, rise: 12.5, thigh: 26.0, knee: 15.0, inseam: 31.0 }
+            };
+
+            const data = sizes[size];
             if (data) {
                 document.getElementById('skirtWaist').value = data.waist;
                 document.getElementById('skirtHips').value = data.hips;
-                document.getElementById('skirtLength').value = data.len;
-                document.getElementById('skirtWaistToKnee').value = data.knee;
+                document.getElementById('skirtLength').value = data.skirtLen;
+                document.getElementById('skirtWaistToKnee').value = data.kneeToWst;
+                document.getElementById('skirtHipLine').value = data.hipLine;
+                document.getElementById('skirtYokeLine').value = data.yoke;
+
                 document.getElementById('pantWaist').value = data.waist;
                 document.getElementById('pantHips').value = data.hips;
                 document.getElementById('pantRise').value = data.rise;
                 document.getElementById('thigh').value = data.thigh;
-                document.getElementById('kneeCirc').value = data.kneeCirc;
+                document.getElementById('kneeCirc').value = data.knee;
                 document.getElementById('inseam').value = data.inseam;
-                generatePattern();
             }
+            generatePattern();
+        }
+
+        function applyPreset() {
+            const preset = document.getElementById('blockPreset').value;
+            if (preset === 'standard') { document.getElementById('bustEase').value = 2.0; document.getElementById('waistEase').value = 1.5; document.getElementById('hipEase').value = 2.0; }
+            else if (preset === 'fitted') { document.getElementById('bustEase').value = 1.0; document.getElementById('waistEase').value = 0.5; document.getElementById('hipEase').value = 1.0; }
+            else if (preset === 'loose') { document.getElementById('bustEase').value = 3.0; document.getElementById('waistEase').value = 2.5; document.getElementById('hipEase').value = 3.0; }
+            generatePattern();
         }
 
         function generatePattern() {
-            const patternGroup = document.getElementById('pattern-group');
-            patternGroup.innerHTML = '';
-            
-            const s = currentUnit === 'in' ? scaleFactor : scaleFactor / 2.54;
-
-            // Add Left-aligned CB marker point (1 inch from top and 1 inch from left)
-            const inchToPx = 2.54 * s; 
-            const markerX = inchToPx;        
-            const markerY = inchToPx;        
-
-            const cbCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            cbCircle.setAttribute('cx', markerX);
-            cbCircle.setAttribute('cy', markerY);
-            cbCircle.setAttribute('r', '4');
-            cbCircle.setAttribute('fill', '#0066ff');
-            cbCircle.setAttribute('stroke', '#ffffff');
-            cbCircle.setAttribute('stroke-width', '1.5');
-            patternGroup.appendChild(cbCircle);
-
-            const cbText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            cbText.setAttribute('x', markerX + 8);
-            cbText.setAttribute('y', markerY + 4);
-            cbText.setAttribute('fill', '#0066ff');
-            cbText.setAttribute('font-size', '12');
-            cbText.setAttribute('font-weight', 'bold');
-            cbText.textContent = 'CB';
-            patternGroup.appendChild(cbText);
-
+            // 1. Bodice Block
+            const bodiceGroup = document.querySelector('#svg-bodice .pattern-group-sub');
+            bodiceGroup.innerHTML = '';
             const bustVal = parseFloat(document.getElementById('bust').value) + parseFloat(document.getElementById('bustEase').value);
             const backLengthVal = parseFloat(document.getElementById('backNeckToWaist').value) + parseFloat(document.getElementById('backNeckToWaistEase').value);
             
-            // Render basic draft block outline representation
+            const bWidth = (bustVal / 4) * scaleFactor;
+            const bHeight = backLengthVal * scaleFactor;
+            
+            document.getElementById('bodiceTitle').textContent = `Bodice Block (Bust: ${document.getElementById('bust').value}" + ${document.getElementById('bustEase').value}" ease)`;
+            
             const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            bodiceRect.setAttribute('x', 50);
-            bodiceRect.setAttribute('y', 50);
-            bodiceRect.setAttribute('width', (bustVal / 4) * s);
-            bodiceRect.setAttribute('height', backLengthVal * s);
-            bodiceRect.setAttribute('fill', 'rgba(194, 94, 111, 0.05)');
-            bodiceRect.setAttribute('stroke', 'var(--primary)');
-            bodiceRect.setAttribute('stroke-width', '2');
-            patternGroup.appendChild(bodiceRect);
+            bodiceRect.setAttribute('x', 50); bodiceRect.setAttribute('y', 50);
+            bodiceRect.setAttribute('width', bWidth); bodiceRect.setAttribute('height', bHeight);
+            bodiceRect.setAttribute('fill', 'rgba(194, 94, 111, 0.06)');
+            bodiceRect.setAttribute('stroke', '#c25e6f'); bodiceRect.setAttribute('stroke-width', '2'); bodiceRect.setAttribute('stroke-dasharray', '4');
+            bodiceGroup.appendChild(bodiceRect);
+
+            // 2. Sleeve Block
+            const hasSleeve = document.getElementById('includeSleeve').value === 'yes';
+            const sleeveGroup = document.querySelector('#svg-sleeve .pattern-group-sub');
+            sleeveGroup.innerHTML = '';
+            if (hasSleeve) {
+                const sLenVal = (parseFloat(document.getElementById('sleeveLength').value) + parseFloat(document.getElementById('sleeveLengthEase').value)) * scaleFactor;
+                const bicepVal = (parseFloat(document.getElementById('bicep').value) + parseFloat(document.getElementById('bicepEase').value)) * scaleFactor;
+                
+                document.getElementById('sleeveTitle').textContent = `Fitted Sleeve (Bicep: ${document.getElementById('bicep').value}" + ${document.getElementById('bicepEase').value}" ease)`;
+
+                const sleeveRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                sleeveRect.setAttribute('x', 50); sleeveRect.setAttribute('y', 50);
+                sleeveRect.setAttribute('width', bicepVal); sleeveRect.setAttribute('height', sLenVal);
+                sleeveRect.setAttribute('fill', 'rgba(92, 82, 79, 0.05)');
+                sleeveRect.setAttribute('stroke', '#5c524f'); sleeveRect.setAttribute('stroke-width', '2'); sleeveRect.setAttribute('stroke-dasharray', '4');
+                sleeveGroup.appendChild(sleeveRect);
+            }
+
+            // 3. Skirt Block
+            const hasSkirt = document.getElementById('includeSkirt').value === 'yes';
+            const skirtGroup = document.querySelector('#svg-skirt .pattern-group-sub');
+            skirtGroup.innerHTML = '';
+            if (hasSkirt) {
+                const skirtHips = parseFloat(document.getElementById('skirtHips').value) + parseFloat(document.getElementById('skirtHipsEase').value);
+                const skirtLen = parseFloat(document.getElementById('skirtLength').value) + parseFloat(document.getElementById('skirtLengthEase').value);
+                
+                document.getElementById('skirtTitle').textContent = `Skirt: ${document.getElementById('skirtStyle').value.toUpperCase()} (Hips: ${document.getElementById('skirtHips').value}")`;
+
+                const skirtRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                skirtRect.setAttribute('x', 50); skirtRect.setAttribute('y', 50);
+                skirtRect.setAttribute('width', (skirtHips / 4) * scaleFactor); skirtRect.setAttribute('height', skirtLen * scaleFactor);
+                skirtRect.setAttribute('fill', 'rgba(194, 94, 111, 0.04)');
+                skirtRect.setAttribute('stroke', '#c25e6f'); skirtRect.setAttribute('stroke-width', '2'); skirtRect.setAttribute('stroke-dasharray', '4');
+                skirtGroup.appendChild(skirtRect);
+            }
+
+            // 4. Trouser Block
+            const hasPant = document.getElementById('includePant').value === 'yes';
+            const pantGroup = document.querySelector('#svg-pant .pattern-group-sub');
+            pantGroup.innerHTML = '';
+            if (hasPant) {
+                const thighVal = parseFloat(document.getElementById('thigh').value) + parseFloat(document.getElementById('thighEase').value);
+                const inseamVal = parseFloat(document.getElementById('inseam').value) + parseFloat(document.getElementById('inseamEase').value);
+                
+                document.getElementById('pantTitle').textContent = `Trouser Block (Rise: ${document.getElementById('pantRise').value}")`;
+
+                const pantRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                pantRect.setAttribute('x', 50); pantRect.setAttribute('y', 50);
+                pantRect.setAttribute('width', (thighVal / 2) * scaleFactor); pantRect.setAttribute('height', inseamVal * scaleFactor);
+                pantRect.setAttribute('fill', 'rgba(92, 82, 79, 0.04)');
+                pantRect.setAttribute('stroke', '#5c524f'); pantRect.setAttribute('stroke-width', '2'); pantRect.setAttribute('stroke-dasharray', '4');
+                pantGroup.appendChild(pantRect);
+            }
         }
 
         function updateTransform() {
@@ -806,64 +1052,78 @@
             wrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${currentScale})`;
         }
 
-        function adjustZoom(delta) {
-            currentScale = Math.max(0.3, Math.min(3.5, currentScale + delta));
+        function adjustZoom(amount) {
+            currentScale = Math.max(0.3, Math.min(3.0, currentScale + amount));
             updateTransform();
         }
 
         function resetZoom() {
             currentScale = 1.0;
-            panX = 50;
-            panY = 50;
+            panX = 20;
+            panY = 20;
             updateTransform();
         }
 
+        function downloadSVG() {
+            // Exports the active visible SVG view
+            const activeBox = isSideBySide ? document.getElementById('bodicePanelBox') : document.getElementById(activeTabId);
+            const svgEl = activeBox.querySelector('svg');
+            const serializer = new XMLSerializer();
+            let source = serializer.serializeToString(svgEl);
+            if(!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
+                source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+            }
+            const blob = new Blob([source], {type: "image/svg+xml;charset=utf-8"});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "Lilinora_Atelier_Pattern_Piece.svg";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
         const viewport = document.getElementById('svg-scroll-viewport');
+
         viewport.addEventListener('mousedown', (e) => {
             isDragging = true;
             startMouseX = e.clientX - panX;
             startMouseY = e.clientY - panY;
         });
-
         window.addEventListener('mousemove', (e) => {
             if (!isDragging) return;
             panX = e.clientX - startMouseX;
             panY = e.clientY - startMouseY;
             updateTransform();
         });
-
         window.addEventListener('mouseup', () => { isDragging = false; });
 
         viewport.addEventListener('wheel', (e) => {
             e.preventDefault();
+            const rect = viewport.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
             const zoomIntensity = 0.1;
-            if (e.deltaY < 0) {
-                currentScale = Math.min(3.5, currentScale * (1 + zoomIntensity));
-            } else {
-                currentScale = Math.max(0.3, currentScale / (1 + zoomIntensity));
-            }
+            const oldScale = currentScale;
+            
+            if (e.deltaY < 0) currentScale = Math.min(3.0, currentScale + zoomIntensity);
+            else currentScale = Math.max(0.3, currentScale - zoomIntensity);
+
+            panX = mouseX - (mouseX - panX) * (currentScale / oldScale);
+            panY = mouseY - (mouseY - panY) * (currentScale / oldScale);
+
             updateTransform();
         }, { passive: false });
 
-        function downloadSVG() {
-            const svgEl = document.getElementById('pattern-svg');
-            const clone = svgEl.cloneNode(true);
-            clone.querySelectorAll('rect[fill="#ffffff"]').forEach(r => r.remove());
-            const serializer = new XMLSerializer();
-            const source = serializer.serializeToString(clone);
-            const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'lilinora_precision_pattern.svg';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
         window.onload = () => {
-            initGrid();
+            initGrids();
             generatePattern();
+            updateTransform();
+            // Default show only bodice tab initially
+            document.getElementById('sleevePanelBox').style.display = 'none';
+            document.getElementById('skirtPanelBox').style.display = 'none';
+            document.getElementById('pantPanelBox').style.display = 'none';
         };
     </script>
 </body>
