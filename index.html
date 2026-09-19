@@ -1613,6 +1613,71 @@
             bodiceGroup.appendChild(bustDartGuideLineNameText);
 
 
+            // --- STEP 17: Shoulder Bust Dart Variations ---
+            // Find the intersection point between the Bust Dart Guide Line and Front shoulder line.
+            // Line from frontNeckPoint (frontNeckPointX, frontNeckPointY) to shoulderLineEnd (shoulderLineEndX, shoulderLineEndY)
+            const slopeShoulder = (shoulderLineEndY - frontNeckPointY) / (shoulderLineEndX - frontNeckPointX);
+            const intersectionX = bustDartGuideLineX;
+            const intersectionY = frontNeckPointY + slopeShoulder * (intersectionX - frontNeckPointX);
+
+            const intersectionCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            intersectionCircle.setAttribute('cx', intersectionX);
+            intersectionCircle.setAttribute('cy', intersectionY);
+            intersectionCircle.setAttribute('r', '4.5');
+            intersectionCircle.setAttribute('fill', '#d97706');
+            bodiceGroup.appendChild(intersectionCircle);
+
+            appendLabel(bodiceGroup, 'Step 17 Intersection', intersectionX + 10, intersectionY - 10, '#d97706', '10', 'bold', true);
+
+            // Move to the left along the Front Shoulder line by 2 cm. Mark this point as T.
+            const twoCmInches = 2.0 / 2.54;
+            const twoCmPixels = twoCmInches * scaleFactor;
+            // Since unitDxS is negative (moving left from frontNeckPointX towards shoulderLineEndX), we move by adding unitDxS * twoCmPixels
+            const pointTX = intersectionX + (unitDxS * twoCmPixels);
+            const pointTY = intersectionY + (unitDyS * twoCmPixels);
+
+            const pointTCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pointTCircle.setAttribute('cx', pointTX);
+            pointTCircle.setAttribute('cy', pointTY);
+            pointTCircle.setAttribute('r', '5');
+            pointTCircle.setAttribute('fill', '#e11d48');
+            bodiceGroup.appendChild(pointTCircle);
+
+            appendLabel(bodiceGroup, 'Point T (2cm from Intersection)', pointTX + 10, pointTY, '#e11d48', '11', 'bold', true);
+
+            // Continue moving to the left along the Front Shoulder line a distance equal to Shoulder Bust Dart width and mark the point D.
+            // Calculate shoulder bust dart width: 2.5 inch for 32 inch bust and increase by 0.25 inch for each larger size (e.g., 2.75 inch for 34 inch).
+            const shoulderBustDartWidthInches = 2.5 + ((totalBust - 32.0) / 2.0) * 0.25;
+            const shoulderBustDartWidthPixels = shoulderBustDartWidthInches * scaleFactor;
+
+            const pointDX = pointTX + (unitDxS * shoulderBustDartWidthPixels);
+            const pointDY = pointTY + (unitDyS * shoulderBustDartWidthPixels);
+
+            const pointDCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pointDCircle.setAttribute('cx', pointDX);
+            pointDCircle.setAttribute('cy', pointDY);
+            pointDCircle.setAttribute('r', '5');
+            pointDCircle.setAttribute('fill', '#7c3aed');
+            bodiceGroup.appendChild(pointDCircle);
+
+            appendLabel(bodiceGroup, `Point D (Dart Width: ${shoulderBustDartWidthInches.toFixed(2)}")`, pointDX + 10, pointDY + 15, '#7c3aed', '11', 'bold', true);
+
+            // Draw dart legs from Point T and Point D to Point G
+            const shoulderDartLeg1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            shoulderDartLeg1.setAttribute('x1', pointTX); shoulderDartLeg1.setAttribute('y1', pointTY);
+            shoulderDartLeg1.setAttribute('x2', pointGX); shoulderDartLeg1.setAttribute('y2', pointGY);
+            shoulderDartLeg1.setAttribute('stroke', '#7c3aed');
+            shoulderDartLeg1.setAttribute('stroke-width', '1.5');
+            bodiceGroup.appendChild(shoulderDartLeg1);
+
+            const shoulderDartLeg2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            shoulderDartLeg2.setAttribute('x1', pointDX); shoulderDartLeg2.setAttribute('y1', pointDY);
+            shoulderDartLeg2.setAttribute('x2', pointGX); shoulderDartLeg2.setAttribute('y2', pointGY);
+            shoulderDartLeg2.setAttribute('stroke', '#7c3aed');
+            shoulderDartLeg2.setAttribute('stroke-width', '1.5');
+            bodiceGroup.appendChild(shoulderDartLeg2);
+
+
             // Draw Bodice Pattern Box Frame
             const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
             bodiceRect.setAttribute('x', 50); bodiceRect.setAttribute('y', 50);
@@ -1822,19 +1887,11 @@
             
             if (e.deltaY < 0) currentScale = Math.min(3.0, currentScale + zoomIntensity);
             else currentScale = Math.max(0.3, currentScale - zoomIntensity);
-
+            
             panX = mouseX - (mouseX - panX) * (currentScale / oldScale);
             panY = mouseY - (mouseY - panY) * (currentScale / oldScale);
             updateTransform();
-        }, { passive: false });
-
-        window.onload = () => {
-            generatePattern();
-            updateTransform();
-            document.getElementById('sleevePanelBox').style.display = 'none';
-            document.getElementById('skirtPanelBox').style.display = 'none';
-            document.getElementById('pantPanelBox').style.display = 'none';
-        };
+        });
     </script>
 </body>
 </html>
