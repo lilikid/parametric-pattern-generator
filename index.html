@@ -1448,6 +1448,38 @@
             appendLabel(bodiceGroup, `Front Neck Point (${frontNeckDistInches.toFixed(2)}" from CF)`, frontNeckPointX - 60, frontNeckPointY - 18, '#0000FF', '11', 'bold', true);
 
 
+            // --- NEW SEQUENCE STEP: Base Front Neck ---
+            // Move vertically downward starting from CF along the Center Front Line a distance as follow:
+            // 3 inches for size 12c UK and can go up to 7 cm for smaller sizes and 8.5 cm for larger sizes. Name this point Base Front Neck.
+            const selectedUpperSize = document.getElementById('upperStandardSize').value;
+            let baseFrontNeckDistInches = 3.0; // default for size 12 UK
+            if (selectedUpperSize === 'uk8' || selectedUpperSize === 'uk10') {
+                baseFrontNeckDistInches = 7.0 / 2.54; // ~2.75 inches (7 cm)
+            } else if (selectedUpperSize === 'uk14' || selectedUpperSize === 'uk16') {
+                baseFrontNeckDistInches = 8.5 / 2.54; // ~3.35 inches (8.5 cm)
+            }
+            const baseFrontNeckDistPixels = baseFrontNeckDistInches * scaleFactor;
+            const baseFrontNeckX = cfAnchorX;
+            const baseFrontNeckY = 50 + baseFrontNeckDistPixels;
+
+            const baseFrontNeckCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            baseFrontNeckCircle.setAttribute('cx', baseFrontNeckX);
+            baseFrontNeckCircle.setAttribute('cy', baseFrontNeckY);
+            baseFrontNeckCircle.setAttribute('r', '5.5');
+            baseFrontNeckCircle.setAttribute('fill', '#9333ea'); // Purple accent
+            bodiceGroup.appendChild(baseFrontNeckCircle);
+
+            const baseFrontNeckSegment = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            baseFrontNeckSegment.setAttribute('x1', cfAnchorX); baseFrontNeckSegment.setAttribute('y1', 50);
+            baseFrontNeckSegment.setAttribute('x2', baseFrontNeckX); baseFrontNeckSegment.setAttribute('y2', baseFrontNeckY);
+            baseFrontNeckSegment.setAttribute('stroke', '#9333ea');
+            baseFrontNeckSegment.setAttribute('stroke-width', '2');
+            baseFrontNeckSegment.setAttribute('stroke-dasharray', '2 2');
+            bodiceGroup.appendChild(baseFrontNeckSegment);
+
+            appendLabel(bodiceGroup, `Base Front Neck (${baseFrontNeckDistInches.toFixed(2)}" down from CF)`, baseFrontNeckX + 12, baseFrontNeckY, '#9333ea', '11', 'bold', false);
+
+
             // Draw Bodice Pattern Box Frame
             const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
             bodiceRect.setAttribute('x', 50); bodiceRect.setAttribute('y', 50);
