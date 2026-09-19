@@ -1792,59 +1792,167 @@
             const frontUnderarmCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             frontUnderarmCircle.setAttribute('cx', frontUnderarmPointX);
             frontUnderarmCircle.setAttribute('cy', frontUnderarmPointY);
-            frontUnderarmCircle.setAttribute('r', '5.5');
-            frontUnderarmCircle.setAttribute('fill', '#0891b2');
+            frontUnderarmCircle.setAttribute('r', '6');
+            frontUnderarmCircle.setAttribute('fill', '#059669'); // Emerald green point for front underarm point
             bodiceGroup.appendChild(frontUnderarmCircle);
 
-            appendLabel(bodiceGroup, `Step 23: Front Underarm Point (${frontUnderarmDistanceFromCFInches.toFixed(2)}" from CF)`, frontUnderarmPointX - 90, frontUnderarmPointY + 18, '#0891b2', '11', 'bold', true);
+            // Draw horizontal segment from CF along the bust line to the Front Underarm Point to show calculation
+            const frontUnderarmSpanLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            frontUnderarmSpanLine.setAttribute('x1', frontUnderarmPointX); frontUnderarmSpanLine.setAttribute('y1', bustLineY);
+            frontUnderarmSpanLine.setAttribute('x2', cfAnchorX); frontUnderarmSpanLine.setAttribute('y2', bustLineY);
+            frontUnderarmSpanLine.setAttribute('stroke', '#059669');
+            frontUnderarmSpanLine.setAttribute('stroke-width', '2');
+            frontUnderarmSpanLine.setAttribute('stroke-dasharray', '3 3');
+            bodiceGroup.appendChild(frontUnderarmSpanLine);
+
+            appendLabel(bodiceGroup, `Step 23: Front Underarm Point (${frontUnderarmDistanceFromCFInches.toFixed(2)}" from CF)`, frontUnderarmPointX - 110, bustLineY + 22, '#059669', '11', 'bold', false);
 
 
-            // --- STEP 24: Draw a dotted guide line from Front shoulder point to the chest point and mark the med point move outward 1 cm to the right of this line and perpendicular to it. Name this point E. ---
-            const midFrontShoulderChestX = (frontShoulderPointX + chestPointX) / 2;
-            const midFrontShoulderChestY = (frontShoulderPointY + chestPointY) / 2;
+            // --- STEP 24: Draw a dotted guide line from Front shoulder point to the chest point and mark the med point move inward 1 cm and to the right of this line and perpendicular to it. Name this point E. ---
+            const frontShoulderPtX = frontShoulderPointX;
+            const frontShoulderPtY = frontShoulderPointY;
+            const chestPtX = chestPointX;
+            const chestPtY = chestPointY;
 
-            // Dotted guide line from Front Shoulder Point to Chest Point
-            const shoulderToChestGuide = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            shoulderToChestGuide.setAttribute('x1', frontShoulderPointX); shoulderToChestGuide.setAttribute('y1', frontShoulderPointY);
-            shoulderToChestGuide.setAttribute('x2', chestPointX); shoulderToChestGuide.setAttribute('y2', chestPointY);
-            shoulderToChestGuide.setAttribute('stroke', '#6366f1');
-            shoulderToChestGuide.setAttribute('stroke-width', '1.5');
-            shoulderToChestGuide.setAttribute('stroke-dasharray', '3 3');
-            bodiceGroup.appendChild(shoulderToChestGuide);
+            const step24GuideLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            step24GuideLine.setAttribute('x1', frontShoulderPtX); step24GuideLine.setAttribute('y1', frontShoulderPtY);
+            step24GuideLine.setAttribute('x2', chestPtX); step24GuideLine.setAttribute('y2', chestPtY);
+            step24GuideLine.setAttribute('stroke', '#4f46e5');
+            step24GuideLine.setAttribute('stroke-width', '1.5');
+            step24GuideLine.setAttribute('stroke-dasharray', '3 3');
+            bodiceGroup.appendChild(step24GuideLine);
 
-            // Move outward 1 cm (approx 0.3937 inches) to the right perpendicular to this line from the midpoint
-            const oneCmInches = 1.0 / 2.54;
-            const oneCmPixels = oneCmInches * scaleFactor;
+            const midX24 = (frontShoulderPtX + chestPtX) / 2;
+            const midY24 = (frontShoulderPtY + chestPtY) / 2;
 
-            // Direction vector from front shoulder point to chest point
-            const dxSC = chestPointX - frontShoulderPointX;
-            const dySC = chestPointY - frontShoulderPointY;
-            const lenSC = Math.sqrt(dxSC * dxSC + dySC * dySC);
-            const uDirX = dxSC / lenSC;
-            const uDirY = dySC / lenSC;
+            const dx24 = chestPtX - frontShoulderPtX;
+            const dy24 = chestPtY - frontShoulderPtY;
+            const len24 = Math.sqrt(dx24 * dx24 + dy24 * dy24);
+            const unitDx24 = dx24 / len24;
+            const unitDy24 = dy24 / len24;
 
-            // Perpendicular vector pointing outward to the right (+90 degrees rotation)
-            const perpX = -uDirY;
-            const perpY = uDirX;
+            // Perpendicular vector pointing to the right of the line segment (towards the right side/CF direction or outwards)
+            // Normal vector rotated 90 degrees clockwise
+            const perpX24 = -unitDy24;
+            const perpY24 = unitDx24;
 
-            const pointEX = midFrontShoulderChestX + (perpX * oneCmPixels);
-            const pointEY = midFrontShoulderChestY + (perpY * oneCmPixels);
+            // Move inward 1 cm (1 cm / 2.54 inches * scaleFactor) to the right and perpendicular
+            const inwardDistInches = 1.0 / 2.54;
+            const inwardDistPixels = inwardDistInches * scaleFactor;
+
+            const pointEX = midX24 + (perpX24 * inwardDistPixels);
+            const pointEY = midY24 + (perpY24 * inwardDistPixels);
 
             const pointECircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             pointECircle.setAttribute('cx', pointEX);
             pointECircle.setAttribute('cy', pointEY);
             pointECircle.setAttribute('r', '5.5');
-            pointECircle.setAttribute('fill', '#ec4899'); // Pink / Magenta accent for point E
+            pointECircle.setAttribute('fill', '#4f46e5');
             bodiceGroup.appendChild(pointECircle);
 
-            appendLabel(bodiceGroup, 'Step 24: Point E (1cm outward right from midpoint)', pointEX + 10, pointEY, '#ec4899', '11', 'bold', true);
+            appendLabel(bodiceGroup, 'Step 24: Point E (1cm inward perp)', pointEX + 12, pointEY, '#4f46e5', '11', 'bold', true);
+
+
+            // Draw Bodice Pattern Box Frame
+            const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            bodiceRect.setAttribute('x', 50); bodiceRect.setAttribute('y', 50);
+            bodiceRect.setAttribute('width', bWidth); bodiceRect.setAttribute('height', bHeight);
+            bodiceRect.setAttribute('fill', 'rgba(194, 94, 111, 0.04)');
+            bodiceRect.setAttribute('stroke', '#c25e6f'); bodiceRect.setAttribute('stroke-width', '2'); bodiceRect.setAttribute('stroke-dasharray', '4');
+            bodiceGroup.appendChild(bodiceRect);
+
+            // Add Hip Line Label to the lower line of the bodice block box
+            appendLabel(bodiceGroup, 'Hip Line', 60, 50 + bHeight, '#c25e6f', '11', 'bold', false);
         }
 
-        // Initialize pattern generator on load
+        function adjustZoom(amount) {
+            currentScale = Math.max(0.4, Math.min(2.5, currentScale + amount));
+            updateCanvasTransform();
+        }
+
+        function resetZoom() {
+            currentScale = 1.0;
+            panX = 20;
+            panY = 20;
+            updateCanvasTransform();
+        }
+
+        function updateCanvasTransform() {
+            const wrapper = document.getElementById('svg-canvas-wrapper');
+            wrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${currentScale})`;
+        }
+
+        // Drag-to-pan handlers & Mouse Wheel Zoom at pointed cursor place option
+        const viewport = document.getElementById('svg-scroll-viewport');
+        
+        viewport.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startMouseX = e.clientX - panX;
+            startMouseY = e.clientY - panY;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            panX = e.clientX - startMouseX;
+            panY = e.clientY - startMouseY;
+            updateCanvasTransform();
+        });
+
+        window.addEventListener('mouseup', () => { isDragging = false; });
+
+        // Add mouse wheel zoom centering on cursor place
+        viewport.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const zoomIntensity = 0.1;
+            const rect = viewport.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            let oldScale = currentScale;
+            if (e.deltaY < 0) {
+                currentScale = Math.min(2.5, currentScale + zoomIntensity);
+            } else {
+                currentScale = Math.max(0.4, currentScale - zoomIntensity);
+            }
+
+            // Adjust pan so zoom happens at pointed cursor place
+            panX = mouseX - (mouseX - panX) * (currentScale / oldScale);
+            panY = mouseY - (mouseY - panY) * (currentScale / oldScale);
+
+            updateCanvasTransform();
+        }, { passive: false });
+
+        function downloadSVG() {
+            const svgElement = document.getElementById('svg-bodice');
+            const serializer = new XMLSerializer();
+            const source = serializer.serializeToString(svgElement);
+            const blob = new Blob([source], {type: "image/svg+xml;charset=utf-8"});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "Lilinora_Bodice_Pattern_Step24.svg";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function exportPDF(format) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+            doc.setFont("Helvetica", "bold");
+            doc.setFontSize(16);
+            doc.text("Lilinora Precision Atelier - Pattern Export (" + format + ")", 15, 20);
+            doc.setFontSize(10);
+            doc.setFont("Helvetica", "normal");
+            doc.text("Generated with Step 24: Point E Armhole Construction.", 15, 28);
+            doc.text("Scale: 1:1 Actual Size Plotter Ready.", 15, 34);
+            doc.save(`Lilinora_Pattern_${format}.pdf`);
+        }
+
+        // Initial generation on load
         window.onload = function() {
             generatePattern();
         };
     </script>
 </body>
 </html>
-```[cite: 19]
