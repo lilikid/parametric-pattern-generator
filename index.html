@@ -1897,10 +1897,8 @@
             const uDirY = dy24 / len24;
 
             // Perpendicular vector pointing towards Center Front (CF is on the right, so positive X direction or orthogonal pointing right/towards CF)
-            // Normal vector (-uDirY, uDirX) or rotated. Since CF is right (+X), let's ensure it squares towards CF.
             let perpX = -uDirY;
             let perpY = uDirX;
-            // Ensure perpX points towards CF (positive X direction relative to midpoint)
             if (perpX < 0) {
                 perpX = -perpX;
                 perpY = -perpY;
@@ -1925,6 +1923,61 @@
             bodiceGroup.appendChild(perpLine);
 
             appendLabel(bodiceGroup, 'Step 24: Point E (1cm perpendicular toward CF)', pointEX + 10, pointEY, '#e11d48', '11', 'bold', true);
+
+
+            // --- STEP 25: draw a doted guideline from the chest point perpendicular at bust line and from the intersection with the bust line draw a a line at 45 degrees Mark a point along this line a half an inch 1.5 centimeters or up to one inch 2.5 centimeters for larger sizes than (arger than UK 12) from the angle. Name this point Y. Y should locates between this dotted vertical lone and Armhole Guide Line. ---
+            const chestPt25X = chestPointX;
+            const chestPt25Y = chestPointY;
+            
+            // Dotted vertical guideline from the chest point perpendicular down to the bust line
+            const chestBustIntersectionX = chestPt25X;
+            const chestBustIntersectionY = bustLineY;
+
+            const step25VertLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            step25VertLine.setAttribute('x1', chestPt25X); step25VertLine.setAttribute('y1', chestPt25Y);
+            step25VertLine.setAttribute('x2', chestBustIntersectionX); step25VertLine.setAttribute('y2', chestBustIntersectionY);
+            step25VertLine.setAttribute('stroke', '#0891b2');
+            step25VertLine.setAttribute('stroke-width', '1.5');
+            step25VertLine.setAttribute('stroke-dasharray', '3 3');
+            bodiceGroup.appendChild(step25VertLine);
+
+            const intersectionMarker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            intersectionMarker.setAttribute('cx', chestBustIntersectionX);
+            intersectionMarker.setAttribute('cy', chestBustIntersectionY);
+            intersectionMarker.setAttribute('r', '4');
+            intersectionMarker.setAttribute('fill', '#0891b2');
+            bodiceGroup.appendChild(intersectionMarker);
+
+            appendLabel(bodiceGroup, 'Step 25: Chest-Bust Intersection', chestBustIntersectionX - 40, chestBustIntersectionY + 14, '#0891b2', '10', '600', false);
+
+            // From the intersection with the bust line draw a line at 45 degrees 
+            // Note: Armhole Guide Line is to the left or right depending on coordinates, but since Y should locate between this dotted vertical line and Armhole Guide Line, 
+            // and Armhole Guide Line is in the back section (to the left of front section), 45 degrees towards the back (left / negative X direction upwards or downwards).
+            // Let's draw it at 45 degrees pointing towards the left (backwards / towards Armhole Guide Line direction).
+            const isLargerSize = (totalBust > 37.0); // Larger than UK 12 check
+            const yDistInches = isLargerSize ? 1.0 : 0.6; // between 0.5" (1.5cm) to 1" (2.5cm)
+            const yDistPixels = yDistInches * scaleFactor;
+
+            const angle25 = Math.PI + (Math.PI / 4); // 225 degrees (diagonal up-left towards back armhole)
+            const pointYX = chestBustIntersectionX + (yDistPixels * Math.cos(angle25));
+            const pointYY = chestBustIntersectionY + (yDistPixels * Math.sin(angle25));
+
+            const line45Deg = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line45Deg.setAttribute('x1', chestBustIntersectionX); line45Deg.setAttribute('y1', chestBustIntersectionY);
+            line45Deg.setAttribute('x2', pointYX); line45Deg.setAttribute('y2', pointYY);
+            line45Deg.setAttribute('stroke', '#7c3aed');
+            line45Deg.setAttribute('stroke-width', '1.75');
+            line45Deg.setAttribute('stroke-dasharray', '2 2');
+            bodiceGroup.appendChild(line45Deg);
+
+            const pointYCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pointYCircle.setAttribute('cx', pointYX);
+            pointYCircle.setAttribute('cy', pointYY);
+            pointYCircle.setAttribute('r', '5.5');
+            pointYCircle.setAttribute('fill', '#7c3aed');
+            bodiceGroup.appendChild(pointYCircle);
+
+            appendLabel(bodiceGroup, `Step 25: Point Y (${yDistInches.toFixed(2)}" at 45º)`, pointYX - 50, pointYY - 10, '#7c3aed', '11', 'bold', true);
 
 
             // --- 2. SLEEVE BLOCK (If enabled) ---
@@ -2005,8 +2058,8 @@
             doc.text('Lilinora Atelier - Pattern Export', 1, 1);
             doc.setFont('Helvetica', 'normal');
             doc.setFontSize(11);
-            doc.text(`Export Type: ${type}`, 1, 1.4);
-            doc.text(`Generated with Step 24 Point E Integration`, 1, 1.8);
+            doc.text(`Export Format: ${type}`, 1, 1.4);
+            doc.text('Your 1:1 scale cutting layout has been generated successfully.', 1, 1.8);
             doc.save(`Lilinora_Pattern_${type}.pdf`);
         }
 
