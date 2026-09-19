@@ -1431,7 +1431,7 @@
             appendLabel(bodiceGroup, 'Step 13: Side Seam Guide Line', step13MidX + 8, step13MidY, '#0891b2', '10', '600', false);
 
 
-            // --- NEW REQUIREMENT: Front Neck Point calculation & placement ---
+            // --- Front Neck Point calculation & placement ---
             const frontNeckDistInches = (((totalBust / 8.0) + 1.25) / 2.0) - 0.25;
             const frontNeckDistPixels = frontNeckDistInches * scaleFactor;
             const cfAnchorX = 50 + bWidth;
@@ -1448,9 +1448,7 @@
             appendLabel(bodiceGroup, `Front Neck Point (${frontNeckDistInches.toFixed(2)}" from CF)`, frontNeckPointX - 60, frontNeckPointY - 18, '#0000FF', '11', 'bold', true);
 
 
-            // --- NEW SEQUENCE STEP: Base Front Neck ---
-            // Move vertically downward starting from CF along the Center Front Line a distance as follow:
-            // 3 inches for size 12c UK and can go up to 7 cm for smaller sizes and 8.5 cm for larger sizes. Name this point Base Front Neck.
+            // --- Base Front Neck ---
             const selectedUpperSize = document.getElementById('upperStandardSize').value;
             let baseFrontNeckDistInches = 3.0; // default for size 12 UK
             if (selectedUpperSize === 'uk8' || selectedUpperSize === 'uk10') {
@@ -1480,7 +1478,7 @@
             appendLabel(bodiceGroup, `Base Front Neck (${baseFrontNeckDistInches.toFixed(2)}" down from CF)`, baseFrontNeckX + 12, baseFrontNeckY, '#9333ea', '11', 'bold', false);
 
 
-            // --- STEP 14: Drawing the Front neck curve. Square down from the Front neck point and across from base Front neck and then draw a guideline of 45 degrees at the right side of the vertical line that we squared down from the Front Neck Point pointing upward toward the CF point and then draw a guideline of 45 degrees quarter inches three centimeters. Name this point F. ---
+            // --- STEP 14: Drawing the Front neck curve ---
             const step14SquareDownLength = 2.0 * scaleFactor; // visual guide length downwards
             const step14VertLineX = frontNeckPointX;
             const step14VertLineStartY = frontNeckPointY;
@@ -1526,43 +1524,46 @@
             appendLabel(bodiceGroup, 'Step 14: Point F (3cm / 0.25" at 45º toward CF)', fPointX + 10, fPointY, '#7c3aed', '11', 'bold', true);
 
 
-            // --- STEP 15: Drawing the front shoulder line. measure along the Bodice Block Top Line six and a half inches 16.5 centimeters from CF Point and move to the left and square down one and three quarter inches 4.5 centimeters. Name this point S. draw the shoulder line from the Front Neck Point through point S just drafted and extend beyond for about 5 inches ---
-            const step15DistInches = 6.5; // 6.5 inches / 16.5 cm
-            const step15DistPixels = step15DistInches * scaleFactor;
-            const step15SquareDownInches = 1.75; // 1.75 inches / 4.5 cm
-            const step15SquareDownPixels = step15SquareDownInches * scaleFactor;
+            // --- STEP 15: Drawing the front shoulder line. measure along the Bodice Block Top Line six and a half inches 16.5 centimeters from CF Point and move to the left and square down one and three quarter inches 4.5 centimeters. Name this point S. draw the shoulder line from the Front Neck Point through point S just drafted and extend beyond for about 5 inches. make this line dotted thin red ---
+            const step15MeasureInches = 6.5; // 6.5 inches / 16.5 cm from CF Point moving to the left
+            const step15MeasurePixels = step15MeasureInches * scaleFactor;
+            const step15SquareInches = 1.75; // 1 and 3/4 inches / 4.5 centimeters down
+            const step15SquarePixels = step15SquareInches * scaleFactor;
 
-            const pointSX = cfAnchorX - step15DistPixels;
-            const pointSY = 50 + step15SquareDownPixels;
+            const pointSX = cfAnchorX - step15MeasurePixels;
+            const pointSY = 50 + step15SquarePixels;
 
             const pointSCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             pointSCircle.setAttribute('cx', pointSX);
             pointSCircle.setAttribute('cy', pointSY);
             pointSCircle.setAttribute('r', '5.5');
-            pointSCircle.setAttribute('fill', '#0284c7'); // Blue accent
+            pointSCircle.setAttribute('fill', '#dc2626'); // Red point
             bodiceGroup.appendChild(pointSCircle);
 
-            appendLabel(bodiceGroup, 'Step 15: Point S (6.5" left, 1.75" down)', pointSX - 40, pointSY + 18, '#0284c7', '11', 'bold', false);
+            appendLabel(bodiceGroup, 'Step 15: Point S (6.5" left, 1.75" down)', pointSX - 40, pointSY + 18, '#dc2626', '11', 'bold', true);
 
-            const frontShoulderVecX = pointSX - frontNeckPointX;
-            const frontShoulderVecY = pointSY - frontNeckPointY;
-            const frontShoulderLen = Math.sqrt(frontShoulderVecX * frontShoulderVecX + frontShoulderVecY * frontShoulderVecY);
-            const unitFSX = frontShoulderVecX / frontShoulderLen;
-            const unitFSY = frontShoulderVecY / frontShoulderLen;
+            // Draw shoulder line from Front Neck Point through Point S and extend beyond for about 5 inches as dotted thin red line
+            const dxS = pointSX - frontNeckPointX;
+            const dyS = pointSY - frontNeckPointY;
+            const distS = Math.sqrt(dxS * dxS + dyS * dyS);
+            const unitDxS = dxS / distS;
+            const unitDyS = dyS / distS;
 
             const extensionInches = 5.0;
             const extensionPixels = extensionInches * scaleFactor;
-            const frontShoulderEndX = frontNeckPointX + (frontShoulderLen + extensionPixels) * unitFSX;
-            const frontShoulderEndY = frontNeckPointY + (frontShoulderLen + extensionPixels) * unitFSY;
+            const totalShoulderLineLen = distS + extensionPixels;
+            const shoulderLineEndX = frontNeckPointX + (unitDxS * totalShoulderLineLen);
+            const shoulderLineEndY = frontNeckPointY + (unitDyS * totalShoulderLineLen);
 
-            const frontShoulderLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            frontShoulderLine.setAttribute('x1', frontNeckPointX); frontShoulderLine.setAttribute('y1', frontNeckPointY);
-            frontShoulderLine.setAttribute('x2', frontShoulderEndX); frontShoulderLine.setAttribute('y2', frontShoulderEndY);
-            frontShoulderLine.setAttribute('stroke', '#0284c7');
-            frontShoulderLine.setAttribute('stroke-width', '2.5');
-            bodiceGroup.appendChild(frontShoulderLine);
+            const step15ShoulderLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            step15ShoulderLine.setAttribute('x1', frontNeckPointX); step15ShoulderLine.setAttribute('y1', frontNeckPointY);
+            step15ShoulderLine.setAttribute('x2', shoulderLineEndX); step15ShoulderLine.setAttribute('y2', shoulderLineEndY);
+            step15ShoulderLine.setAttribute('stroke', '#dc2626');
+            step15ShoulderLine.setAttribute('stroke-width', '1');
+            step15ShoulderLine.setAttribute('stroke-dasharray', '3 3');
+            bodiceGroup.appendChild(step15ShoulderLine);
 
-            appendLabel(bodiceGroup, 'Front Shoulder Line (Extended 5")', frontShoulderEndX + 10, frontShoulderEndY, '#0284c7', '10', 'bold', true);
+            appendLabel(bodiceGroup, 'Step 15: Front Shoulder Line (extended 5")', shoulderLineEndX + 10, shoulderLineEndY, '#dc2626', '10', 'bold', false);
 
 
             // Draw Bodice Pattern Box Frame
@@ -1605,13 +1606,13 @@
             bodiceGroup.appendChild(cbText);
 
 
-            // --- NEW REQUIREMENT: TOP SIDE NAME ---
+            // --- TOP SIDE NAME ---
             const topSideMidX = 50 + (bWidth / 2);
-            const topSideY = 50; // top side line y coordinate
+            const topSideY = 50;
             
             const topSideName = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             topSideName.setAttribute('x', topSideMidX);
-            topSideName.setAttribute('y', topSideY - 8); // near the line from outside (above the top line)
+            topSideName.setAttribute('y', topSideY - 8);
             topSideName.setAttribute('text-anchor', 'middle');
             topSideName.setAttribute('font-family', 'Montserrat, sans-serif');
             topSideName.setAttribute('font-size', '11');
