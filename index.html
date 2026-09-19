@@ -1376,6 +1376,45 @@
             appendLabel(bodiceGroup, 'Shoulder Dart (½" / 1cm wide)', shoulderMidX, shoulderMidY - 18, '#dc2626', '10', 'bold', true);
 
 
+            // --- STEP 12: Measure from the left side along the Hip Line ¼ of the Hip measurement and label this point Back Hip Point y ---
+            const hipLineY = 50 + bHeight;
+            const quarterHipInches = hipVal / 4.0;
+            const quarterHipPixels = quarterHipInches * scaleFactor;
+            const backHipPointX = 50 + quarterHipPixels;
+
+            const backHipCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            backHipCircle.setAttribute('cx', backHipPointX);
+            backHipCircle.setAttribute('cy', hipLineY);
+            backHipCircle.setAttribute('r', '5.5');
+            backHipCircle.setAttribute('fill', '#2563eb'); // Blue
+            bodiceGroup.appendChild(backHipCircle);
+
+            const backHipTick = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            backHipTick.setAttribute('x1', backHipPointX); backHipTick.setAttribute('y1', hipLineY - 8);
+            backHipTick.setAttribute('x2', backHipPointX); backHipTick.setAttribute('y2', hipLineY + 8);
+            backHipTick.setAttribute('stroke', '#2563eb');
+            backHipTick.setAttribute('stroke-width', '2');
+            bodiceGroup.appendChild(backHipTick);
+
+            const backHipLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            backHipLabel.setAttribute('x', backHipPointX);
+            backHipLabel.setAttribute('y', hipLineY + 24);
+            backHipLabel.setAttribute('font-family', 'Montserrat, sans-serif');
+            backHipLabel.setAttribute('font-size', '11');
+            backHipLabel.setAttribute('font-weight', 'bold');
+            backHipLabel.setAttribute('fill', '#2563eb');
+            backHipLabel.setAttribute('class', 'pattern-label');
+            backHipLabel.textContent = `Step 12: Back Hip Point y (${quarterHipInches.toFixed(2)}" / ${(quarterHipInches * 2.54).toFixed(1)}cm)`;
+            
+            let isHidden12 = false;
+            backHipLabel.addEventListener('click', (e) => {
+                e.stopPropagation();
+                isHidden12 = !isHidden12;
+                backHipLabel.style.display = isHidden12 ? 'none' : 'block';
+            });
+            bodiceGroup.appendChild(backHipLabel);
+
+
             // Draw Bodice Pattern Box Frame
             const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
             bodiceRect.setAttribute('x', 50); bodiceRect.setAttribute('y', 50);
