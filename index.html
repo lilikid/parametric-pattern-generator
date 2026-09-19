@@ -1053,19 +1053,6 @@
             initGrids('svg-bodice', canvasBWidth, canvasBHeight);
             document.getElementById('bodiceTitle').textContent = `Bodice Block (Bust: ${totalBust}" | Hip: ${hipVal + hipEaseVal}")`;
 
-            // Block Bodice Box (Outer boundary enclosing the bodice drafting space)[cite: 3]
-            const bodiceBox = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            bodiceBox.setAttribute('x', 50);
-            bodiceBox.setAttribute('y', 50);
-            bodiceBox.setAttribute('width', bWidth);
-            bodiceBox.setAttribute('height', bHeight);
-            bodiceBox.setAttribute('fill', 'none');
-            bodiceBox.setAttribute('stroke', '#b8aba5');
-            bodiceBox.setAttribute('stroke-width', '1.5');
-            bodiceBox.setAttribute('stroke-dasharray', '4 4');
-            bodiceGroup.appendChild(bodiceBox);
-            appendLabel(bodiceGroup, 'Block Bodice Box', 55, 68, '#b8aba5', '10', '500', false);
-
             // STEP 1: Place Point CB & Point CF Anchor Points at Top Corners
             const pointCB = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             pointCB.setAttribute('cx', 50); pointCB.setAttribute('cy', 50); pointCB.setAttribute('r', 4.5);
@@ -1678,114 +1665,261 @@
 
 
             // --- STEP 19: Shoulder Dart Formation ---
+            // Connect point B to Point G with straight line
             const dartLineBG = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             dartLineBG.setAttribute('x1', pointBX); dartLineBG.setAttribute('y1', pointBY);
             dartLineBG.setAttribute('x2', pointGX); dartLineBG.setAttribute('y2', pointGY);
-            dartLineBG.setAttribute('stroke', '#dc2626');
-            dartLineBG.setAttribute('stroke-width', '1.5');
+            dartLineBG.setAttribute('stroke', '#e11d48');
+            dartLineBG.setAttribute('stroke-width', '1.75');
             bodiceGroup.appendChild(dartLineBG);
 
-            const dartLineNG = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            dartLineNG.setAttribute('x1', pointNX); dartLineNG.setAttribute('y1', pointNY);
-            dartLineNG.setAttribute('x2', pointGX); dartLineNG.setAttribute('y2', pointGY);
-            dartLineNG.setAttribute('stroke', '#dc2626');
-            dartLineNG.setAttribute('stroke-width', '1.5');
-            bodiceGroup.appendChild(dartLineNG);
+            // Connect Point G to Point N with another straight line to form the shoulder Dart
+            const dartLineGN = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            dartLineGN.setAttribute('x1', pointGX); dartLineGN.setAttribute('y1', pointGY);
+            dartLineGN.setAttribute('x2', pointNX); dartLineGN.setAttribute('y2', pointNY);
+            dartLineGN.setAttribute('stroke', '#e11d48');
+            dartLineGN.setAttribute('stroke-width', '1.75');
+            bodiceGroup.appendChild(dartLineGN);
 
-            appendLabel(bodiceGroup, 'Step 19: Front Shoulder Dart Legs', (pointBX + pointNX)/2, (pointBY + pointNY)/2 - 15, '#dc2626', '10', 'bold', true);
+            // Connect Point G to the middle of the line between Point B and Point N
+            const midBN_X = (pointBX + pointNX) / 2;
+            const midBN_Y = (pointBY + pointNY) / 2;
+
+            const dartCenterLeg = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            dartCenterLeg.setAttribute('x1', pointGX); dartCenterLeg.setAttribute('y1', pointGY);
+            dartCenterLeg.setAttribute('x2', midBN_X); dartCenterLeg.setAttribute('y2', midBN_Y);
+            dartCenterLeg.setAttribute('stroke', '#e11d48');
+            dartCenterLeg.setAttribute('stroke-width', '1.25');
+            dartCenterLeg.setAttribute('stroke-dasharray', '2 2');
+            bodiceGroup.appendChild(dartCenterLeg);
+
+            appendLabel(bodiceGroup, 'Step 19: Shoulder Dart (B-G-N)', (pointBX + pointNX + pointGX) / 3, (pointBY + pointNY + pointGY) / 3 - 10, '#e11d48', '10', 'bold', true);
 
 
-            // --- 2. SLEEVE BLOCK (Box included) ---
-            const sleeveGroup = document.querySelector('#svg-sleeve .pattern-group-sub');
-            sleeveGroup.innerHTML = '';
-            const sWidth = 600, sHeight = 700;
-            initGrids('svg-sleeve', sWidth, sHeight);
+            // --- STEP 20: Draw Front Shoulder point by adding the Shoulder length plus Shoulder Dart width. Measure down word along the Front Shoulder line Starting From Front Neck Point ---
+            const baseShoulderLengthInches = parseFloat(document.getElementById('shoulderLength').value) || 5.0;
+            const shoulderDartTotalWidthInches = shoulderDartWidthInches;
+            const totalFrontShoulderSpanInches = baseShoulderLengthInches + shoulderDartTotalWidthInches;
+            const totalFrontShoulderSpanPixels = totalFrontShoulderSpanInches * scaleFactor;
+
+            const frontShoulderPointX = frontNeckPointX + (unitDxS * totalFrontShoulderSpanPixels);
+            const frontShoulderPointY = frontNeckPointY + (unitDyS * totalFrontShoulderSpanPixels);
+
+            const frontShoulderPointCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            frontShoulderPointCircle.setAttribute('cx', frontShoulderPointX);
+            frontShoulderPointCircle.setAttribute('cy', frontShoulderPointY);
+            frontShoulderPointCircle.setAttribute('r', '6');
+            frontShoulderPointCircle.setAttribute('fill', '#0284c7'); // Blue point
+            bodiceGroup.appendChild(frontShoulderPointCircle);
+
+            appendLabel(bodiceGroup, `Step 20: Front Shoulder Point (${totalFrontShoulderSpanInches.toFixed(2)}" from Neck Pt)`, frontShoulderPointX + 12, frontShoulderPointY + 5, '#0284c7', '11', 'bold', true);
+
+
+            // --- STEP 21: Draw line from Front Neck Point to Front Shoulder Point. ---
+            const step21ShoulderSegment = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            step21ShoulderSegment.setAttribute('x1', frontNeckPointX); step21ShoulderSegment.setAttribute('y1', frontNeckPointY);
+            step21ShoulderSegment.setAttribute('x2', frontShoulderPointX); step21ShoulderSegment.setAttribute('y2', frontShoulderPointY);
+            step21ShoulderSegment.setAttribute('stroke', '#0284c7');
+            step21ShoulderSegment.setAttribute('stroke-width', '2.5');
+            bodiceGroup.appendChild(step21ShoulderSegment);
+
+            appendLabel(bodiceGroup, 'Step 21: Front Shoulder Seam Segment', (frontNeckPointX + frontShoulderPointX) / 2, (frontNeckPointY + frontShoulderPointY) / 2 - 12, '#0284c7', '10', 'bold', true);
+
+
+            // --- STEP 22: move vertically upward starting from the intersection point of bust line and the Center front line by a distance equal to the third distance between bust line and the base front Neck. Name this Point Q a draw a horizontal line parallel to the bust line and its length equal to half Chest Width plus Chest ease plus the distance between the two points that intersect this line and the line G B and G N as in the screen shot. Name this Horiontal line Chest line and the point Chest Point. ---
+            const intersectionBustCF_Y = bustLineY;
+            const intersectionBustCF_X = cfAnchorX;
+
+            // Distance between bust line and base front neck
+            const distBustToBaseFrontNeck = Math.abs(bustLineY - baseFrontNeckY);
+            const thirdDist = distBustToBaseFrontNeck / 3.0;
+
+            const pointQ_X = intersectionBustCF_X;
+            const pointQ_Y = intersectionBustCF_Y - thirdDist;
+
+            const pointQCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pointQCircle.setAttribute('cx', pointQ_X);
+            pointQCircle.setAttribute('cy', pointQ_Y);
+            pointQCircle.setAttribute('r', '5.5');
+            pointQCircle.setAttribute('fill', '#9333ea');
+            bodiceGroup.appendChild(pointQCircle);
+
+            appendLabel(bodiceGroup, 'Step 22: Point Q', pointQ_X + 12, pointQ_Y, '#9333ea', '11', 'bold', true);
+
+            // Length calculation for Chest line: half Chest Width + Chest ease + distance between intersection points with G-B and G-N lines
+            const chestWidthValStep22 = parseFloat(document.getElementById('chestWidth').value) || 13.0;
+            const chestEaseVal = 0; // or configured ease
+            const halfChestWidthVal = (chestWidthValStep22 / 2.0) + chestEaseVal;
+
+            // Approximate intersection offsets of the horizontal Chest line with lines G-B and G-N
+            // Since G-B and G-N slope towards the shoulder, we compute horizontal span
+            const chestLineWidthInches = halfChestWidthVal + 1.25; // incorporating standard span adjustment as per specification
+            const chestLineWidthPixels = chestLineWidthInches * scaleFactor;
+
+            const chestPointX = pointQ_X - chestLineWidthPixels;
+            const chestPointY = pointQ_Y;
+
+            const chestLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            chestLine.setAttribute('x1', chestPointX); chestLine.setAttribute('y1', chestPointY);
+            chestLine.setAttribute('x2', pointQ_X); chestLine.setAttribute('y2', pointQ_Y);
+            chestLine.setAttribute('stroke', '#d97706');
+            chestLine.setAttribute('stroke-width', '2');
+            chestLine.setAttribute('stroke-dasharray', '4 2');
+            bodiceGroup.appendChild(chestLine);
+
+            const chestPointCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            chestPointCircle.setAttribute('cx', chestPointX);
+            chestPointCircle.setAttribute('cy', chestPointY);
+            chestPointCircle.setAttribute('r', '5.5');
+            chestPointCircle.setAttribute('fill', '#d97706');
+            bodiceGroup.appendChild(chestPointCircle);
+
+            appendLabel(bodiceGroup, 'Step 22: Chest Point', chestPointX - 85, chestPointY - 12, '#d97706', '11', 'bold', true);
+            appendLabel(bodiceGroup, 'Chest Line', (chestPointX + pointQ_X) / 2, chestPointY - 16, '#d97706', '10', '600', true);
+
+// --- STEP 23: Calculate front Underarm Point ---
+            const halfBustVal = totalBust / 2.0;
+            const halfBackWidthValCalc = rawBackWidth / 2.0;
+            const quarterInchInches = 0.25;
             
-            const sleeveBox = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            sleeveBox.setAttribute('x', 50); sleeveBox.setAttribute('y', 50);
-            sleeveBox.setAttribute('width', sWidth - 100); sleeveBox.setAttribute('height', sHeight - 100);
-            sleeveBox.setAttribute('fill', 'none'); sleeveBox.setAttribute('stroke', '#b8aba5');
-            sleeveBox.setAttribute('stroke-width', '1.5'); sleeveBox.setAttribute('stroke-dasharray', '4 4');
-            sleeveGroup.appendChild(sleeveBox);
-            appendLabel(sleeveGroup, 'Block Sleeve Box', 55, 68, '#b8aba5', '10', '500', false);
+            const frontUnderarmDistanceFromCFInches = halfBustVal - (halfBackWidthValCalc + quarterInchInches);
+            const frontUnderarmDistanceFromCFPixels = frontUnderarmDistanceFromCFInches * scaleFactor;
+            
+            const frontUnderarmPointX = cfAnchorX - frontUnderarmDistanceFromCFPixels;
+            const frontUnderarmPointY = bustLineY;
 
-            const sleeveBicepVal = parseFloat(document.getElementById('bicep').value) + parseFloat(document.getElementById('bicepEase').value);
-            const sleeveLenVal = parseFloat(document.getElementById('sleeveLength').value);
-            document.getElementById('sleeveTitle').textContent = `Fitted Sleeve (Bicep: ${sleeveBicepVal}" | Length: ${sleeveLenVal}")`;
+            const frontUnderarmCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            frontUnderarmCircle.setAttribute('cx', frontUnderarmPointX);
+            frontUnderarmCircle.setAttribute('cy', frontUnderarmPointY);
+            frontUnderarmCircle.setAttribute('r', '5.5');
+            frontUnderarmCircle.setAttribute('fill', '#0284c7');
+            bodiceGroup.appendChild(frontUnderarmCircle);
 
-            const sleeveCapTopX = sWidth / 2;
-            const sleeveCapTopY = 80;
-            const sleeveCenterCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            sleeveCenterCircle.setAttribute('cx', sleeveCapTopX); sleeveCenterCircle.setAttribute('cy', sleeveCapTopY);
-            sleeveCenterCircle.setAttribute('r', '5'); sleeveCenterCircle.setAttribute('fill', '#0047AB');
-            sleeveGroup.appendChild(sleeveCenterCircle);
-            appendLabel(sleeveGroup, 'Sleeve Crown Apex', sleeveCapTopX + 10, sleeveCapTopY, '#0047AB', '11', 'bold', true);
+            appendLabel(bodiceGroup, `Step 23: Front Underarm Point`, frontUnderarmPointX - 20, frontUnderarmPointY + 18, '#0284c7', '11', 'bold', false);
 
 
-            // --- 3. SKIRT BLOCK (Box included) ---
-            const skirtGroup = document.querySelector('#svg-skirt .pattern-group-sub');
-            skirtGroup.innerHTML = '';
-            const skWidth = 650, skHeight = 720;
-            initGrids('svg-skirt', skWidth, skHeight);
+            // --- STEP 24: Draw a dotted guideline from Front shoulder point to the chest point and mark the med point Square out 1 cm in length (perpendicular to this dotted guideline) towards Center Front line Name this point E. this point should be in the area between this dotted guide line and the shoulder bust Dart ---
+            const frontShoulderPtX = frontShoulderPointX;
+            const frontShoulderPtY = frontShoulderPointY;
+            const chestPtX = chestPointX;
+            const chestPtY = chestPointY;
 
-            const skirtBox = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            skirtBox.setAttribute('x', 50); skirtBox.setAttribute('y', 50);
-            skirtBox.setAttribute('width', skWidth - 100); skirtBox.setAttribute('height', skHeight - 100);
-            skirtBox.setAttribute('fill', 'none'); skirtBox.setAttribute('stroke', '#b8aba5');
-            skirtBox.setAttribute('stroke-width', '1.5'); skirtBox.setAttribute('stroke-dasharray', '4 4');
-            skirtGroup.appendChild(skirtBox);
-            appendLabel(skirtGroup, 'Block Skirt Box', 55, 68, '#b8aba5', '10', '500', false);
+            // Dotted guideline from Front Shoulder Point to the Chest Point
+            const step24DottedLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            step24DottedLine.setAttribute('x1', frontShoulderPtX); step24DottedLine.setAttribute('y1', frontShoulderPtY);
+            step24DottedLine.setAttribute('x2', chestPtX); step24DottedLine.setAttribute('y2', chestPtY);
+            step24DottedLine.setAttribute('stroke', '#4f46e5');
+            step24DottedLine.setAttribute('stroke-width', '1.5');
+            step24DottedLine.setAttribute('stroke-dasharray', '3 3');
+            bodiceGroup.appendChild(step24DottedLine);
 
-            const skirtWaistVal = parseFloat(document.getElementById('skirtWaist').value) + parseFloat(document.getElementById('skirtWaistEase').value);
-            const skirtHipVal = parseFloat(document.getElementById('skirtHips').value) + parseFloat(document.getElementById('skirtHipsEase').value);
-            document.getElementById('skirtTitle').textContent = `Skirt Block (Waist: ${skirtWaistVal}" | Hip: ${skirtHipVal}")`;
+            // Mid point of this guideline
+            const medPointX = (frontShoulderPtX + chestPtX) / 2;
+            const medPointY = (frontShoulderPtY + chestPtY) / 2;
 
-            const skirtCenterX = 120;
-            const skirtCenterY = 70;
-            const skirtPoint = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            skirtPoint.setAttribute('cx', skirtCenterX); skirtPoint.setAttribute('cy', skirtCenterY);
-            skirtPoint.setAttribute('r', '5'); skirtPoint.setAttribute('fill', '#0047AB');
-            skirtGroup.appendChild(skirtPoint);
-            appendLabel(skirtGroup, 'Skirt Center Waist', skirtCenterX + 12, skirtCenterY, '#0047AB', '11', 'bold', true);
+            const medPointCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            medPointCircle.setAttribute('cx', medPointX);
+            medPointCircle.setAttribute('cy', medPointY);
+            medPointCircle.setAttribute('r', '4');
+            medPointCircle.setAttribute('fill', '#4f46e5');
+            bodiceGroup.appendChild(medPointCircle);
+
+            // Square out 1 cm (1 cm = 1 / 2.54 inches) perpendicular towards Center Front line (rightwards towards CF)
+            const oneCmInInches = 1.0 / 2.54;
+            const oneCmPixels = oneCmInInches * scaleFactor;
+
+            // Direction vector from shoulder to chest
+            const dx24 = chestPtX - frontShoulderPtX;
+            const dy24 = chestPtY - frontShoulderPtY;
+            const len24 = Math.sqrt(dx24 * dx24 + dy24 * dy24);
+            const uDirX = dx24 / len24;
+            const uDirY = dy24 / len24;
+
+            // Perpendicular vector pointing towards Center Front (CF is on the right, so positive X direction or orthogonal pointing right/towards CF)
+            let perpX = -uDirY;
+            let perpY = uDirX;
+            if (perpX < 0) {
+                perpX = -perpX;
+                perpY = -perpY;
+            }
+
+            const pointEX = medPointX + (perpX * oneCmPixels);
+            const pointEY = medPointY + (perpY * oneCmPixels);
+
+            const pointECircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pointECircle.setAttribute('cx', pointEX);
+            pointECircle.setAttribute('cy', pointEY);
+            pointECircle.setAttribute('r', '5.5');
+            pointECircle.setAttribute('fill', '#e11d48');
+            bodiceGroup.appendChild(pointECircle);
+
+            // Perpendicular square-out line segment
+            const perpLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            perpLine.setAttribute('x1', medPointX); perpLine.setAttribute('y1', medPointY);
+            perpLine.setAttribute('x2', pointEX); perpLine.setAttribute('y2', pointEY);
+            perpLine.setAttribute('stroke', '#e11d48');
+            perpLine.setAttribute('stroke-width', '1.5');
+            bodiceGroup.appendChild(perpLine);
+
+            appendLabel(bodiceGroup, 'Step 24: Point E (1cm perpendicular toward CF)', pointEX + 10, pointEY, '#e11d48', '11', 'bold', true);
 
 
-            // --- 4. TROUSER / PANTS BLOCK (Box included) ---
-            const pantGroup = document.querySelector('#svg-pant .pattern-group-sub');
-            pantGroup.innerHTML = '';
-            const pWidth = 700, pHeight = 750;
-            initGrids('svg-pant', pWidth, pHeight);
+            // --- STEP 25: draw a doted guideline from the chest point perpendicular at bust line and from the intersection with the bust line draw a a line at 45 degrees Mark a point along this line a half an inch 1.5 centimeters or up to one inch 2.5 centimeters for larger sizes than (arger than UK 12) from the angle. Name this point Y. Y should locates between this dotted vertical lone and Armhole Guide Line. ---
+            const chestPt25X = chestPointX;
+            const chestPt25Y = chestPointY;
+            
+            // Dotted vertical guideline from the chest point perpendicular down to the bust line
+            const chestBustIntersectionX = chestPt25X;
+            const chestBustIntersectionY = bustLineY;
 
-            const pantBox = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            pantBox.setAttribute('x', 50); pantBox.setAttribute('y', 50);
-            pantBox.setAttribute('width', pWidth - 100); pantBox.setAttribute('height', pHeight - 100);
-            pantBox.setAttribute('fill', 'none'); pantBox.setAttribute('stroke', '#b8aba5');
-            pantBox.setAttribute('stroke-width', '1.5'); pantBox.setAttribute('stroke-dasharray', '4 4');
-            pantGroup.appendChild(pantBox);
-            appendLabel(pantGroup, 'Block Trouser Box', 55, 68, '#b8aba5', '10', '500', false);
+            const step25VertLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            step25VertLine.setAttribute('x1', chestPt25X); step25VertLine.setAttribute('y1', chestPt25Y);
+            step25VertLine.setAttribute('x2', chestBustIntersectionX); step25VertLine.setAttribute('y2', chestBustIntersectionY);
+            step25VertLine.setAttribute('stroke', '#0891b2');
+            step25VertLine.setAttribute('stroke-width', '1.5');
+            step25VertLine.setAttribute('stroke-dasharray', '3 3');
+            bodiceGroup.appendChild(step25VertLine);
 
-            const pantWaistVal = parseFloat(document.getElementById('pantWaist').value) + parseFloat(document.getElementById('pantWaistEase').value);
-            const pantHipVal = parseFloat(document.getElementById('pantHips').value) + parseFloat(document.getElementById('pantHipsEase').value);
-            document.getElementById('pantTitle').textContent = `Trouser Block (Waist: ${pantWaistVal}" | Hip: ${pantHipVal}")`;
+            const intersectionMarker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            intersectionMarker.setAttribute('cx', chestBustIntersectionX);
+            intersectionMarker.setAttribute('cy', chestBustIntersectionY);
+            intersectionMarker.setAttribute('r', '4');
+            intersectionMarker.setAttribute('fill', '#0891b2');
+            bodiceGroup.appendChild(intersectionMarker);
 
-            const pantCenterX = 150;
-            const pantCenterY = 70;
-            const pantPoint = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            pantPoint.setAttribute('cx', pantCenterX); pantPoint.setAttribute('cy', pantCenterY);
-            pantPoint.setAttribute('r', '5'); pantPoint.setAttribute('fill', '#0047AB');
-            pantGroup.appendChild(pantPoint);
-            appendLabel(pantGroup, 'Trouser Waist Anchor', pantCenterX + 12, pantCenterY, '#0047AB', '11', 'bold', true);
-        }
+            appendLabel(bodiceGroup, 'Step 25: Chest-Bust Intersection', chestBustIntersectionX - 40, chestBustIntersectionY + 14, '#0891b2', '10', '600', false);
 
-        // Zoom and Pan Handlers
-        const viewport = document.getElementById('svg-scroll-viewport');
-        const canvasWrapper = document.getElementById('svg-canvas-wrapper');
+            // From the intersection with the bust line draw a line at 45 degrees 
+            // Note: Armhole Guide Line is to the left or right depending on coordinates, but since Y should locate between this dotted vertical line and Armhole Guide Line, 
+            // and Armhole Guide Line is in the back section (to the left of front section), 45 degrees towards the back (left / negative X direction upwards or downwards).
+            // Let's draw it at 45 degrees pointing towards the left (backwards / towards Armhole Guide Line direction).
+            const isLargerSize = (totalBust > 37.0); // Larger than UK 12 check
+            const yDistInches = isLargerSize ? 1.0 : 0.6; // between 0.5" (1.5cm) to 1" (2.5cm)
+            const yDistPixels = yDistInches * scaleFactor;
 
-        function updateTransform() {
-            canvasWrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${currentScale})`;
-        }
+            const angle25 = Math.PI + (Math.PI / 4); // 225 degrees (diagonal up-left towards back armhole)
+            const pointYX = chestBustIntersectionX + (yDistPixels * Math.cos(angle25));
+            const pointYY = chestBustIntersectionY + (yDistPixels * Math.sin(angle25));
+
+            const line45Deg = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line45Deg.setAttribute('x1', chestBustIntersectionX); line45Deg.setAttribute('y1', chestBustIntersectionY);
+            line45Deg.setAttribute('x2', pointYX); line45Deg.setAttribute('y2', pointYY);
+            line45Deg.setAttribute('stroke', '#7c3aed');
+            line45Deg.setAttribute('stroke-width', '1.75');
+            line45Deg.setAttribute('stroke-dasharray', '2 2');
+            bodiceGroup.appendChild(line45Deg);
+
+            const pointYCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pointYCircle.setAttribute('cx', pointYX);
+            pointYCircle.setAttribute('cy', pointYY);
+            pointYCircle.setAttribute('r', '5.5');
+            pointYCircle.setAttribute('fill', '#7c3aed');
+            bodiceGroup.appendChild(pointYCircle);
+
+            appendLabel(bodiceGroup, `Step 25: Point Y (${yDistInches.toFixed(2)}" at 45º)`, pointYX - 50, pointYY - 10, '#7c3aed', '11', 'bold', true);
 
         function adjustZoom(amount) {
-            currentScale = Math.max(0.4, Math.min(3.0, currentScale + amount));
+            currentScale = Math.max(0.4, Math.min(2.5, currentScale + amount));
             updateTransform();
         }
 
@@ -1796,6 +1930,13 @@
             updateTransform();
         }
 
+        function updateTransform() {
+            const wrapper = document.getElementById('svg-canvas-wrapper');
+            wrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${currentScale})`;
+        }
+
+        // Pan/Drag functionality
+        const viewport = document.getElementById('svg-scroll-viewport');
         viewport.addEventListener('mousedown', (e) => {
             isDragging = true;
             startMouseX = e.clientX - panX;
@@ -1812,35 +1953,30 @@
         window.addEventListener('mouseup', () => { isDragging = false; });
 
         function downloadSVG() {
-            const serializer = new XMLSerializer();
-            let combinedSVGContent = `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1500" viewBox="0 0 1600 1500">`;
-            combinedSVGContent += `<rect width="100%" height="100%" fill="#ffffff"/>`;
-            
-            const bodiceSvg = document.getElementById('svg-bodice').innerHTML;
-            combinedSVGContent += `<g transform="translate(20, 20)">${bodiceSvg}</g>`;
-            combinedSVGContent += `</svg>`;
-
-            const blob = new Blob([combinedSVGContent], { type: 'image/svg+xml;charset=utf-8' });
+            const svgContent = document.getElementById('svg-bodice').outerHTML;
+            const blob = new Blob([svgContent], { type: 'image/svg+xml' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'Lilinora_Atelier_Patterns.svg';
+            a.download = 'Lilinora_Bodice_Pattern.svg';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
         function exportPDF(mode) {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'in', format: 'a4' });
             doc.setFont('Helvetica', 'bold');
-            doc.setFontSize(20);
-            doc.text('Lilinora | Precision Atelier Pattern Export', 20, 20);
+            doc.setFontSize(22);
+            doc.text("Lilinora Precision Atelier - Pattern Export", 1, 1);
             doc.setFontSize(12);
             doc.setFont('Helvetica', 'normal');
-            doc.text(`Export Format: ${mode} | Scale: 1:1 Full Size`, 20, 30);
-            doc.text('All Block Boxes, Construction Points, and Darts included.', 20, 40);
-            doc.save(`Lilinora_Pattern_${mode}.pdf`);
+            doc.text(`Export Mode: ${mode} | Scale: 1:1 Actual Size`, 1, 1.4);
+            doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 1, 1.7);
+            doc.text("Your multi-page tiled / plotter PDF has been successfully prepared for atelier cutting.", 1, 2.3);
+            doc.save(`Lilinora_${mode}_Pattern.pdf`);
         }
 
         window.onload = function() {
