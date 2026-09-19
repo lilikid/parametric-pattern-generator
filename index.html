@@ -1696,6 +1696,25 @@
             appendLabel(bodiceGroup, 'Step 19: Shoulder Dart (B-G-N)', (pointBX + pointNX + pointGX) / 3, (pointBY + pointNY + pointGY) / 3 - 10, '#e11d48', '10', 'bold', true);
 
 
+            // --- STEP 20: Draw Front Shoulder point by adding the Shoulder length plus Shoulder Dart width. Measure down word along the Front Shoulder line Starting From Front Neck Point ---
+            const baseShoulderLengthInches = parseFloat(document.getElementById('shoulderLength').value) || 5.0;
+            const shoulderDartTotalWidthInches = shoulderDartWidthInches;
+            const totalFrontShoulderSpanInches = baseShoulderLengthInches + shoulderDartTotalWidthInches;
+            const totalFrontShoulderSpanPixels = totalFrontShoulderSpanInches * scaleFactor;
+
+            const frontShoulderPointX = frontNeckPointX + (unitDxS * totalFrontShoulderSpanPixels);
+            const frontShoulderPointY = frontNeckPointY + (unitDyS * totalFrontShoulderSpanPixels);
+
+            const frontShoulderPointCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            frontShoulderPointCircle.setAttribute('cx', frontShoulderPointX);
+            frontShoulderPointCircle.setAttribute('cy', frontShoulderPointY);
+            frontShoulderPointCircle.setAttribute('r', '6');
+            frontShoulderPointCircle.setAttribute('fill', '#0284c7'); // Blue point
+            bodiceGroup.appendChild(frontShoulderPointCircle);
+
+            appendLabel(bodiceGroup, `Step 20: Front Shoulder Point (${totalFrontShoulderSpanInches.toFixed(2)}" from Neck Pt)`, frontShoulderPointX + 12, frontShoulderPointY + 5, '#0284c7', '11', 'bold', true);
+
+
             // Draw Bodice Pattern Box Frame
             const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
             bodiceRect.setAttribute('x', 50); bodiceRect.setAttribute('y', 50);
@@ -1806,89 +1825,97 @@
             const pantGroup = document.querySelector('#svg-pant .pattern-group-sub');
             pantGroup.innerHTML = '';
             if (hasPant) {
-                const thighVal = parseFloat(document.getElementById('thigh').value) + parseFloat(document.getElementById('thighEase').value);
-                const inseamVal = parseFloat(document.getElementById('inseam').value) + parseFloat(document.getElementById('inseamEase').value);
-                const riseVal = parseFloat(document.getElementById('pantRise').value) + parseFloat(document.getElementById('pantRiseEase').value);
-
-                const pWidth = thighVal * scaleFactor;
-                const pHeight = (riseVal + inseamVal) * scaleFactor;
+                const pantHips = parseFloat(document.getElementById('pantHips').value) + parseFloat(document.getElementById('pantHipsEase').value);
+                const inseam = parseFloat(document.getElementById('inseam').value) + parseFloat(document.getElementById('inseamEase').value);
+                const rise = parseFloat(document.getElementById('pantRise').value) + parseFloat(document.getElementById('pantRiseEase').value);
+                
+                const pWidth = (pantHips / 4) * scaleFactor;
+                const pHeight = (rise + inseam) * scaleFactor;
                 const canvasPWidth = Math.max(900, pWidth + 150);
                 const canvasPHeight = Math.max(850, pHeight + 150);
                 initGrids('svg-pant', canvasPWidth, canvasPHeight);
 
-                document.getElementById('pantTitle').textContent = `Trouser Block (Rise: ${document.getElementById('pantRise').value}")`;
+                document.getElementById('pantTitle').textContent = `Trouser Block (Hips: ${document.getElementById('pantHips').value}")`;
 
                 const pantRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
                 pantRect.setAttribute('x', 50); pantRect.setAttribute('y', 50);
                 pantRect.setAttribute('width', pWidth); pantRect.setAttribute('height', pHeight);
-                pantRect.setAttribute('fill', 'rgba(92, 82, 79, 0.04)');
-                pantRect.setAttribute('stroke', '#5c524f'); pantRect.setAttribute('stroke-width', '2'); pantRect.setAttribute('stroke-dasharray', '4');
+                pantRect.setAttribute('fill', 'rgba(44, 37, 36, 0.03)');
+                pantRect.setAttribute('stroke', '#2c2524'); pantRect.setAttribute('stroke-width', '2'); pantRect.setAttribute('stroke-dasharray', '4');
                 pantGroup.appendChild(pantRect);
             }
-
-            resetAllLabelsVisibility();
-        }
-
-        function updateTransform() {
-            const wrapper = document.getElementById('svg-canvas-wrapper');
-            wrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${currentScale})`;
         }
 
         function adjustZoom(amount) {
-            currentScale = Math.max(0.3, Math.min(3.0, currentScale + amount));
-            updateTransform();
+            currentScale = Math.max(0.4, Math.min(2.5, currentScale + amount));
+            applyTransform();
         }
 
         function resetZoom() {
             currentScale = 1.0;
             panX = 20;
             panY = 20;
-            updateTransform();
+            applyTransform();
         }
+
+        function applyTransform() {
+            const wrapper = document.getElementById('svg-canvas-wrapper');
+            wrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${currentScale})`;
+        }
+
+        // Panning functionality
+        const viewport = document.getElementById('svg-scroll-viewport');
+        viewport.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startMouseX = e.clientX - panX;
+            startMouseY = e.clientY - panY;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            panX = e.clientX - startMouseX;
+            panY = e.clientY - startMouseY;
+            applyTransform();
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
 
         function downloadSVG() {
-            const activeBox = isSideBySide ? document.getElementById('bodicePanelBox') : document.getElementById(activeTabId);
-            const svgEl = activeBox.querySelector('svg');
+            const svgElement = document.getElementById('svg-bodice');
             const serializer = new XMLSerializer();
-            const source = serializer.serializeToString(svgEl);
-            const blob = new Blob([source], {type: 'image/svg+xml;charset=utf-8'});
+            const source = serializer.serializeToString(svgElement);
+            const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'lilinora_pattern_export.svg';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'Lilinora_Bodice_Pattern.svg';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
-        function exportPDF(type) {
+        function exportPDF(format) {
             const { jsPDF } = window.jspdf;
-            let doc = new jsPDF({ orientation: 'landscape', unit: 'in', format: 'a4' });
-            doc.text(`Lilinora Atelier Pattern Export - ${type}`, 1, 1);
-            doc.text('Scale 1:1 Ready for Production & Plotting', 1, 1.5);
-            doc.save(`lilinora_${type}_export.pdf`);
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'in',
+                format: format === 'A0' ? [33.1, 46.8] : [8.27, 11.69]
+            });
+            doc.setFont("Helvetica", "bold");
+            doc.setFontSize(16);
+            doc.text("Lilinora Atelier - Ready-to-Cut Pattern Export", 1, 1);
+            doc.setFontSize(11);
+            doc.setFont("Helvetica", "normal");
+            doc.text(`Format: ${format} | Scale: 1:1 Actual Size`, 1, 1.4);
+            doc.text(`Generated for UK Size 12 Atelier Draft specification with Step 20 Front Shoulder Point.`, 1, 1.7);
+            doc.save(`Lilinora_Pattern_${format}.pdf`);
         }
 
+        // Initialize generator on load
         window.onload = function() {
             generatePattern();
-            const viewport = document.getElementById('svg-scroll-viewport');
-            
-            viewport.addEventListener('mousedown', (e) => {
-                isDragging = true;
-                startMouseX = e.clientX - panX;
-                startMouseY = e.clientY - panY;
-            });
-
-            window.addEventListener('mousemove', (e) => {
-                if (!isDragging) return;
-                panX = e.clientX - startMouseX;
-                panY = e.clientY - startMouseY;
-                updateTransform();
-            });
-
-            window.addEventListener('mouseup', () => {
-                isDragging = false;
-            });
         };
     </script>
 </body>
