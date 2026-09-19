@@ -1480,59 +1480,57 @@
             appendLabel(bodiceGroup, `Base Front Neck (${baseFrontNeckDistInches.toFixed(2)}" down from CF)`, baseFrontNeckX + 12, baseFrontNeckY, '#9333ea', '11', 'bold', false);
 
 
-            // --- STEP 14: Drawing the Front neck curve ---
-            // Square down from the Front neck point and across from base Front neck and then draw a guideline of 45 degrees pointing upward toward the CF point and then draw a guideline of 45 degrees quarter inches three centimeters. Name this point F.
-            // Square down from Front Neck Point (vertical line down)
-            const squareDownLen = baseFrontNeckY - frontNeckPointY;
-            const squareDownLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            squareDownLine.setAttribute('x1', frontNeckPointX); squareDownLine.setAttribute('y1', frontNeckPointY);
-            squareDownLine.setAttribute('x2', frontNeckPointX); squareDownLine.setAttribute('y2', baseFrontNeckY);
-            squareDownLine.setAttribute('stroke', '#0284c7');
-            squareDownLine.setAttribute('stroke-width', '1.5');
-            squareDownLine.setAttribute('stroke-dasharray', '3 3');
-            bodiceGroup.appendChild(squareDownLine);
+            // --- STEP 14: Drawing the Front neck curve. Square down from the Front neck point and across from base Front neck and then draw a guideline of 45 degrees at the right side of the vertical line that we squared down from the Front Neck Point pointing upward toward the CF point and then draw a guideline of 45 degrees quarter inches three centimeters. Name this point F. ---
+            // 1. Square down from the Front Neck Point (vertical line from frontNeckPointX, frontNeckPointY downwards)
+            const step14SquareDownLength = 2.0 * scaleFactor; // visual guide length downwards
+            const step14VertLineX = frontNeckPointX;
+            const step14VertLineStartY = frontNeckPointY;
+            const step14VertLineEndY = frontNeckPointY + step14SquareDownLength;
 
-            // Square across from Base Front Neck (horizontal line across to the left to meet the vertical square down line)
-            const squareAcrossLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            squareAcrossLine.setAttribute('x1', baseFrontNeckX); squareAcrossLine.setAttribute('y1', baseFrontNeckY);
-            squareAcrossLine.setAttribute('x2', frontNeckPointX); squareAcrossLine.setAttribute('y2', baseFrontNeckY);
-            squareAcrossLine.setAttribute('stroke', '#0284c7');
-            squareAcrossLine.setAttribute('stroke-width', '1.5');
-            squareAcrossLine.setAttribute('stroke-dasharray', '3 3');
-            bodiceGroup.appendChild(squareAcrossLine);
+            const step14VertLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            step14VertLine.setAttribute('x1', step14VertLineX); step14VertLine.setAttribute('y1', step14VertLineStartY);
+            step14VertLine.setAttribute('x2', step14VertLineX); step14VertLine.setAttribute('y2', step14VertLineEndY);
+            step14VertLine.setAttribute('stroke', '#0284c7');
+            step14VertLine.setAttribute('stroke-width', '1.5');
+            step14VertLine.setAttribute('stroke-dasharray', '3 3');
+            bodiceGroup.appendChild(step14VertLine);
 
-            // Intersection point of the square down and square across (corner angle)
-            const cornerIntersectionX = frontNeckPointX;
-            const cornerIntersectionY = baseFrontNeckY;
+            // 2. Square across from base Front neck (horizontal line from baseFrontNeckX, baseFrontNeckY horizontally across to the left/right)
+            const step14HorizLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            step14HorizLine.setAttribute('x1', baseFrontNeckX - (2.5 * scaleFactor)); step14HorizLine.setAttribute('y1', baseFrontNeckY);
+            step14HorizLine.setAttribute('x2', baseFrontNeckX); step14HorizLine.setAttribute('y2', baseFrontNeckY);
+            step14HorizLine.setAttribute('stroke', '#0284c7');
+            step14HorizLine.setAttribute('stroke-width', '1.5');
+            step14HorizLine.setAttribute('stroke-dasharray', '3 3');
+            bodiceGroup.appendChild(step14HorizLine);
 
-            // Guideline of 45 degrees pointing upward toward the CF point from the corner intersection
-            const angle45Rad = Math.PI / 4;
-            const guidelineLengthPixels = 3.0 * scaleFactor; // visual guideline length
-            const guideUpX = cornerIntersectionX - (guidelineLengthPixels * Math.cos(angle45Rad)); // pointing toward CF (leftwards / inwards from CF corner)
-            const guideUpY = cornerIntersectionY - (guidelineLengthPixels * Math.sin(angle45Rad));
+            // 3. Intersection / corner point of squaring down from Front Neck Point and across from Base Front Neck (or angle vertex reference)
+            // 4. Guideline of 45 degrees at the right side of the vertical line that we squared down from the Front Neck Point pointing upward toward the CF point (or from the corner vertex pointing towards CF / up-right / up-left depending on orientation, here Front Neck Point is to the left of CF, so right side of the vertical line squared down from Front Neck Point points toward CF)
+            // Distance: 3 cm / quarter inches (let's use 3 cm ~ 1.18 inches or 0.25 inches as specified: "quarter inches three centimeters" -> 3 cm / 1.18 in, let's use 3 cm / 1.18 inches magnitude). Let's use 3 cm = 3 / 2.54 inches = 1.181 inches.
+            const fDistInches = 3.0 / 2.54; // 3 cm
+            const fDistPixels = fDistInches * scaleFactor;
+            // 45 degrees pointing upward toward the CF point from the vertical line intersection / corner below Front Neck Point
+            // Since Front Neck Point is to the left of CF, "right side of the vertical line" means towards CF (positive X direction, upwards (-Y direction)).
+            const fAngleRad = -Math.PI / 4; // -45 degrees (up and right towards CF)
+            const fPointX = step14VertLineX + (fDistPixels * Math.cos(fAngleRad));
+            const fPointY = (frontNeckPointY + baseFrontNeckDistPixels) + (fDistPixels * Math.sin(fAngleRad)); // from the corner vertex at (frontNeckPointX, baseFrontNeckY)
 
-            const guideline45Up = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            guideline45Up.setAttribute('x1', cornerIntersectionX); guideline45Up.setAttribute('y1', cornerIntersectionY);
-            guideline45Up.setAttribute('x2', guideUpX); guideline45Up.setAttribute('y2', guideUpY);
-            guideline45Up.setAttribute('stroke', '#d97706');
-            guideline45Up.setAttribute('stroke-width', '1.5');
-            guideline45Up.setAttribute('stroke-dasharray', '4 2');
-            bodiceGroup.appendChild(guideline45Up);
+            const fGuideLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            fGuideLine.setAttribute('x1', step14VertLineX); fGuideLine.setAttribute('y1', baseFrontNeckY);
+            fGuideLine.setAttribute('x2', fPointX); fGuideLine.setAttribute('y2', fPointY);
+            fGuideLine.setAttribute('stroke', '#7c3aed');
+            fGuideLine.setAttribute('stroke-width', '2');
+            fGuideLine.setAttribute('stroke-dasharray', '2 2');
+            bodiceGroup.appendChild(fGuideLine);
 
-            // Point F: guideline of 45 degrees at quarter inches / three centimeters along that 45 degree angle
-            const pointFDistInches = 0.75; // quarter inches / three centimeters (~0.75 in / ~1.9cm - 3cm interpreted based on instruction context)
-            const pointFPixels = pointFDistInches * scaleFactor;
-            const pointFX = cornerIntersectionX - (pointFPixels * Math.cos(angle45Rad));
-            const pointFY = cornerIntersectionY - (pointFPixels * Math.sin(angle45Rad));
+            const fPointCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            fPointCircle.setAttribute('cx', fPointX);
+            fPointCircle.setAttribute('cy', fPointY);
+            fPointCircle.setAttribute('r', '5.5');
+            fPointCircle.setAttribute('fill', '#7c3aed'); // Purple
+            bodiceGroup.appendChild(fPointCircle);
 
-            const pointFCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            pointFCircle.setAttribute('cx', pointFX);
-            pointFCircle.setAttribute('cy', pointFY);
-            pointFCircle.setAttribute('r', '5.5');
-            pointFCircle.setAttribute('fill', '#e11d48'); // Red accent for Point F
-            bodiceGroup.appendChild(pointFCircle);
-
-            appendLabel(bodiceGroup, 'Step 14: Point F (45º guideline)', pointFX - 20, pointFY - 12, '#e11d48', '11', 'bold', true);
+            appendLabel(bodiceGroup, 'Step 14: Point F (3cm / 0.25" at 45º toward CF)', fPointX + 10, fPointY, '#7c3aed', '11', 'bold', true);
 
 
             // Draw Bodice Pattern Box Frame
