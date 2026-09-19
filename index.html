@@ -1481,7 +1481,6 @@
 
 
             // --- STEP 14: Drawing the Front neck curve. Square down from the Front neck point and across from base Front neck and then draw a guideline of 45 degrees at the right side of the vertical line that we squared down from the Front Neck Point pointing upward toward the CF point and then draw a guideline of 45 degrees quarter inches three centimeters. Name this point F. ---
-            // 1. Square down from the Front Neck Point (vertical line from frontNeckPointX, frontNeckPointY downwards)
             const step14SquareDownLength = 2.0 * scaleFactor; // visual guide length downwards
             const step14VertLineX = frontNeckPointX;
             const step14VertLineStartY = frontNeckPointY;
@@ -1495,7 +1494,6 @@
             step14VertLine.setAttribute('stroke-dasharray', '3 3');
             bodiceGroup.appendChild(step14VertLine);
 
-            // 2. Square across from base Front neck (horizontal line from baseFrontNeckX, baseFrontNeckY horizontally across to the left/right)
             const step14HorizLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             step14HorizLine.setAttribute('x1', baseFrontNeckX - (2.5 * scaleFactor)); step14HorizLine.setAttribute('y1', baseFrontNeckY);
             step14HorizLine.setAttribute('x2', baseFrontNeckX); step14HorizLine.setAttribute('y2', baseFrontNeckY);
@@ -1504,16 +1502,11 @@
             step14HorizLine.setAttribute('stroke-dasharray', '3 3');
             bodiceGroup.appendChild(step14HorizLine);
 
-            // 3. Intersection / corner point of squaring down from Front Neck Point and across from Base Front Neck (or angle vertex reference)
-            // 4. Guideline of 45 degrees at the right side of the vertical line that we squared down from the Front Neck Point pointing upward toward the CF point (or from the corner vertex pointing towards CF / up-right / up-left depending on orientation, here Front Neck Point is to the left of CF, so right side of the vertical line squared down from Front Neck Point points toward CF)
-            // Distance: 3 cm / quarter inches (let's use 3 cm ~ 1.18 inches or 0.25 inches as specified: "quarter inches three centimeters" -> 3 cm / 1.18 in, let's use 3 cm / 1.18 inches magnitude). Let's use 3 cm = 3 / 2.54 inches = 1.181 inches.
             const fDistInches = 3.0 / 2.54; // 3 cm
             const fDistPixels = fDistInches * scaleFactor;
-            // 45 degrees pointing upward toward the CF point from the vertical line intersection / corner below Front Neck Point
-            // Since Front Neck Point is to the left of CF, "right side of the vertical line" means towards CF (positive X direction, upwards (-Y direction)).
             const fAngleRad = -Math.PI / 4; // -45 degrees (up and right towards CF)
             const fPointX = step14VertLineX + (fDistPixels * Math.cos(fAngleRad));
-            const fPointY = (frontNeckPointY + baseFrontNeckDistPixels) + (fDistPixels * Math.sin(fAngleRad)); // from the corner vertex at (frontNeckPointX, baseFrontNeckY)
+            const fPointY = (frontNeckPointY + baseFrontNeckDistPixels) + (fDistPixels * Math.sin(fAngleRad));
 
             const fGuideLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             fGuideLine.setAttribute('x1', step14VertLineX); fGuideLine.setAttribute('y1', baseFrontNeckY);
@@ -1531,6 +1524,45 @@
             bodiceGroup.appendChild(fPointCircle);
 
             appendLabel(bodiceGroup, 'Step 14: Point F (3cm / 0.25" at 45º toward CF)', fPointX + 10, fPointY, '#7c3aed', '11', 'bold', true);
+
+
+            // --- STEP 15: Drawing the front shoulder line. measure along the Bodice Block Top Line six and a half inches 16.5 centimeters from CF Point and move to the left and square down one and three quarter inches 4.5 centimeters. Name this point S. draw the shoulder line from the Front Neck Point through point S just drafted and extend beyond for about 5 inches ---
+            const step15DistInches = 6.5; // 6.5 inches / 16.5 cm
+            const step15DistPixels = step15DistInches * scaleFactor;
+            const step15SquareDownInches = 1.75; // 1.75 inches / 4.5 cm
+            const step15SquareDownPixels = step15SquareDownInches * scaleFactor;
+
+            const pointSX = cfAnchorX - step15DistPixels;
+            const pointSY = 50 + step15SquareDownPixels;
+
+            const pointSCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pointSCircle.setAttribute('cx', pointSX);
+            pointSCircle.setAttribute('cy', pointSY);
+            pointSCircle.setAttribute('r', '5.5');
+            pointSCircle.setAttribute('fill', '#0284c7'); // Blue accent
+            bodiceGroup.appendChild(pointSCircle);
+
+            appendLabel(bodiceGroup, 'Step 15: Point S (6.5" left, 1.75" down)', pointSX - 40, pointSY + 18, '#0284c7', '11', 'bold', false);
+
+            const frontShoulderVecX = pointSX - frontNeckPointX;
+            const frontShoulderVecY = pointSY - frontNeckPointY;
+            const frontShoulderLen = Math.sqrt(frontShoulderVecX * frontShoulderVecX + frontShoulderVecY * frontShoulderVecY);
+            const unitFSX = frontShoulderVecX / frontShoulderLen;
+            const unitFSY = frontShoulderVecY / frontShoulderLen;
+
+            const extensionInches = 5.0;
+            const extensionPixels = extensionInches * scaleFactor;
+            const frontShoulderEndX = frontNeckPointX + (frontShoulderLen + extensionPixels) * unitFSX;
+            const frontShoulderEndY = frontNeckPointY + (frontShoulderLen + extensionPixels) * unitFSY;
+
+            const frontShoulderLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            frontShoulderLine.setAttribute('x1', frontNeckPointX); frontShoulderLine.setAttribute('y1', frontNeckPointY);
+            frontShoulderLine.setAttribute('x2', frontShoulderEndX); frontShoulderLine.setAttribute('y2', frontShoulderEndY);
+            frontShoulderLine.setAttribute('stroke', '#0284c7');
+            frontShoulderLine.setAttribute('stroke-width', '2.5');
+            bodiceGroup.appendChild(frontShoulderLine);
+
+            appendLabel(bodiceGroup, 'Front Shoulder Line (Extended 5")', frontShoulderEndX + 10, frontShoulderEndY, '#0284c7', '10', 'bold', true);
 
 
             // Draw Bodice Pattern Box Frame
@@ -1574,8 +1606,6 @@
 
 
             // --- NEW REQUIREMENT: TOP SIDE NAME ---
-            // Name the top side of the bodice block box (the current dotted line between CF and CB points).
-            // Horizontal direction, at the middle of the line and near the line from outside the bodice block box.
             const topSideMidX = 50 + (bWidth / 2);
             const topSideY = 50; // top side line y coordinate
             
