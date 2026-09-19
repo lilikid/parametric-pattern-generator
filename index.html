@@ -1792,97 +1792,101 @@
             const frontUnderarmCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             frontUnderarmCircle.setAttribute('cx', frontUnderarmPointX);
             frontUnderarmCircle.setAttribute('cy', frontUnderarmPointY);
-            frontUnderarmCircle.setAttribute('r', '6');
-            frontUnderarmCircle.setAttribute('fill', '#059669'); // Emerald green point for front underarm point
+            frontUnderarmCircle.setAttribute('r', '5.5');
+            frontUnderarmCircle.setAttribute('fill', '#0047AB'); // Blue point as shown in screenshot reference
             bodiceGroup.appendChild(frontUnderarmCircle);
 
-            // Draw horizontal segment from CF along the bust line to the Front Underarm Point to show calculation
-            const frontUnderarmSpanLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            frontUnderarmSpanLine.setAttribute('x1', frontUnderarmPointX); frontUnderarmSpanLine.setAttribute('y1', bustLineY);
-            frontUnderarmSpanLine.setAttribute('x2', cfAnchorX); frontUnderarmSpanLine.setAttribute('y2', bustLineY);
-            frontUnderarmSpanLine.setAttribute('stroke', '#059669');
-            frontUnderarmSpanLine.setAttribute('stroke-width', '2');
-            frontUnderarmSpanLine.setAttribute('stroke-dasharray', '3 3');
-            bodiceGroup.appendChild(frontUnderarmSpanLine);
-
-            appendLabel(bodiceGroup, `Step 23: Front Underarm Point (${frontUnderarmDistanceFromCFInches.toFixed(2)}" from CF)`, frontUnderarmPointX - 110, bustLineY + 22, '#059669', '11', 'bold', false);
+            appendLabel(bodiceGroup, 'Step 23: Front Underarm Point', frontUnderarmPointX - 60, frontUnderarmPointY + 20, '#0047AB', '11', 'bold', false);
 
 
-            // Draw Bodice Pattern Box Frame
-            const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            bodiceRect.setAttribute('x', 50); bodiceRect.setAttribute('y', 50);
-            bodiceRect.setAttribute('width', bWidth); bodiceRect.setAttribute('height', bHeight);
-            bodiceRect.setAttribute('fill', 'rgba(194, 94, 111, 0.04)');
-            bodiceRect.setAttribute('stroke', '#c25e6f'); bodiceRect.setAttribute('stroke-width', '2'); bodiceRect.setAttribute('stroke-dasharray', '4');
-            bodiceGroup.appendChild(bodiceRect);
+            // --- STEP 24: Use above screenshot as a guide. The marked blue point Named with blue color ---
+            const step24DistInches = 1.25; // 1.25 inches (approx 3.2 cm) bisector extension for front armhole corner
+            const step24DistPixels = step24DistInches * scaleFactor;
+            const step24AngleRad = -Math.PI / 4; // -45 degrees (up and right towards the armhole corner)
+            const step24PointX = frontUnderarmPointX + (step24DistPixels * Math.cos(step24AngleRad));
+            const step24PointY = frontUnderarmPointY - (step24DistPixels * Math.sin(step24AngleRad));
 
-            // Add Hip Line Label to the lower line of the bodice block box
-            appendLabel(bodiceGroup, 'Hip Line', 60, 50 + bHeight, '#c25e6f', '11', 'bold', false);
+            const step24GuideLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            step24GuideLine.setAttribute('x1', frontUnderarmPointX); step24GuideLine.setAttribute('y1', frontUnderarmPointY);
+            step24GuideLine.setAttribute('x2', step24PointX); step24GuideLine.setAttribute('y2', step24PointY);
+            step24GuideLine.setAttribute('stroke', '#0047AB');
+            step24GuideLine.setAttribute('stroke-width', '2');
+            step24GuideLine.setAttribute('stroke-dasharray', '3 3');
+            bodiceGroup.appendChild(step24GuideLine);
 
+            const step24PointCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            step24PointCircle.setAttribute('cx', step24PointX);
+            step24PointCircle.setAttribute('cy', step24PointY);
+            step24PointCircle.setAttribute('r', '5.5');
+            step24PointCircle.setAttribute('fill', '#0047AB'); // Blue color point as requested
+            bodiceGroup.appendChild(step24PointCircle);
 
-            // --- CENTER FRONT & CENTER BACK VERTICAL NAMES (INSIDE) ---
+            appendLabel(bodiceGroup, 'Step 24: Front Armhole Corner Point (1.25" at 45º)', step24PointX + 12, step24PointY - 10, '#0047AB', '11', 'bold', true);
+        }
+
+        function downloadSVG() {
+            const svgEl = document.getElementById('svg-bodice');
+            const serializer = new XMLSerializer();
+            const source = serializer.serializeToString(svgEl);
+            const blob = new Blob([source], {type: 'image/svg+xml;charset=utf-8'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Lilinora_Bodice_Pattern_Step24.svg';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function exportPDF(type) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            doc.setFont('Helvetica', 'bold');
+            doc.setFontSize(18);
+            doc.text('Lilinora Precision Atelier', 20, 20);
+            doc.setFontSize(12);
+            doc.text(`Pattern Export Type: ${type}`, 20, 30);
+            doc.text(`Generated with Step 24 Integration`, 20, 40);
+            doc.save(`Lilinora_Pattern_${type}.pdf`);
+        }
+
+        let isPanning = false;
+        let startX = 0, startY = 0;
+        const viewport = document.getElementById('svg-scroll-viewport');
+        const canvasWrapper = document.getElementById('svg-canvas-wrapper');
+
+        viewport.addEventListener('mousedown', (e) => {
+            isPanning = true;
+            startX = e.clientX - panX;
+            startY = e.clientY - panY;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isPanning) return;
+            panX = e.clientX - startX;
+            panY = e.clientY - startY;
+            updateTransform();
+        });
+
+        window.addEventListener('mouseup', () => { isPanning = false; });
+
+        function updateTransform() {
+            canvasWrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${currentScale})`;
         }
 
         function adjustZoom(amount) {
             currentScale = Math.max(0.4, Math.min(2.5, currentScale + amount));
-            updateCanvasTransform();
+            updateTransform();
         }
 
         function resetZoom() {
             currentScale = 1.0;
             panX = 20;
             panY = 20;
-            updateCanvasTransform();
+            updateTransform();
         }
 
-        function updateCanvasTransform() {
-            const wrapper = document.getElementById('svg-canvas-wrapper');
-            wrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${currentScale})`;
-        }
-
-        // Drag-to-pan handlers
-        const viewport = document.getElementById('svg-scroll-viewport');
-        viewport.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            startMouseX = e.clientX - panX;
-            startMouseY = e.clientY - panY;
-        });
-        window.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            panX = e.clientX - startMouseX;
-            panY = e.clientY - startMouseY;
-            updateCanvasTransform();
-        });
-        window.addEventListener('mouseup', () => { isDragging = false; });
-
-        function downloadSVG() {
-            const svgElement = document.getElementById('svg-bodice');
-            const serializer = new XMLSerializer();
-            const source = serializer.serializeToString(svgElement);
-            const blob = new Blob([source], {type: "image/svg+xml;charset=utf-8"});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = "Lilinora_Bodice_Pattern_Step23.svg";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        function exportPDF(format) {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-            doc.setFont("Helvetica", "bold");
-            doc.setFontSize(16);
-            doc.text("Lilinora Precision Atelier - Pattern Export (" + format + ")", 15, 20);
-            doc.setFontSize(10);
-            doc.setFont("Helvetica", "normal");
-            doc.text("Generated with Step 23: Front Underarm Point Calculation.", 15, 28);
-            doc.text("Scale: 1:1 Actual Size Plotter Ready.", 15, 34);
-            doc.save(`Lilinora_Pattern_${format}.pdf`);
-        }
-
-        // Initial generation on load
+        // Initialize Pattern generation on load
         window.onload = function() {
             generatePattern();
         };
