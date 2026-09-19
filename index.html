@@ -1053,14 +1053,6 @@
             initGrids('svg-bodice', canvasBWidth, canvasBHeight);
             document.getElementById('bodiceTitle').textContent = `Bodice Block (Bust: ${totalBust}" | Hip: ${hipVal + hipEaseVal}")`;
 
-            // Draw Bodice Pattern Box Frame first so boundaries are ready
-            const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            bodiceRect.setAttribute('x', 50); bodiceRect.setAttribute('y', 50);
-            bodiceRect.setAttribute('width', bWidth); bodiceRect.setAttribute('height', bHeight);
-            bodiceRect.setAttribute('fill', 'rgba(194, 94, 111, 0.04)');
-            bodiceRect.setAttribute('stroke', '#c25e6f'); bodiceRect.setAttribute('stroke-width', '2'); bodiceRect.setAttribute('stroke-dasharray', '4');
-            bodiceGroup.appendChild(bodiceRect);
-
             // STEP 1: Place Point CB & Point CF Anchor Points at Top Corners
             const pointCB = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             pointCB.setAttribute('cx', 50); pointCB.setAttribute('cy', 50); pointCB.setAttribute('r', 4.5);
@@ -1075,32 +1067,6 @@
             bodiceGroup.appendChild(pointCF);
 
             appendLabel(bodiceGroup, 'CF (Center Front)', 50 + bWidth - 145, 42, '#0047AB', '12', 'bold', true);
-
-
-            // --- NEW STEP: Name the Center Back line and Center Front line along the sides of the bodice block box ---
-            const centerBackText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            centerBackText.setAttribute('x', 30);
-            centerBackText.setAttribute('y', 50 + (bHeight / 2));
-            centerBackText.setAttribute('font-family', 'Montserrat, sans-serif');
-            centerBackText.setAttribute('font-size', '11');
-            centerBackText.setAttribute('font-weight', 'bold');
-            centerBackText.setAttribute('fill', '#0047AB');
-            centerBackText.setAttribute('class', 'pattern-label');
-            centerBackText.setAttribute('transform', `rotate(-90, 30, ${50 + (bHeight / 2)})`);
-            centerBackText.textContent = 'Center Back line';
-            bodiceGroup.appendChild(centerBackText);
-
-            const centerFrontText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            centerFrontText.setAttribute('x', 50 + bWidth + 25);
-            centerFrontText.setAttribute('y', 50 + (bHeight / 2));
-            centerFrontText.setAttribute('font-family', 'Montserrat, sans-serif');
-            centerFrontText.setAttribute('font-size', '11');
-            centerFrontText.setAttribute('font-weight', 'bold');
-            centerFrontText.setAttribute('fill', '#0047AB');
-            centerFrontText.setAttribute('class', 'pattern-label');
-            centerFrontText.setAttribute('transform', `rotate(90, ${50 + bWidth + 25}, ${50 + (bHeight / 2)})`);
-            centerFrontText.textContent = 'Center Front line';
-            bodiceGroup.appendChild(centerFrontText);
 
 
             // STEP 2: Drawing the Nape Line
@@ -1464,8 +1430,47 @@
             const step13MidY = (backUnderarmPointY + hipLineY) / 2;
             appendLabel(bodiceGroup, 'Step 13: Side Seam Guide Line', step13MidX + 8, step13MidY, '#0891b2', '10', '600', false);
 
+
+            // Draw Bodice Pattern Box Frame
+            const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            bodiceRect.setAttribute('x', 50); bodiceRect.setAttribute('y', 50);
+            bodiceRect.setAttribute('width', bWidth); bodiceRect.setAttribute('height', bHeight);
+            bodiceRect.setAttribute('fill', 'rgba(194, 94, 111, 0.04)');
+            bodiceRect.setAttribute('stroke', '#c25e6f'); bodiceRect.setAttribute('stroke-width', '2'); bodiceRect.setAttribute('stroke-dasharray', '4');
+            bodiceGroup.appendChild(bodiceRect);
+
             // Add Hip Line Label to the lower line of the bodice block box
             appendLabel(bodiceGroup, 'Hip Line', 60, 50 + bHeight, '#c25e6f', '11', 'bold', false);
+
+
+            // --- NEW REQUIREMENT: Center Front Line & Center Back Line ---
+            // Center Front line name: vertical, near the right side line from CF to bottom right corner, from inside
+            const cfText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            cfText.setAttribute('x', 50 + bWidth - 12);
+            cfText.setAttribute('y', 50 + bHeight / 2);
+            cfText.setAttribute('writing-mode', 'vertical-rl');
+            cfText.setAttribute('text-anchor', 'middle');
+            cfText.setAttribute('font-family', 'Montserrat, sans-serif');
+            cfText.setAttribute('font-size', '11');
+            cfText.setAttribute('font-weight', 'bold');
+            cfText.setAttribute('fill', '#c25e6f');
+            cfText.setAttribute('class', 'pattern-label');
+            cfText.textContent = 'Center Front line';
+            bodiceGroup.appendChild(cfText);
+
+            // Center Back line name: vertical, near the left side line from CB to bottom left corner, from inside
+            const cbText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            cbText.setAttribute('x', 50 + 12);
+            cbText.setAttribute('y', 50 + bHeight / 2);
+            cbText.setAttribute('writing-mode', 'vertical-rl');
+            cbText.setAttribute('text-anchor', 'middle');
+            cbText.setAttribute('font-family', 'Montserrat, sans-serif');
+            cbText.setAttribute('font-size', '11');
+            cbText.setAttribute('font-weight', 'bold');
+            cbText.setAttribute('fill', '#c25e6f');
+            cbText.setAttribute('class', 'pattern-label');
+            cbText.textContent = 'Center Back line';
+            bodiceGroup.appendChild(cbText);
 
 
             // --- 2. SLEEVE BLOCK ---
@@ -1636,4 +1641,4 @@
     </script>
 </body>
 </html>
-```[cite: 9]
+```[cite: 8]
