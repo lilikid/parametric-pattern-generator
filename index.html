@@ -1431,6 +1431,23 @@
             appendLabel(bodiceGroup, 'Step 13: Side Seam Guide Line', step13MidX + 8, step13MidY, '#0891b2', '10', '600', false);
 
 
+            // --- NEW STEP: Front Neck Point calculation & placement ---
+            const frontNeckDistInches = (((totalBust / 8.0) + 1.25) / 2.0) - 0.25;
+            const frontNeckDistPixels = frontNeckDistInches * scaleFactor;
+            const cfAnchorX = 50 + bWidth;
+            const frontNeckPointX = cfAnchorX - frontNeckDistPixels;
+            const frontNeckPointY = 50; // along the block bodice top line
+
+            const frontNeckCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            frontNeckCircle.setAttribute('cx', frontNeckPointX);
+            frontNeckCircle.setAttribute('cy', frontNeckPointY);
+            frontNeckCircle.setAttribute('r', '5');
+            frontNeckCircle.setAttribute('fill', '#0000FF'); // Bold blue point
+            bodiceGroup.appendChild(frontNeckCircle);
+
+            appendLabel(bodiceGroup, `Front Neck Point (${frontNeckDistInches.toFixed(2)}" from CF)`, frontNeckPointX - 60, frontNeckPointY - 18, '#0000FF', '11', 'bold', true);
+
+
             // Draw Bodice Pattern Box Frame
             const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
             bodiceRect.setAttribute('x', 50); bodiceRect.setAttribute('y', 50);
@@ -1658,4 +1675,3 @@
     </script>
 </body>
 </html>
-```[cite: 10]
