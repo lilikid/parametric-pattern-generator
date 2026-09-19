@@ -1627,35 +1627,27 @@
             pointTCircle.setAttribute('cx', pointTX);
             pointTCircle.setAttribute('cy', pointTY);
             pointTCircle.setAttribute('r', '5.5');
-            pointTCircle.setAttribute('fill', '#2563eb'); // Blue point for T
+            pointTCircle.setAttribute('fill', '#2563eb');
             bodiceGroup.appendChild(pointTCircle);
 
             appendLabel(bodiceGroup, 'Step 17: Point T (Intersection)', pointTX + 12, pointTY - 10, '#2563eb', '11', 'bold', true);
 
 
-            // --- STEP 18: Move 2 cm along the Front shoulder starting from Point T and the direction of the movement should be moving to the left of point T along the Front Shoulder line ---
+            // --- STEP 18: Mark this point D. Point D should locate left the Bust Dart Guide line and at the front shoulder line, 2cm away from point T, measured along the front shoulder Line starting from Point T. ---
             const step18DistCm = 2.0;
             const step18DistInches = step18DistCm / 2.54;
-            const step18Pixels = step18DistInches * scaleFactor;
+            const step18DistPixels = step18DistInches * scaleFactor;
+            const pointDX = pointTX + (unitDxS * step18DistPixels);
+            const pointDY = pointTY + (unitDyS * step18DistPixels);
 
-            // Direction from Point T to the left along the Front Shoulder line is towards the Front Neck Point (which is to the left of Point T)
-            const dxTS = frontNeckPointX - pointTX;
-            const dyTS = frontNeckPointY - pointTY;
-            const lenTS = Math.sqrt(dxTS * dxTS + dyTS * dyTS);
-            const unitDxTS = lenTS > 0 ? dxTS / lenTS : -1;
-            const unitDyTS = lenTS > 0 ? dyTS / lenTS : 0;
+            const pointDCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pointDCircle.setAttribute('cx', pointDX);
+            pointDCircle.setAttribute('cy', pointDY);
+            pointDCircle.setAttribute('r', '5.5');
+            pointDCircle.setAttribute('fill', '#9333ea');
+            bodiceGroup.appendChild(pointDCircle);
 
-            const pointStep18X = pointTX + (unitDxTS * step18Pixels);
-            const pointStep18Y = pointTY + (unitDyTS * step18Pixels);
-
-            const pointStep18Circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            pointStep18Circle.setAttribute('cx', pointStep18X);
-            pointStep18Circle.setAttribute('cy', pointStep18Y);
-            pointStep18Circle.setAttribute('r', '5.5');
-            pointStep18Circle.setAttribute('fill', '#f59e0b'); // Amber/Orange point for Step 18
-            bodiceGroup.appendChild(pointStep18Circle);
-
-            appendLabel(bodiceGroup, 'Step 18: 2cm left along shoulder from T', pointStep18X - 30, pointStep18Y - 18, '#f59e0b', '11', 'bold', true);
+            appendLabel(bodiceGroup, 'Step 18: Point D (2cm from T)', pointDX + 10, pointDY - 10, '#9333ea', '11', 'bold', true);
 
 
             // Draw Bodice Pattern Box Frame
@@ -1837,49 +1829,11 @@
                 doc.text("Lilinora Atelier - Tiled A4 Sheet 1 of 4", 20, 20);
                 doc.save("Lilinora_Pattern_A4_Tiled.pdf");
             } else if (format === 'Projector') {
-                const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [1000, 1000] });
-                doc.text("Lilinora Atelier - Projector Calibration Layout", 20, 20);
-                doc.save("Lilinora_Projector_Layout.pdf");
+                const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a1' });
+                doc.text("Lilinora Atelier - Projector Calibration Grid File", 20, 20);
+                doc.save("Lilinora_Pattern_Projector.pdf");
             }
         }
-
-        const viewport = document.getElementById('svg-scroll-viewport');
-        viewport.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            startMouseX = e.clientX - panX;
-            startMouseY = e.clientY - panY;
-        });
-        window.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            panX = e.clientX - startMouseX;
-            panY = e.clientY - startMouseY;
-            updateTransform();
-        });
-        window.addEventListener('mouseup', () => { isDragging = false; });
-
-        viewport.addEventListener('wheel', (e) => {
-            e.preventDefault();
-            const rect = viewport.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
-            const zoomIntensity = 0.1;
-            const oldScale = currentScale;
-            
-            if (e.deltaY < 0) currentScale = Math.min(3.0, currentScale + zoomIntensity);
-            else currentScale = Math.max(0.3, currentScale - zoomIntensity);
-
-            panX = mouseX - (mouseX - panX) * (currentScale / oldScale);
-            panY = mouseY - (mouseY - panY) * (currentScale / oldScale);
-            updateTransform();
-        }, { passive: false });
-
-        window.onload = () => {
-            generatePattern();
-            updateTransform();
-            document.getElementById('sleevePanelBox').style.display = 'none';
-            document.getElementById('skirtPanelBox').style.display = 'none';
-            document.getElementById('pantPanelBox').style.display = 'none';
-        };
     </script>
 </body>
 </html>
