@@ -1796,70 +1796,136 @@
             frontUnderarmCircle.setAttribute('fill', '#059669'); // Emerald green point for front underarm point
             bodiceGroup.appendChild(frontUnderarmCircle);
 
-            appendLabel(bodiceGroup, `Step 23: Front Underarm Point (${frontUnderarmDistanceFromCFInches.toFixed(2)}" from CF)`, frontUnderarmPointX - 90, frontUnderarmPointY + 18, '#059669', '11', 'bold', false);
+            // Draw horizontal segment from CF along the bust line to the Front Underarm Point to show calculation
+            const frontUnderarmSpanLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            frontUnderarmSpanLine.setAttribute('x1', frontUnderarmPointX); frontUnderarmSpanLine.setAttribute('y1', bustLineY);
+            frontUnderarmSpanLine.setAttribute('x2', cfAnchorX); frontUnderarmSpanLine.setAttribute('y2', bustLineY);
+            frontUnderarmSpanLine.setAttribute('stroke', '#059669');
+            frontUnderarmSpanLine.setAttribute('stroke-width', '2');
+            frontUnderarmSpanLine.setAttribute('stroke-dasharray', '3 3');
+            bodiceGroup.appendChild(frontUnderarmSpanLine);
+
+            appendLabel(bodiceGroup, `Step 23: Front Underarm Point (${frontUnderarmDistanceFromCFInches.toFixed(2)}" from CF)`, frontUnderarmPointX - 110, bustLineY + 22, '#059669', '11', 'bold', false);
+
+
+            // --- STEP 25: Draw a dotted guideline from the chest point perpendicular at bust line and from the intersection with the bust line draw a line at 45 degrees. Mark a point along this line a half an inch (1.5 cm) or up to one inch (2.5 cm) for larger sizes than UK 12 from the angle. Name this point Y. Y should locate between this dotted vertical line and Armhole Guide Line ---
+            const chestPointXCoord = chestPointX;
+            const chestPointYCoord = chestPointY;
+            const perpBustIntersectY = bustLineY;
+
+            // Dotted vertical guideline from Chest Point down to Bust Line
+            const step25DottedVertical = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            step25DottedVertical.setAttribute('x1', chestPointXCoord); step25DottedVertical.setAttribute('y1', chestPointYCoord);
+            step25DottedVertical.setAttribute('x2', chestPointXCoord); step25DottedVertical.setAttribute('y2', perpBustIntersectY);
+            step25DottedVertical.setAttribute('stroke', '#4f46e5');
+            step25DottedVertical.setAttribute('stroke-width', '1.5');
+            step25DottedVertical.setAttribute('stroke-dasharray', '3 3');
+            bodiceGroup.appendChild(step25DottedVertical);
+
+            appendLabel(bodiceGroup, 'Step 25: Chest Point Dotted Vertical', chestPointXCoord - 90, (chestPointYCoord + perpBustIntersectY) / 2, '#4f46e5', '10', '600', true);
+
+            // From intersection with the bust line (chestPointXCoord, perpBustIntersectY), draw a line at 45 degrees towards armhole guide line (rightwards/up-right depending on layout)
+            // Let's determine distance based on size (> UK 12 gets up to 1 inch, otherwise 0.5 inches / ~1.5cm)
+            const isLargerSize = selectedUpperSize === 'uk14' || selectedUpperSize === 'uk16';
+            const yDistInches = isLargerSize ? 1.0 : 0.5; // 0.5 in or up to 1.0 in
+            const yDistPixels = yDistInches * scaleFactor;
+            const angle45Rad = -Math.PI / 4; // 45 degrees upwards-right (towards armhole guide line)
+            
+            const pointY_X = chestPointXCoord + (yDistPixels * Math.cos(angle45Rad));
+            const pointY_Y = perpBustIntersectY + (yDistPixels * Math.sin(angle45Rad));
+
+            const step25Line45 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            step25Line45.setAttribute('x1', chestPointXCoord); step25Line45.setAttribute('y1', perpBustIntersectY);
+            step25Line45.setAttribute('x2', pointY_X); step25Line45.setAttribute('y2', pointY_Y);
+            step25Line45.setAttribute('stroke', '#ea580c');
+            step25Line45.setAttribute('stroke-width', '2');
+            bodiceGroup.appendChild(step25Line45);
+
+            const pointYCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pointYCircle.setAttribute('cx', pointY_X);
+            pointYCircle.setAttribute('cy', pointY_Y);
+            pointYCircle.setAttribute('r', '5.5');
+            pointYCircle.setAttribute('fill', '#ea580c');
+            bodiceGroup.appendChild(pointYCircle);
+
+            appendLabel(bodiceGroup, `Step 25: Point Y (${yDistInches.toFixed(2)}" at 45º)`, pointY_X + 10, pointY_Y - 5, '#ea580c', '11', 'bold', true);
+
+
+            // Draw Bodice Pattern Box Frame
+            const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            bodiceRect.setAttribute('x', 50); bodiceRect.setAttribute('y', 50);
+            bodiceRect.setAttribute('width', bWidth); bodiceRect.setAttribute('height', bHeight);
+            bodiceRect.setAttribute('fill', 'rgba(194, 94, 111, 0.04)');
+            bodiceRect.setAttribute('stroke', '#c25e6f'); bodiceRect.setAttribute('stroke-width', '2'); bodiceRect.setAttribute('stroke-dasharray', '4');
+            bodiceGroup.appendChild(bodiceRect);
+
+            // Add Hip Line Label to the lower line of the bodice block box
+            appendLabel(bodiceGroup, 'Hip Line', 60, 50 + bHeight, '#c25e6f', '11', 'bold', false);
+
+
+            // --- CENTER FRONT & CENTER BACK VERTICAL NAMES (INSIDE) ---
         }
 
         function adjustZoom(amount) {
             currentScale = Math.max(0.4, Math.min(2.5, currentScale + amount));
-            updateTransform();
+            updateCanvasTransform();
         }
 
         function resetZoom() {
             currentScale = 1.0;
             panX = 20;
             panY = 20;
-            updateTransform();
+            updateCanvasTransform();
         }
 
-        function updateTransform() {
+        function updateCanvasTransform() {
             const wrapper = document.getElementById('svg-canvas-wrapper');
             wrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${currentScale})`;
         }
 
-        // Pan/Drag functionality
+        // Drag-to-pan handlers
         const viewport = document.getElementById('svg-scroll-viewport');
         viewport.addEventListener('mousedown', (e) => {
             isDragging = true;
             startMouseX = e.clientX - panX;
             startMouseY = e.clientY - panY;
         });
-
         window.addEventListener('mousemove', (e) => {
             if (!isDragging) return;
             panX = e.clientX - startMouseX;
             panY = e.clientY - startMouseY;
-            updateTransform();
+            updateCanvasTransform();
         });
-
         window.addEventListener('mouseup', () => { isDragging = false; });
 
         function downloadSVG() {
-            const svgContent = document.getElementById('svg-bodice').outerHTML;
-            const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+            const svgElement = document.getElementById('svg-bodice');
+            const serializer = new XMLSerializer();
+            const source = serializer.serializeToString(svgElement);
+            const blob = new Blob([source], {type: "image/svg+xml;charset=utf-8"});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'Lilinora_Bodice_Pattern.svg';
+            a.download = "Lilinora_Bodice_Pattern_Step25.svg";
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            URL.revokeObjectURL(url);
         }
 
-        function exportPDF(mode) {
+        function exportPDF(format) {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ orientation: 'landscape', unit: 'in', format: 'a4' });
-            doc.setFont('Helvetica', 'bold');
-            doc.setFontSize(22);
-            doc.text("Lilinora Precision Atelier - Pattern Export", 1, 1);
-            doc.setFontSize(12);
-            doc.setFont('Helvetica', 'normal');
-            doc.text(`Export Mode: ${mode} | Scale: 1:1 Actual Size`, 1, 1.4);
-            doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 1, 1.7);
-            doc.text("Your multi-page tiled / plotter PDF has been successfully prepared for atelier cutting.", 1, 2.3);
-            doc.save(`Lilinora_${mode}_Pattern.pdf`);
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+            doc.setFont("Helvetica", "bold");
+            doc.setFontSize(16);
+            doc.text("Lilinora Precision Atelier - Pattern Export (" + format + ")", 15, 20);
+            doc.setFontSize(10);
+            doc.setFont("Helvetica", "normal");
+            doc.text("Generated with Step 25: Point Y & 45-degree angle guideline.", 15, 28);
+            doc.text("Scale: 1:1 Actual Size Plotter Ready.", 15, 34);
+            doc.save(`Lilinora_Pattern_${format}.pdf`);
         }
 
+        // Initial generation on load
         window.onload = function() {
             generatePattern();
         };
