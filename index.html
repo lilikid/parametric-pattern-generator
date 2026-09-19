@@ -1614,12 +1614,8 @@
 
 
             // --- STEP 17: Call the intersection point between of the Bust Dart Guide Line and Front shoulder line as point T ---
-            // The Bust Dart Guide Line is a vertical line at x = bustDartGuideLineX, extending from y = 50 (top line) down to bustLineY + scaleFactor.
-            // The Front Shoulder Line is a line from (frontNeckPointX, frontNeckPointY) to (shoulderLineEndX, shoulderLineEndY).
-            // Let's compute their intersection mathematically:
             const x1 = frontNeckPointX, y1 = frontNeckPointY;
             const x2 = shoulderLineEndX, y2 = shoulderLineEndY;
-            // Line equation: y - y1 = m * (x - x1), where m = (y2 - y1) / (x2 - x1)
             let pointTX = bustDartGuideLineX;
             let pointTY = y1;
             if (Math.abs(x2 - x1) > 0.001) {
@@ -1635,6 +1631,31 @@
             bodiceGroup.appendChild(pointTCircle);
 
             appendLabel(bodiceGroup, 'Step 17: Point T (Intersection)', pointTX + 12, pointTY - 10, '#2563eb', '11', 'bold', true);
+
+
+            // --- STEP 18: Move 2 cm along the Front shoulder starting from Point T and the direction of the movement should be moving to the left of point T along the Front Shoulder line ---
+            const step18DistCm = 2.0;
+            const step18DistInches = step18DistCm / 2.54;
+            const step18Pixels = step18DistInches * scaleFactor;
+
+            // Direction from Point T to the left along the Front Shoulder line is towards the Front Neck Point (which is to the left of Point T)
+            const dxTS = frontNeckPointX - pointTX;
+            const dyTS = frontNeckPointY - pointTY;
+            const lenTS = Math.sqrt(dxTS * dxTS + dyTS * dyTS);
+            const unitDxTS = lenTS > 0 ? dxTS / lenTS : -1;
+            const unitDyTS = lenTS > 0 ? dyTS / lenTS : 0;
+
+            const pointStep18X = pointTX + (unitDxTS * step18Pixels);
+            const pointStep18Y = pointTY + (unitDyTS * step18Pixels);
+
+            const pointStep18Circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pointStep18Circle.setAttribute('cx', pointStep18X);
+            pointStep18Circle.setAttribute('cy', pointStep18Y);
+            pointStep18Circle.setAttribute('r', '5.5');
+            pointStep18Circle.setAttribute('fill', '#f59e0b'); // Amber/Orange point for Step 18
+            bodiceGroup.appendChild(pointStep18Circle);
+
+            appendLabel(bodiceGroup, 'Step 18: 2cm left along shoulder from T', pointStep18X - 30, pointStep18Y - 18, '#f59e0b', '11', 'bold', true);
 
 
             // Draw Bodice Pattern Box Frame
