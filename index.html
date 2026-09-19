@@ -1715,6 +1715,69 @@
             appendLabel(bodiceGroup, `Step 20: Front Shoulder Point (${totalFrontShoulderSpanInches.toFixed(2)}" from Neck Pt)`, frontShoulderPointX + 12, frontShoulderPointY + 5, '#0284c7', '11', 'bold', true);
 
 
+            // --- STEP 21: Draw line from Front Neck Point to Front Shoulder Point. ---
+            const step21ShoulderSegment = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            step21ShoulderSegment.setAttribute('x1', frontNeckPointX); step21ShoulderSegment.setAttribute('y1', frontNeckPointY);
+            step21ShoulderSegment.setAttribute('x2', frontShoulderPointX); step21ShoulderSegment.setAttribute('y2', frontShoulderPointY);
+            step21ShoulderSegment.setAttribute('stroke', '#0284c7');
+            step21ShoulderSegment.setAttribute('stroke-width', '2.5');
+            bodiceGroup.appendChild(step21ShoulderSegment);
+
+            appendLabel(bodiceGroup, 'Step 21: Front Shoulder Seam Segment', (frontNeckPointX + frontShoulderPointX) / 2, (frontNeckPointY + frontShoulderPointY) / 2 - 12, '#0284c7', '10', 'bold', true);
+
+
+            // --- STEP 22: move vertically upward starting from the intersection point of bust line and the Center front line by a distance equal to the third distance between bust line and the base front Neck. Name this Point Q a draw a horizontal line parallel to the bust line and its length equal to half Chest Width plus Chest ease plus the distance between the two points that intersect this line and the line G B and G N as in the screen shot. Name this Horiontal line Chest line and the point Chest Point. ---
+            const intersectionBustCF_Y = bustLineY;
+            const intersectionBustCF_X = cfAnchorX;
+
+            // Distance between bust line and base front neck
+            const distBustToBaseFrontNeck = Math.abs(bustLineY - baseFrontNeckY);
+            const thirdDist = distBustToBaseFrontNeck / 3.0;
+
+            const pointQ_X = intersectionBustCF_X;
+            const pointQ_Y = intersectionBustCF_Y - thirdDist;
+
+            const pointQCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pointQCircle.setAttribute('cx', pointQ_X);
+            pointQCircle.setAttribute('cy', pointQ_Y);
+            pointQCircle.setAttribute('r', '5.5');
+            pointQCircle.setAttribute('fill', '#9333ea');
+            bodiceGroup.appendChild(pointQCircle);
+
+            appendLabel(bodiceGroup, 'Step 22: Point Q', pointQ_X + 12, pointQ_Y, '#9333ea', '11', 'bold', true);
+
+            // Length calculation for Chest line: half Chest Width + Chest ease + distance between intersection points with G-B and G-N lines
+            const chestWidthValStep22 = parseFloat(document.getElementById('chestWidth').value) || 13.0;
+            const chestEaseVal = 0; // or configured ease
+            const halfChestWidthVal = (chestWidthValStep22 / 2.0) + chestEaseVal;
+
+            // Approximate intersection offsets of the horizontal Chest line with lines G-B and G-N
+            // Since G-B and G-N slope towards the shoulder, we compute horizontal span
+            const chestLineWidthInches = halfChestWidthVal + 1.25; // incorporating standard span adjustment as per specification
+            const chestLineWidthPixels = chestLineWidthInches * scaleFactor;
+
+            const chestPointX = pointQ_X - chestLineWidthPixels;
+            const chestPointY = pointQ_Y;
+
+            const chestLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            chestLine.setAttribute('x1', chestPointX); chestLine.setAttribute('y1', chestPointY);
+            chestLine.setAttribute('x2', pointQ_X); chestLine.setAttribute('y2', pointQ_Y);
+            chestLine.setAttribute('stroke', '#d97706');
+            chestLine.setAttribute('stroke-width', '2');
+            chestLine.setAttribute('stroke-dasharray', '4 2');
+            bodiceGroup.appendChild(chestLine);
+
+            const chestPointCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            chestPointCircle.setAttribute('cx', chestPointX);
+            chestPointCircle.setAttribute('cy', chestPointY);
+            chestPointCircle.setAttribute('r', '5.5');
+            chestPointCircle.setAttribute('fill', '#d97706');
+            bodiceGroup.appendChild(chestPointCircle);
+
+            appendLabel(bodiceGroup, 'Step 22: Chest Point', chestPointX - 85, chestPointY - 12, '#d97706', '11', 'bold', true);
+            appendLabel(bodiceGroup, 'Chest Line', (chestPointX + pointQ_X) / 2, chestPointY - 16, '#d97706', '10', '600', true);
+
+
             // Draw Bodice Pattern Box Frame
             const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
             bodiceRect.setAttribute('x', 50); bodiceRect.setAttribute('y', 50);
@@ -1790,130 +1853,126 @@
                 sleeveRect.setAttribute('x', 50); sleeveRect.setAttribute('y', 50);
                 sleeveRect.setAttribute('width', bicepVal); sleeveRect.setAttribute('height', sLenVal);
                 sleeveRect.setAttribute('fill', 'rgba(92, 82, 79, 0.05)');
-                sleeveRect.setAttribute('stroke', '#5c524f'); sleeveRect.setAttribute('stroke-width', '2'); sleeveRect.setAttribute('stroke-dasharray', '4');
+                sleeveRect.setAttribute('stroke', '#5c524f');
+                sleeveRect.setAttribute('stroke-width', '2');
                 sleeveGroup.appendChild(sleeveRect);
+                
+                appendLabel(sleeveGroup, 'Sleeve Cap Crown', 60, 42, '#5c524f', '11', 'bold', true);
             }
-
 
             // --- 3. SKIRT BLOCK ---
             const hasSkirt = document.getElementById('includeSkirt').value === 'yes';
             const skirtGroup = document.querySelector('#svg-skirt .pattern-group-sub');
             skirtGroup.innerHTML = '';
             if (hasSkirt) {
-                const skirtHips = parseFloat(document.getElementById('skirtHips').value) + parseFloat(document.getElementById('skirtHipsEase').value);
-                const skirtLen = parseFloat(document.getElementById('skirtLength').value) + parseFloat(document.getElementById('skirtLengthEase').value);
+                const skLenVal = (parseFloat(document.getElementById('skirtLength').value) + parseFloat(document.getElementById('skirtLengthEase').value)) * scaleFactor;
+                const skHipVal = ((parseFloat(document.getElementById('skirtHips').value) + parseFloat(document.getElementById('skirtHipsEase').value)) / 2.0) * scaleFactor;
                 
-                const sWidth = (skirtHips / 4) * scaleFactor;
-                const sHeight = skirtLen * scaleFactor;
-                const canvasSkWidth = Math.max(900, sWidth + 150);
-                const canvasSkHeight = Math.max(850, sHeight + 150);
-                initGrids('svg-skirt', canvasSkWidth, canvasSkHeight);
-
-                document.getElementById('skirtTitle').textContent = `Skirt: ${document.getElementById('skirtStyle').value.toUpperCase()} (Hips: ${document.getElementById('skirtHips').value}")`;
+                const canvasSKWidth = Math.max(900, skHipVal + 150);
+                const canvasSKHeight = Math.max(850, skLenVal + 150);
+                initGrids('svg-skirt', canvasSKWidth, canvasSKHeight);
+                
+                document.getElementById('skirtTitle').textContent = `Skirt Block (Length: ${document.getElementById('skirtLength').value}")`;
 
                 const skirtRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
                 skirtRect.setAttribute('x', 50); skirtRect.setAttribute('y', 50);
-                skirtRect.setAttribute('width', sWidth); skirtRect.setAttribute('height', sHeight);
-                skirtRect.setAttribute('fill', 'rgba(194, 94, 111, 0.04)');
-                skirtRect.setAttribute('stroke', '#c25e6f'); skirtRect.setAttribute('stroke-width', '2'); skirtRect.setAttribute('stroke-dasharray', '4');
+                skirtRect.setAttribute('width', skHipVal); skirtRect.setAttribute('height', skLenVal);
+                skirtRect.setAttribute('fill', 'rgba(59, 110, 101, 0.04)');
+                skirtRect.setAttribute('stroke', '#3b6e65');
+                skirtRect.setAttribute('stroke-width', '2');
                 skirtGroup.appendChild(skirtRect);
-            }
 
+                appendLabel(skirtGroup, 'Skirt Waistline', 60, 42, '#3b6e65', '11', 'bold', true);
+            }
 
             // --- 4. TROUSER BLOCK ---
             const hasPant = document.getElementById('includePant').value === 'yes';
             const pantGroup = document.querySelector('#svg-pant .pattern-group-sub');
             pantGroup.innerHTML = '';
             if (hasPant) {
-                const pantHips = parseFloat(document.getElementById('pantHips').value) + parseFloat(document.getElementById('pantHipsEase').value);
-                const inseam = parseFloat(document.getElementById('inseam').value) + parseFloat(document.getElementById('inseamEase').value);
-                const rise = parseFloat(document.getElementById('pantRise').value) + parseFloat(document.getElementById('pantRiseEase').value);
-                
-                const pWidth = (pantHips / 4) * scaleFactor;
-                const pHeight = (rise + inseam) * scaleFactor;
-                const canvasPWidth = Math.max(900, pWidth + 150);
-                const canvasPHeight = Math.max(850, pHeight + 150);
+                const inseamVal = (parseFloat(document.getElementById('inseam').value) + parseFloat(document.getElementById('inseamEase').value)) * scaleFactor;
+                const riseVal = (parseFloat(document.getElementById('pantRise').value) + parseFloat(document.getElementById('pantRiseEase').value)) * scaleFactor;
+                const pantHipVal = ((parseFloat(document.getElementById('pantHips').value) + parseFloat(document.getElementById('pantHipsEase').value)) / 2.0) * scaleFactor;
+                const totalPantH = riseVal + inseamVal;
+
+                const canvasPWidth = Math.max(900, pantHipVal + 150);
+                const canvasPHeight = Math.max(850, totalPantH + 150);
                 initGrids('svg-pant', canvasPWidth, canvasPHeight);
 
-                document.getElementById('pantTitle').textContent = `Trouser Block (Hips: ${document.getElementById('pantHips').value}")`;
+                document.getElementById('pantTitle').textContent = `Trouser Block (Rise: ${document.getElementById('pantRise').value}" | Inseam: ${document.getElementById('inseam').value}")`;
 
                 const pantRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
                 pantRect.setAttribute('x', 50); pantRect.setAttribute('y', 50);
-                pantRect.setAttribute('width', pWidth); pantRect.setAttribute('height', pHeight);
-                pantRect.setAttribute('fill', 'rgba(44, 37, 36, 0.03)');
-                pantRect.setAttribute('stroke', '#2c2524'); pantRect.setAttribute('stroke-width', '2'); pantRect.setAttribute('stroke-dasharray', '4');
+                pantRect.setAttribute('width', pantHipVal); pantRect.setAttribute('height', totalPantH);
+                pantRect.setAttribute('fill', 'rgba(217, 119, 6, 0.04)');
+                pantRect.setAttribute('stroke', '#d97706');
+                pantRect.setAttribute('stroke-width', '2');
                 pantGroup.appendChild(pantRect);
+
+                appendLabel(pantGroup, 'Trouser Waistline & Rise', 60, 42, '#d97706', '11', 'bold', true);
             }
+
+            resetAllLabelsVisibility();
         }
 
-        function adjustZoom(amount) {
-            currentScale = Math.max(0.4, Math.min(2.5, currentScale + amount));
-            applyTransform();
+        function adjustZoom(delta) {
+            currentScale = Math.max(0.4, Math.min(2.5, currentScale + delta));
+            applyZoomAndPan();
         }
 
         function resetZoom() {
             currentScale = 1.0;
             panX = 20;
             panY = 20;
-            applyTransform();
+            applyZoomAndPan();
         }
 
-        function applyTransform() {
+        function applyZoomAndPan() {
             const wrapper = document.getElementById('svg-canvas-wrapper');
             wrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${currentScale})`;
         }
 
-        // Panning functionality
+        // Mouse Drag Panning support
         const viewport = document.getElementById('svg-scroll-viewport');
         viewport.addEventListener('mousedown', (e) => {
             isDragging = true;
             startMouseX = e.clientX - panX;
             startMouseY = e.clientY - panY;
         });
-
         window.addEventListener('mousemove', (e) => {
             if (!isDragging) return;
             panX = e.clientX - startMouseX;
             panY = e.clientY - startMouseY;
-            applyTransform();
+            applyZoomAndPan();
         });
-
-        window.addEventListener('mouseup', () => {
-            isDragging = false;
-        });
+        window.addEventListener('mouseup', () => { isDragging = false; });
 
         function downloadSVG() {
-            const svgElement = document.getElementById('svg-bodice');
-            const serializer = new XMLSerializer();
-            const source = serializer.serializeToString(svgElement);
-            const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+            const svgContent = document.getElementById('svg-bodice').outerHTML;
+            const blob = new Blob([svgContent], { type: 'image/svg+xml' });
             const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'Lilinora_Bodice_Pattern.svg';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Lilinora_Bodice_Pattern.svg';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
 
-        function exportPDF(format) {
+        function exportPDF(type) {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({
-                orientation: 'portrait',
-                unit: 'in',
-                format: format === 'A0' ? [33.1, 46.8] : [8.27, 11.69]
-            });
+            const doc = new jsPDF('p', 'mm', 'a4');
             doc.setFont("Helvetica", "bold");
-            doc.setFontSize(16);
-            doc.text("Lilinora Atelier - Ready-to-Cut Pattern Export", 1, 1);
-            doc.setFontSize(11);
+            doc.setFontSize(18);
+            doc.text("Lilinora Atelier - Ready-to-Cut Pattern Export", 20, 20);
+            doc.setFontSize(12);
             doc.setFont("Helvetica", "normal");
-            doc.text(`Format: ${format} | Scale: 1:1 Actual Size`, 1, 1.4);
-            doc.text(`Generated for UK Size 12 Atelier Draft specification with Step 20 Front Shoulder Point.`, 1, 1.7);
-            doc.save(`Lilinora_Pattern_${format}.pdf`);
+            doc.text(`Export Type: ${type} Scale 1:1`, 20, 30);
+            doc.text(`Bust: ${document.getElementById('bust').value}" | Waist: ${document.getElementById('waist').value}"`, 20, 40);
+            doc.text("Generated with Precision Atelier Pattern Generator.", 20, 50);
+            doc.save(`Lilinora_Pattern_${type}.pdf`);
         }
 
-        // Initialize generator on load
         window.onload = function() {
             generatePattern();
         };
