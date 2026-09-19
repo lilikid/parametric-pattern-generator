@@ -1431,7 +1431,7 @@
             appendLabel(bodiceGroup, 'Step 13: Side Seam Guide Line', step13MidX + 8, step13MidY, '#0891b2', '10', '600', false);
 
 
-            // --- NEW STEP: Front Neck Point calculation & placement ---
+            // --- NEW REQUIREMENT: Front Neck Point calculation & placement ---
             const frontNeckDistInches = (((totalBust / 8.0) + 1.25) / 2.0) - 0.25;
             const frontNeckDistPixels = frontNeckDistInches * scaleFactor;
             const cfAnchorX = 50 + bWidth;
@@ -1449,8 +1449,6 @@
 
 
             // --- NEW SEQUENCE STEP: Base Front Neck ---
-            // Move vertically downward starting from CF along the Center Front Line a distance as follow:
-            // 3 inches for size 12c UK and can go up to 7 cm for smaller sizes and 8.5 cm for larger sizes. Name this point Base Front Neck.
             const selectedUpperSize = document.getElementById('upperStandardSize').value;
             let baseFrontNeckDistInches = 3.0; // default for size 12 UK
             if (selectedUpperSize === 'uk8' || selectedUpperSize === 'uk10') {
@@ -1478,6 +1476,64 @@
             bodiceGroup.appendChild(baseFrontNeckSegment);
 
             appendLabel(bodiceGroup, `Base Front Neck (${baseFrontNeckDistInches.toFixed(2)}" down from CF)`, baseFrontNeckX + 12, baseFrontNeckY, '#9333ea', '11', 'bold', false);
+
+
+            // --- STEP 14: Drawing the Front neck curve ---
+            // Square down from the Front neck point and across from base Front neck
+            const squareDownLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            squareDownLine.setAttribute('x1', frontNeckPointX); squareDownLine.setAttribute('y1', frontNeckPointY);
+            squareDownLine.setAttribute('x2', frontNeckPointX); squareDownLine.setAttribute('y2', baseFrontNeckY);
+            squareDownLine.setAttribute('stroke', '#0284c7');
+            squareDownLine.setAttribute('stroke-width', '1.25');
+            squareDownLine.setAttribute('stroke-dasharray', '3 3');
+            bodiceGroup.appendChild(squareDownLine);
+
+            const squareAcrossLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            squareAcrossLine.setAttribute('x1', frontNeckPointX); squareAcrossLine.setAttribute('y1', baseFrontNeckY);
+            squareAcrossLine.setAttribute('x2', baseFrontNeckX); squareAcrossLine.setAttribute('y2', baseFrontNeckY);
+            squareAcrossLine.setAttribute('stroke', '#0284c7');
+            squareAcrossLine.setAttribute('stroke-width', '1.25');
+            squareAcrossLine.setAttribute('stroke-dasharray', '3 3');
+            bodiceGroup.appendChild(squareAcrossLine);
+
+            // Intersection point of the square down and square across lines (inner corner square)
+            const cornerIntersectionX = frontNeckPointX;
+            const cornerIntersectionY = baseFrontNeckY;
+
+            // Draw a guideline of 45 degrees pointing to the center front line and the tip of it pointing upward (from corner intersection towards top-left/upward diagonal)
+            const guide45LenInches = 0.75; // quarter inches to three centimeters (~0.75 inches / ~1.9cm)
+            const guide45LenPixels = guide45LenInches * scaleFactor;
+            // 45 degrees pointing upward and toward center front (since CF is to the right, upward-left diagonal relative to the inner corner)
+            const guide45TargetX = cornerIntersectionX - (guide45LenPixels * Math.cos(Math.PI / 4));
+            const guide45TargetY = cornerIntersectionY - (guide45LenPixels * Math.sin(Math.PI / 4));
+
+            const guideline45 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            guideline45.setAttribute('x1', cornerIntersectionX); guideline45.setAttribute('y1', cornerIntersectionY);
+            guideline45.setAttribute('x2', guide45TargetX); guideline45.setAttribute('y2', guide45TargetY);
+            guideline45.setAttribute('stroke', '#e11d48');
+            guideline45.setAttribute('stroke-width', '1.5');
+            guideline45.setAttribute('stroke-dasharray', '2 2');
+            bodiceGroup.appendChild(guideline45);
+
+            const guide45Circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            guide45Circle.setAttribute('cx', guide45TargetX);
+            guide45Circle.setAttribute('cy', guide45TargetY);
+            guide45Circle.setAttribute('r', '4');
+            guide45Circle.setAttribute('fill', '#e11d48');
+            bodiceGroup.appendChild(guide45Circle);
+
+            appendLabel(bodiceGroup, 'Step 14: 45° Guideline (0.75" / 2cm)', guide45TargetX - 70, guide45TargetY - 10, '#e11d48', '10', 'bold', true);
+
+            // Draw the neckline curve through these points (Front Neck Point, 45° guideline tip, and Base Front Neck)
+            const frontNeckCurve = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            const frontCurveData = `M ${frontNeckPointX} ${frontNeckPointY} Q ${guide45TargetX} ${guide45TargetY}, ${baseFrontNeckX} ${baseFrontNeckY}`;
+            frontNeckCurve.setAttribute('d', frontCurveData);
+            frontNeckCurve.setAttribute('stroke', '#e11d48');
+            frontNeckCurve.setAttribute('stroke-width', '2.5');
+            frontNeckCurve.setAttribute('fill', 'none');
+            bodiceGroup.appendChild(frontNeckCurve);
+
+            appendLabel(bodiceGroup, 'Front Neckline Curve', guide45TargetX + 15, guide45TargetY + 20, '#e11d48', '11', 'bold', false);
 
 
             // Draw Bodice Pattern Box Frame
@@ -1521,8 +1577,6 @@
 
 
             // --- NEW REQUIREMENT: TOP SIDE NAME ---
-            // Name the top side of the bodice block box (the current dotted line between CF and CB points).
-            // Horizontal direction, at the middle of the line and near the line from outside the bodice block box.
             const topSideMidX = 50 + (bWidth / 2);
             const topSideY = 50; // top side line y coordinate
             
