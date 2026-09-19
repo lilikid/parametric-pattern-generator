@@ -1415,7 +1415,7 @@
             bodiceGroup.appendChild(backHipLabel);
 
 
-            // --- STEP 13: Join the Back Under Arm Point to the Back Hip Point with a straight guide line ---
+            // --- STEP 13: Front Neckline, Naming and Front Neck Point ---
             const backUnderarmPointY = bustLineY;
 
             const backUnderarmToHipLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -1429,6 +1429,26 @@
             const step13MidX = (backUnderarmPointX + backHipPointX) / 2;
             const step13MidY = (backUnderarmPointY + hipLineY) / 2;
             appendLabel(bodiceGroup, 'Step 13: Side Seam Guide Line', step13MidX + 8, step13MidY, '#0891b2', '10', '600', false);
+
+            // Labels for Center Front Line and Center Back Line
+            appendLabel(bodiceGroup, 'Center Front Line', 50 + bWidth - 110, 80, '#1f7a8c', '10', 'bold', true);
+            appendLabel(bodiceGroup, 'Center Back Line', 60, 80, '#1f7a8c', '10', 'bold', true);
+
+            // Front Neck Point calculation:
+            // ((bust/8 + 1.25 inch (3cm)) / 2) - 0.25 inch (0.5 cm)
+            const frontNeckWidth = (((totalBust / 8.0) + 1.25) / 2.0) - 0.25;
+            const frontNeckWidthPixels = frontNeckWidth * scaleFactor;
+            const frontNeckPointX = (50 + bWidth) - frontNeckWidthPixels;
+            const frontNeckPointY = napeLineY;
+
+            const frontNeckPointCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            frontNeckPointCircle.setAttribute('cx', frontNeckPointX);
+            frontNeckPointCircle.setAttribute('cy', frontNeckPointY);
+            frontNeckPointCircle.setAttribute('r', '5');
+            frontNeckPointCircle.setAttribute('fill', '#0000FF'); // Bold blue
+            bodiceGroup.appendChild(frontNeckPointCircle);
+
+            appendLabel(bodiceGroup, `front Neck Point (${frontNeckWidth.toFixed(2)}" / ${(frontNeckWidth * 2.54).toFixed(1)}cm)`, frontNeckPointX - 60, frontNeckPointY - 15, '#0000FF', '11', 'bold', true);
 
 
             // Draw Bodice Pattern Box Frame
@@ -1611,4 +1631,4 @@
     </script>
 </body>
 </html>
-```[cite: 8]
+```[cite: 9]
