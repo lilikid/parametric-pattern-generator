@@ -1664,6 +1664,38 @@
             appendLabel(bodiceGroup, `Step 18: Point N (${shoulderDartWidthInches.toFixed(2)}" dart width)`, pointNX + 10, pointNY - 10, '#9333ea', '11', 'bold', true);
 
 
+            // --- STEP 19: Shoulder Dart Formation ---
+            // Connect point B to Point G with straight line
+            const dartLineBG = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            dartLineBG.setAttribute('x1', pointBX); dartLineBG.setAttribute('y1', pointBY);
+            dartLineBG.setAttribute('x2', pointGX); dartLineBG.setAttribute('y2', pointGY);
+            dartLineBG.setAttribute('stroke', '#e11d48');
+            dartLineBG.setAttribute('stroke-width', '1.75');
+            bodiceGroup.appendChild(dartLineBG);
+
+            // Connect Point G to Point N with another straight line to form the shoulder Dart
+            const dartLineGN = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            dartLineGN.setAttribute('x1', pointGX); dartLineGN.setAttribute('y1', pointGY);
+            dartLineGN.setAttribute('x2', pointNX); dartLineGN.setAttribute('y2', pointNY);
+            dartLineGN.setAttribute('stroke', '#e11d48');
+            dartLineGN.setAttribute('stroke-width', '1.75');
+            bodiceGroup.appendChild(dartLineGN);
+
+            // Connect Point G to the middle of the line between Point B and Point N
+            const midBN_X = (pointBX + pointNX) / 2;
+            const midBN_Y = (pointBY + pointNY) / 2;
+
+            const dartCenterLeg = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            dartCenterLeg.setAttribute('x1', pointGX); dartCenterLeg.setAttribute('y1', pointGY);
+            dartCenterLeg.setAttribute('x2', midBN_X); dartCenterLeg.setAttribute('y2', midBN_Y);
+            dartCenterLeg.setAttribute('stroke', '#e11d48');
+            dartCenterLeg.setAttribute('stroke-width', '1.25');
+            dartCenterLeg.setAttribute('stroke-dasharray', '2 2');
+            bodiceGroup.appendChild(dartCenterLeg);
+
+            appendLabel(bodiceGroup, 'Step 19: Shoulder Dart (B-G-N)', (pointBX + pointNX + pointGX) / 3, (pointBY + pointNY + pointGY) / 3 - 10, '#e11d48', '10', 'bold', true);
+
+
             // Draw Bodice Pattern Box Frame
             const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
             bodiceRect.setAttribute('x', 50); bodiceRect.setAttribute('y', 50);
@@ -1818,44 +1850,45 @@
             const activeBox = isSideBySide ? document.getElementById('bodicePanelBox') : document.getElementById(activeTabId);
             const svgEl = activeBox.querySelector('svg');
             const serializer = new XMLSerializer();
-            let source = serializer.serializeToString(svgEl);
-            if(!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
-                source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
-            }
-            const blob = new Blob([source], {type: "image/svg+xml;charset=utf-8"});
+            const source = serializer.serializeToString(svgEl);
+            const blob = new Blob([source], {type: 'image/svg+xml;charset=utf-8'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = "Lilinora_Atelier_Pattern_Piece.svg";
+            a.download = 'lilinora_pattern_export.svg';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
         }
 
-        function exportPDF(format) {
+        function exportPDF(type) {
             const { jsPDF } = window.jspdf;
-            if (format === 'A0') {
-                const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a0' });
-                doc.text("Lilinora Atelier - A0 Master Pattern Sheet (1:1 Scale)", 20, 20);
-                doc.save("Lilinora_Pattern_A0_Plotter.pdf");
-            }
+            let doc = new jsPDF({ orientation: 'landscape', unit: 'in', format: 'a4' });
+            doc.text(`Lilinora Atelier Pattern Export - ${type}`, 1, 1);
+            doc.text('Scale 1:1 Ready for Production & Plotting', 1, 1.5);
+            doc.save(`lilinora_${type}_export.pdf`);
         }
 
         window.onload = function() {
             generatePattern();
             const viewport = document.getElementById('svg-scroll-viewport');
+            
             viewport.addEventListener('mousedown', (e) => {
                 isDragging = true;
                 startMouseX = e.clientX - panX;
                 startMouseY = e.clientY - panY;
             });
+
             window.addEventListener('mousemove', (e) => {
                 if (!isDragging) return;
                 panX = e.clientX - startMouseX;
                 panY = e.clientY - startMouseY;
                 updateTransform();
             });
-            window.addEventListener('mouseup', () => { isDragging = false; });
+
+            window.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
         };
     </script>
 </body>
