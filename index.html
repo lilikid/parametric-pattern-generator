@@ -1566,6 +1566,53 @@
             appendLabel(bodiceGroup, 'Step 15: Front Shoulder Line (extended 5")', shoulderLineEndX + 10, shoulderLineEndY, '#dc2626', '10', 'bold', false);
 
 
+            // --- STEP 16: Bust Dart Position ---
+            // Measure out from the center Front Point CF a quarter chest width and move this distance to the right
+            const chestWidthVal = parseFloat(document.getElementById('chestWidth').value) || 13.0;
+            const quarterChestWidthInches = chestWidthVal / 4.0;
+            const quarterChestWidthPixels = quarterChestWidthInches * scaleFactor;
+            const bustDartGuideLineX = cfAnchorX - quarterChestWidthPixels;
+
+            // Draw at this distance a guideline parallel to Center Front line up to meet the shoulder seam and down to one inch 2.5 centimeters below the bustline.
+            const bustDartGuideLineStartY = 50; // top line
+            const bustDartGuideLineEndY = bustLineY + (1.0 * scaleFactor); // 1 inch (2.5 cm) below the bustline
+
+            const bustDartGuideLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            bustDartGuideLine.setAttribute('x1', bustDartGuideLineX); bustDartGuideLine.setAttribute('y1', bustDartGuideLineStartY);
+            bustDartGuideLine.setAttribute('x2', bustDartGuideLineX); bustDartGuideLine.setAttribute('y2', bustDartGuideLineEndY);
+            bustDartGuideLine.setAttribute('stroke', '#10b981'); // Green
+            bustDartGuideLine.setAttribute('stroke-width', '1.5');
+            bustDartGuideLine.setAttribute('stroke-dasharray', '4 2');
+            bodiceGroup.appendChild(bustDartGuideLine);
+
+            // This new point below the bust line would be the point of the bust Dart (Name it G).
+            const pointGX = bustDartGuideLineX;
+            const pointGY = bustLineY + (1.0 * scaleFactor);
+
+            const pointGCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pointGCircle.setAttribute('cx', pointGX);
+            pointGCircle.setAttribute('cy', pointGY);
+            pointGCircle.setAttribute('r', '5.5');
+            pointGCircle.setAttribute('fill', '#10b981');
+            bodiceGroup.appendChild(pointGCircle);
+
+            appendLabel(bodiceGroup, 'Step 16: Point G (Bust Dart Point)', pointGX + 12, pointGY, '#10b981', '11', 'bold', false);
+
+            // Name this guideline as Bust Dart Guide Line the Name direction should be vertical near the line.
+            const bustDartGuideLineNameText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            bustDartGuideLineNameText.setAttribute('x', bustDartGuideLineX - 12);
+            bustDartGuideLineNameText.setAttribute('y', 50 + (bHeight / 3));
+            bustDartGuideLineNameText.setAttribute('writing-mode', 'vertical-rl');
+            bustDartGuideLineNameText.setAttribute('text-anchor', 'middle');
+            bustDartGuideLineNameText.setAttribute('font-family', 'Montserrat, sans-serif');
+            bustDartGuideLineNameText.setAttribute('font-size', '11');
+            bustDartGuideLineNameText.setAttribute('font-weight', 'bold');
+            bustDartGuideLineNameText.setAttribute('fill', '#10b981');
+            bustDartGuideLineNameText.setAttribute('class', 'pattern-label');
+            bustDartGuideLineNameText.textContent = 'Bust Dart Guide Line';
+            bodiceGroup.appendChild(bustDartGuideLineNameText);
+
+
             // Draw Bodice Pattern Box Frame
             const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
             bodiceRect.setAttribute('x', 50); bodiceRect.setAttribute('y', 50);
