@@ -1415,7 +1415,7 @@
             bodiceGroup.appendChild(backHipLabel);
 
 
-            // --- STEP 13: Front Neckline, Naming and Front Neck Point ---
+            // --- STEP 13: Join the Back Under Arm Point to the Back Hip Point with a straight guide line ---
             const backUnderarmPointY = bustLineY;
 
             const backUnderarmToHipLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -1430,26 +1430,6 @@
             const step13MidY = (backUnderarmPointY + hipLineY) / 2;
             appendLabel(bodiceGroup, 'Step 13: Side Seam Guide Line', step13MidX + 8, step13MidY, '#0891b2', '10', '600', false);
 
-            // Labels for Center Front Line and Center Back Line
-            appendLabel(bodiceGroup, 'Center Front Line', 50 + bWidth - 110, 80, '#1f7a8c', '10', 'bold', true);
-            appendLabel(bodiceGroup, 'Center Back Line', 60, 80, '#1f7a8c', '10', 'bold', true);
-
-            // Front Neck Point calculation:
-            // ((bust/8 + 1.25 inch (3cm)) / 2) - 0.25 inch (0.5 cm)
-            const frontNeckWidth = (((totalBust / 8.0) + 1.25) / 2.0) - 0.25;
-            const frontNeckWidthPixels = frontNeckWidth * scaleFactor;
-            const frontNeckPointX = (50 + bWidth) - frontNeckWidthPixels;
-            const frontNeckPointY = napeLineY;
-
-            const frontNeckPointCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            frontNeckPointCircle.setAttribute('cx', frontNeckPointX);
-            frontNeckPointCircle.setAttribute('cy', frontNeckPointY);
-            frontNeckPointCircle.setAttribute('r', '5');
-            frontNeckPointCircle.setAttribute('fill', '#0000FF'); // Bold blue
-            bodiceGroup.appendChild(frontNeckPointCircle);
-
-            appendLabel(bodiceGroup, `front Neck Point (${frontNeckWidth.toFixed(2)}" / ${(frontNeckWidth * 2.54).toFixed(1)}cm)`, frontNeckPointX - 60, frontNeckPointY - 15, '#0000FF', '11', 'bold', true);
-
 
             // Draw Bodice Pattern Box Frame
             const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -1458,6 +1438,35 @@
             bodiceRect.setAttribute('fill', 'rgba(194, 94, 111, 0.04)');
             bodiceRect.setAttribute('stroke', '#c25e6f'); bodiceRect.setAttribute('stroke-width', '2'); bodiceRect.setAttribute('stroke-dasharray', '4');
             bodiceGroup.appendChild(bodiceRect);
+
+            // --- NEW INSTRUCTIONS IMPLEMENTATION ---
+            // 1. Name the right side of the bodice block box (the current dotted line starting from CF to the bottom right corner of the bodice block box) as a Center Front line.
+            appendLabel(bodiceGroup, 'Center Front line', 50 + bWidth + 8, 50 + (bHeight / 2), '#c25e6f', '11', 'bold', false);
+
+            // 2. Name the left side that starts from CB to the bottom left corner of the bodice block box as Center Back line.
+            appendLabel(bodiceGroup, 'Center Back line', 20, 50 + (bHeight / 2), '#c25e6f', '11', 'bold', false);
+
+            // 3. Draw front Neck point by measuring the neck width as follow (((bust/8)+1.25 inch (3cm))/2)- 0.25 inch (0.5 cm). Measure this Neck width starting from CF and move horizontally to the left. label this point the front Neck Point.
+            const frontNeckWidth = (((totalBust / 8.0) + 1.25) / 2.0) - 0.25;
+            const frontNeckWidthPixels = frontNeckWidth * scaleFactor;
+            const frontNeckPointX = (50 + bWidth) - frontNeckWidthPixels;
+            const frontNeckPointY = napeLineY;
+
+            const frontNeckWidthLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            frontNeckWidthLine.setAttribute('x1', 50 + bWidth); frontNeckWidthLine.setAttribute('y1', napeLineY);
+            frontNeckWidthLine.setAttribute('x2', frontNeckPointX); frontNeckWidthLine.setAttribute('y2', napeLineY);
+            frontNeckWidthLine.setAttribute('stroke', '#8b5cf6');
+            frontNeckWidthLine.setAttribute('stroke-width', '2.5');
+            bodiceGroup.appendChild(frontNeckWidthLine);
+
+            const frontNeckPointCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            frontNeckPointCircle.setAttribute('cx', frontNeckPointX);
+            frontNeckPointCircle.setAttribute('cy', frontNeckPointY);
+            frontNeckPointCircle.setAttribute('r', '4.5');
+            frontNeckPointCircle.setAttribute('fill', '#8b5cf6');
+            bodiceGroup.appendChild(frontNeckPointCircle);
+
+            appendLabel(bodiceGroup, `front Neck Point (${frontNeckWidth.toFixed(2)}" / ${(frontNeckWidth * 2.54).toFixed(1)}cm)`, frontNeckPointX - 110, napeLineY + 20, '#8b5cf6', '10', 'bold', false);
 
             // Add Hip Line Label to the lower line of the bodice block box
             appendLabel(bodiceGroup, 'Hip Line', 60, 50 + bHeight, '#c25e6f', '11', 'bold', false);
@@ -1631,4 +1640,4 @@
     </script>
 </body>
 </html>
-```[cite: 9]
+```[cite: 8]
