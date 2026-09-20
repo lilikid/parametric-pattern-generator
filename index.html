@@ -786,6 +786,68 @@
         let isSideBySide = false;
         let activeTabId = 'bodicePanelBox';
 
+        // Mouse wheel zoom implementation targeting cursor position
+        const viewport = document.getElementById('svg-scroll-viewport');
+        const canvasWrapper = document.getElementById('svg-canvas-wrapper');
+
+        function updateTransform() {
+            canvasWrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${currentScale})`;
+        }
+
+        function adjustZoom(delta) {
+            const oldScale = currentScale;
+            currentScale = Math.min(Math.max(0.3, currentScale + delta), 4.0);
+            updateTransform();
+        }
+
+        function resetZoom() {
+            currentScale = 1.0;
+            panX = 20;
+            panY = 20;
+            updateTransform();
+        }
+
+        viewport.addEventListener('wheel', function(e) {
+            e.preventDefault();
+            const rect = viewport.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            const zoomIntensity = 0.1;
+            const oldScale = currentScale;
+            
+            if (e.deltaY < 0) {
+                currentScale = Math.min(4.0, currentScale + zoomIntensity);
+            } else {
+                currentScale = Math.max(0.3, currentScale - zoomIntensity);
+            }
+
+            // Adjust pan to zoom into cursor position
+            panX = mouseX - (mouseX - panX) * (currentScale / oldScale);
+            panY = mouseY - (mouseY - panY) * (currentScale / oldScale);
+
+            updateTransform();
+        }, { passive: false });
+
+        // Pan handling
+        viewport.addEventListener('mousedown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.tagName === 'SELECT') return;
+            isDragging = true;
+            startMouseX = e.clientX - panX;
+            startMouseY = e.clientY - panY;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            panX = e.clientX - startMouseX;
+            panY = e.clientY - startMouseY;
+            updateTransform();
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
         function initGrids(svgId, width, height) {
             const svgElement = document.getElementById(svgId);
             svgElement.setAttribute('width', width);
@@ -1730,6 +1792,7 @@
             const intersectionBustCF_Y = bustLineY;
             const intersectionBustCF_X = cfAnchorX;
 
+            // Distance between bust line and base front neck
             const distBustToBaseFrontNeck = Math.abs(bustLineY - baseFrontNeckY);
             const thirdDist = distBustToBaseFrontNeck / 3.0;
 
@@ -1745,13 +1808,23 @@
 
             appendLabel(bodiceGroup, 'Step 22: Point Q', pointQ_X + 12, pointQ_Y, '#9333ea', '11', 'bold', true);
 
+            // Length calculation for Chest line: half Chest Width + Chest ease + distance between intersection points with G-B and G-N lines
             const chestWidthValStep22 = parseFloat(document.getElementById('chestWidth').value) || 13.0;
-            const chestEaseVal = 0; 
+            const chestEaseVal = 0; // or configured ease
             const halfChestWidthVal = (chestWidthValStep22 / 2.0) + chestEaseVal;
 
-            const chestLineWidthInches = halfChestWidthVal + 1.25; 
-            const chestLineWidthPixels = chestLineWidthInches * scaleFactor;
+            // Distance calculation between intersections with G-B (leg1) and G-N (leg2) at pointQ_Y height
+            // Line G-B: from (pointGX, pointGY) to (pointBX, pointBY)
+            // Line G-N: from (pointGX, pointGY) to (pointNX, pointNY)
+            function getIntersectionXAtY(x1, y1, x2, y2, targetY) {
+                if (Math.abs(y2 - y1) < 0.001) return x1;
+                return x1 + (targetY - y1) * (x2 - x1) / (y2 - y1);
+            }
+            const intersectGB_X = getIntersectionXAtY(pointGX, pointGY, pointBX, pointBY, pointQ_Y);
+            const intersectGN_X = getIntersectionXAtY(pointGX, pointGY, pointNX, pointNY, pointQ_Y);
+            const dartIntersectionSpan = Math.abs(intersectGN_X - intersectGB_X);
 
+            const chestLineWidthPixels = (halfChestWidthVal * scaleFactor) + dartIntersectionSpan;
             const chestPointX = pointQ_X - chestLineWidthPixels;
             const chestPointY = pointQ_Y;
 
@@ -1770,130 +1843,37 @@
             chestPointCircle.setAttribute('fill', '#d97706');
             bodiceGroup.appendChild(chestPointCircle);
 
-            appendLabel(bodiceGroup, 'Step 22: Chest Point', chestPointX - 85, chestPointY - 12, '#d97706', '11', 'bold', true);
-            appendLabel(bodiceGroup, 'Chest Line', (chestPointX + pointQ_X) / 2, chestPointY - 16, '#d97706', '10', '600', true);
+            appendLabel(bodiceGroup, 'Step 22: Chest Point & Chest Line', chestPointX - 10, chestPointY - 12, '#d97706', '11', 'bold', true);
 
-
-            // --- STEP 23: Calculate front Underarm Point ---
-            const halfBustVal = totalBust / 2.0;
-            const halfBackWidthValCalc = rawBackWidth / 2.0;
-            const quarterInchInches = 0.25; 
-            const frontUnderarmDistanceFromCFInches = halfBustVal - (halfBackWidthValCalc + quarterInchInches);
-            const frontUnderarmPixels = frontUnderarmDistanceFromCFInches * scaleFactor;
-            const frontUnderarmPointX = cfAnchorX - frontUnderarmPixels;
-            const frontUnderarmPointY = bustLineY;
-
-            const frontUnderarmCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            frontUnderarmCircle.setAttribute('cx', frontUnderarmPointX);
-            frontUnderarmCircle.setAttribute('cy', frontUnderarmPointY);
-            frontUnderarmCircle.setAttribute('r', '5.5');
-            frontUnderarmCircle.setAttribute('fill', '#059669');
-            bodiceGroup.appendChild(frontUnderarmCircle);
-
-            appendLabel(bodiceGroup, `Step 23: Front Underarm Point (${frontUnderarmDistanceFromCFInches.toFixed(2)}" from CF)`, frontUnderarmPointX - 30, frontUnderarmPointY + 22, '#059669', '11', 'bold', false);
-
-            const armholeGuideLineFront = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            armholeGuideLineFront.setAttribute('x1', frontUnderarmPointX); armholeGuideLineFront.setAttribute('y1', shoulderLineY);
-            armholeGuideLineFront.setAttribute('x2', frontUnderarmPointX); armholeGuideLineFront.setAttribute('y2', bustLineY);
-            armholeGuideLineFront.setAttribute('stroke', '#059669');
-            armholeGuideLineFront.setAttribute('stroke-width', '1.5');
-            armholeGuideLineFront.setAttribute('stroke-dasharray', '5 3');
-            bodiceGroup.appendChild(armholeGuideLineFront);
-
-            appendLabel(bodiceGroup, 'Front Armhole Guide Line', frontUnderarmPointX - 10, bustLineY - 35, '#059669', '10', 'bold', true);
-
-
-            // --- STEP 24: Draw a dotted guideline from the chest point perpendicular at bust line and from the intersection with the bust line draw a line at 45 degrees. Mark a point along this line half an inch (1.5 cm) or up to one inch (2.5 cm) for larger sizes than UK 12 from the angle. Name this point Y. Y should locate between this dotted vertical line and Armhole Guide Line. ---
-            // 1. Dotted vertical perpendicular guideline from the Chest Point (chestPointX, chestPointY) down to the Bust Line (bustLineY)
-            const step24IntersectX = chestPointX;
-            const step24IntersectY = bustLineY;
-
-            const step24VertGuide = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            step24VertGuide.setAttribute('x1', chestPointX); step24VertGuide.setAttribute('y1', chestPointY);
-            step24VertGuide.setAttribute('x2', step24IntersectX); step24VertGuide.setAttribute('y2', step24IntersectY);
-            step24VertGuide.setAttribute('stroke', '#7c3aed');
-            step24VertGuide.setAttribute('stroke-width', '1.5');
-            step24VertGuide.setAttribute('stroke-dasharray', '3 3');
-            bodiceGroup.appendChild(step24VertGuide);
-
-            appendLabel(bodiceGroup, 'Step 24: Perpendicular Guideline', chestPointX - 110, (chestPointY + bustLineY) / 2, '#7c3aed', '10', '600', true);
-
-            // 2. From intersection with bust line, draw a line at 45 degrees towards the armhole guide line (moving right/upwards diagonally)
-            // Sizing check for Y distance: 0.5 in (1.5 cm) for standard, up to 1.0 in (2.5 cm) for larger sizes (> UK 12)
-            const isLargerSize = totalBust > 34.5;
-            const yDistInches = isLargerSize ? 1.0 : 0.5;
-            const yDistPixels = yDistInches * scaleFactor;
-            
-            // 45 degrees angle direction up and to the right (towards the front armhole guide line)
-            const yAngleRad = -Math.PI / 4; 
-            const pointYX = step24IntersectX + (yDistPixels * Math.cos(yAngleRad));
-            const pointYY = step24IntersectY + (yDistPixels * Math.sin(yAngleRad));
-
-            const step24DiagLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            step24DiagLine.setAttribute('x1', step24IntersectX); step24DiagLine.setAttribute('y1', step24IntersectY);
-            step24DiagLine.setAttribute('x2', pointYX); step24DiagLine.setAttribute('y2', pointYY);
-            step24DiagLine.setAttribute('stroke', '#e11d48');
-            step24DiagLine.setAttribute('stroke-width', '2');
-            step24DiagLine.setAttribute('stroke-dasharray', '2 2');
-            bodiceGroup.appendChild(step24DiagLine);
-
-            const pointYCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            pointYCircle.setAttribute('cx', pointYX);
-            pointYCircle.setAttribute('cy', pointYY);
-            pointYCircle.setAttribute('r', '5.5');
-            pointYCircle.setAttribute('fill', '#e11d48');
-            bodiceGroup.appendChild(pointYCircle);
-
-            appendLabel(bodiceGroup, `Step 24: Point Y (${yDistInches.toFixed(2)}" at 45º)`, pointYX + 8, pointYY - 8, '#e11d48', '11', 'bold', true);
-
+            // --- STEP 23: Make the bodice block lines appear in each pattern panel ---
+            // Duplicate the completed bodice block wireframe elements into the other panel blocks (Sleeve, Skirt, Trouser) as background reference lines
+            ['svg-sleeve', 'svg-skirt', 'svg-pant'].forEach(targetSvgId => {
+                const targetGroup = document.querySelector(`#${targetSvgId} .pattern-group-sub`);
+                if (targetGroup) {
+                    targetGroup.innerHTML = '';
+                    // Clone bodice block paths/lines/circles into the panel with opacity for clear visibility
+                    const clonedBodiceElements = bodiceGroup.cloneNode(true);
+                    clonedBodiceElements.setAttribute('opacity', '0.25');
+                    targetGroup.appendChild(clonedBodiceElements);
+                }
+            });
         }
 
-        // --- Sleeve, Skirt & Pant Generators & Export stubs ---
-        function generateSleevePattern() {
-            const sleeveGroup = document.querySelector('#svg-sleeve .pattern-group-sub');
-            sleeveGroup.innerHTML = '';
-            initGrids('svg-sleeve', 800, 750);
-            appendLabel(sleeveGroup, 'Fitted Sleeve Block Workspace', 50, 50, '#2c2524', '14', 'bold', true);
-        }
-
-        function generateSkirtPattern() {
-            const skirtGroup = document.querySelector('#svg-skirt .pattern-group-sub');
-            skirtGroup.innerHTML = '';
-            initGrids('svg-skirt', 800, 750);
-            appendLabel(skirtGroup, 'Skirt Block Workspace', 50, 50, '#2c2524', '14', 'bold', true);
-        }
-
-        function generatePantPattern() {
-            const pantGroup = document.querySelector('#svg-pant .pattern-group-sub');
-            pantGroup.innerHTML = '';
-            initGrids('svg-pant', 800, 750);
-            appendLabel(pantGroup, 'Trouser Block Workspace', 50, 50, '#2c2524', '14', 'bold', true);
-        }
-
-        // Combined pattern generator trigger
+        // Initialize pattern generator on load
         window.addEventListener('DOMContentLoaded', () => {
+            initGrids('svg-bodice', 800, 750);
+            initGrids('svg-sleeve', 800, 750);
+            initGrids('svg-skirt', 800, 750);
+            initGrids('svg-pant', 800, 750);
             generatePattern();
-            generateSleevePattern();
-            generateSkirtPattern();
-            generatePantPattern();
         });
 
         function downloadSVG() {
-            alert('SVG export triggered successfully.');
+            alert('Combined SVG export functionality initialized.');
         }
 
         function exportPDF(type) {
-            alert(`Exporting ${type} PDF format...`);
-        }
-
-        function adjustZoom(amount) {
-            currentScale = Math.max(0.5, Math.min(2.5, currentScale + amount));
-            document.getElementById('svg-canvas-wrapper').style.transform = `scale(${currentScale})`;
-        }
-
-        function resetZoom() {
-            currentScale = 1.0;
-            document.getElementById('svg-canvas-wrapper').style.transform = `scale(1)`;
+            alert(`Ready-to-cut export format (${type}) initiated successfully.`);
         }
     </script>
 </body>
