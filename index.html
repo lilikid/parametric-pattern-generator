@@ -3,97 +3,433 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parametric Pattern Generator Engine</title>
+    <title>Lilinora Precision Atelier | Parametric Pattern Generator</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; height: 100vh; background: #f3f4f6; color: #1f2937; }
-        
+        :root {
+            --bg-primary: #121418;
+            --bg-secondary: #1a1d24;
+            --bg-tertiary: #232731;
+            --accent: #c5a880;
+            --accent-hover: #d4bc98;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: #2d3748;
+            --grid-major: rgba(197, 168, 128, 0.25);
+            --grid-half: rgba(197, 168, 128, 0.12);
+            --grid-sub: rgba(197, 168, 128, 0.04);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        header {
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            color: var(--accent);
+        }
+
+        .brand p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .workspace {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
         /* Sidebar Controls */
-        #sidebar { width: 340px; background: #ffffff; border-right: 1px solid #e5e7eb; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; box-shadow: 2px 0 8px rgba(0,0,0,0.05); }
-        h2 { font-size: 1.1rem; border-bottom: 2px solid #3b82f6; padding-bottom: 6px; margin-bottom: 8px; color: #1d4ed8; }
-        .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
-        label { font-size: 0.82rem; font-weight: 600; color: #4b5563; }
-        input[type="number"], select { padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 0.9rem; }
-        .checkbox-group { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 500; cursor: pointer; }
-        
-        button { background: #2563eb; color: white; border: none; padding: 10px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-        button:hover { background: #1d4ed8; }
-        
-        /* SVG Workspace */
-        #workspace { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; background: #eef2ff; }
-        #canvas-container { flex: 1; overflow: auto; padding: 40px; display: flex; justify-content: center; align-items: center; }
-        svg { background: #ffffff; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border-radius: 4px; }
-        
-        /* SVG Styling Rules */
-        .grid-minor { stroke: #e5e7eb; stroke-width: 0.5; }
-        .grid-major { stroke: #cbd5e1; stroke-width: 1; }
-        .base-line { stroke: #94a3b8; stroke-width: 1; stroke-dasharray: 4,4; }
-        .pattern-net { stroke: #0f172a; stroke-width: 2; fill: none; stroke-linecap: round; }
-        .sewing-dart { stroke: #2563eb; stroke-width: 1.5; stroke-dasharray: 4,4; fill: none; }
-        .seam-allowance { stroke: #0284c7; stroke-width: 1; stroke-dasharray: 6,3; fill: none; }
-        .apex-marker { fill: #ef4444; stroke: #b91c1c; stroke-width: 1; }
-        .text-annotation { font-family: monospace; font-size: 10px; fill: #475569; }
+        sidebar {
+            width: 380px;
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.25rem;
+        }
+
+        .control-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .control-group h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.3rem;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            align-items: center;
+        }
+
+        .form-row label {
+            flex: 1;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .form-row input, .form-row select {
+            flex: 1;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 0.4rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .form-row input:focus, .form-row select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        /* Canvas Area */
+        .canvas-container {
+            flex: 1;
+            background-color: var(--bg-primary);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+        }
+
+        svg:active {
+            cursor: grabbing;
+        }
+
+        /* Grid lines styled via CSS classes */
+        .grid-line-major { stroke: var(--grid-major); stroke-width: 1px; }
+        .grid-line-half { stroke: var(--grid-half); stroke-width: 0.5px; }
+        .grid-line-sub { stroke: var(--grid-sub); stroke-width: 0.25px; }
+
+        .pattern-path {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 1.5;
+            vector-effect: non-scaling-stroke;
+        }
+
+        .toolbar-overlay {
+            position: absolute;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 20;
+        }
+
+        .btn {
+            background: var(--bg-tertiary);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-color: var(--accent);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--bg-primary);
+            font-weight: 600;
+            border-color: var(--accent);
+            width: 100%;
+            padding: 0.6rem;
+            margin-top: 1rem;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
     </style>
 </head>
 <body>
 
-    <aside id="sidebar">
-        <h2>1. Anatomic Inputs</h2>
-        <div class="form-group">
-            <label>Unit System</label>
-            <select id="unit-system">
-                <option value="inch" selected>Inches (in)</option>
-                <option value="cm">Centimeters (cm)</option>
-            </select>
+    <header>
+        <div class="brand">
+            <h1>LILINORA PRECISION ATELIER</h1>
+            <p>Parametric Pattern Generator</p>
         </div>
-        
-        <div id="measurements-inputs">
-            <!-- Inputs populated dynamically by measurements.js -->
+        <div class="actions">
+            <button class="btn" onclick="resetView()">Reset View</button>
+            <button class="btn" onclick="exportSVG()">Export SVG</button>
         </div>
+    </header>
 
-        <h2>2. Silhouette & Ease</h2>
-        <div class="form-group">
-            <label for="ease-preset">Silhouette Preset</label>
-            <select id="ease-preset">
-                <option value="-2.0">Corset / Compression (-2.0")</option>
-                <option value="0.5">Close-Fitting / Knit (+0.5")</option>
-                <option value="1.25" selected>Standard Fitted Block (+1.25")</option>
-                <option value="2.0">Semi-Fitted / Daywear (+2.0")</option>
-                <option value="3.5">Loose / Outerwear (+3.5")</option>
-            </select>
-        </div>
+    <div class="workspace">
+        <sidebar>
+            <div class="sidebar-content">
+                <div class="control-group">
+                    <h3>Units & Scale</h3>
+                    <div class="form-row">
+                        <label>Unit System</label>
+                        <select id="unitSystem" onchange="updateUnits()">
+                            <option value="cm">Metric (cm)</option>
+                            <option value="in">Imperial (inches)</option>
+                        </select>
+                    </div>
+                </div>
 
-        <h2>3. Display Options</h2>
-        <label class="checkbox-group"><input type="checkbox" id="toggle-grid" checked> Background Grid</label>
-        <label class="checkbox-group"><input type="checkbox" id="toggle-baselines" checked> Base Reference Lines</label>
-        <label class="checkbox-group"><input type="checkbox" id="toggle-sewing-darts" checked> Retracted Sewing Darts</label>
-        <label class="checkbox-group"><input type="checkbox" id="toggle-sa" checked> Seam Allowances (0.5")</label>
+                <div class="control-group">
+                    <h3>Garment Configuration</h3>
+                    <div class="form-row">
+                        <label>Piece Selection</label>
+                        <select id="garmentPiece" onchange="renderPattern()">
+                            <option value="bodice">Bodice Block</option>
+                            <option value="sleeve">Sleeve Block</option>
+                            <option value="skirt">Skirt Block</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label>Standard Size</label>
+                        <select id="standardSize" onchange="loadStandardSize()">
+                            <option value="uk12">UK Size 12</option>
+                            <option value="custom">Custom Measurements</option>
+                        </select>
+                    </div>
+                </div>
 
-        <button id="btn-render" style="margin-top: 10px;">Re-Generate Pattern</button>
-        <button id="btn-print" style="background: #059669;">Print / Save PDF</button>
-    </aside>
+                <div class="control-group">
+                    <h3>Measurements</h3>
+                    <div class="form-row">
+                        <label>Bust / Chest</label>
+                        <input type="number" id="mBust" value="88" step="0.5" oninput="renderPattern()">
+                    </div>
+                    <div class="form-row">
+                        <label>Waist</label>
+                        <input type="number" id="mWaist" value="70" step="0.5" oninput="renderPattern()">
+                    </div>
+                    <div class="form-row">
+                        <label>Hips</label>
+                        <input type="number" id="mHips" value="96" step="0.5" oninput="renderPattern()">
+                    </div>
+                    <div class="form-row">
+                        <label>Back Length</label>
+                        <input type="number" id="mBackLength" value="40" step="0.5" oninput="renderPattern()">
+                    </div>
+                </div>
 
-    <main id="workspace">
-        <div id="canvas-container">
-            <svg id="pattern-canvas" width="1200" height="900" viewBox="0 0 1200 900" xmlns="http://www.w3.org/2000/svg">
-                <!-- Layers constructed by svgRenderer.js -->
-                <defs id="svg-defs"></defs>
-                <g id="layer-bg-grid"></g>
-                <g id="layer-baselines"></g>
-                <g id="layer-construction"></g>
-                <g id="layer-sewing-darts"></g>
-                <g id="layer-net-pattern"></g>
-                <g id="layer-seam-allowance"></g>
-                <g id="layer-markers"></g>
-                <g id="layer-annotations"></g>
+                <button class="btn btn-primary" onclick="renderPattern()">Generate Pattern</button>
+            </div>
+        </sidebar>
+
+        <div class="canvas-container" id="canvasContainer">
+            <svg id="patternCanvas" viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid meet">
+                <g id="gridGroup"></g>
+                <g id="patternGroup">
+                    <!-- Dynamic pattern paths will render here -->
+                </g>
             </svg>
-        </div>
-    </main>
 
-    <!-- Script Pipeline -->
-    <script src="measurements.js"></script>
-    <script src="draftingEngine.js"></script>
-    <script src="svgRenderer.js"></script>
-    <script src="app.js"></script>
+            <div class="toolbar-overlay">
+                <button class="btn" onclick="adjustZoom(1.2)">Zoom +</button>
+                <button class="btn" onclick="adjustZoom(0.8)">Zoom -</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUnit = 'cm';
+        let viewBox = { x: -100, y: -100, w: 1000, h: 800 };
+        let isPanning = false;
+        let startPoint = { x: 0, y: 0 };
+
+        const svgCanvas = document.getElementById('patternCanvas');
+        const gridGroup = document.getElementById('gridGroup');
+        const patternGroup = document.getElementById('patternGroup');
+
+        function initGrid() {
+            gridGroup.innerHTML = '';
+            const width = 2000;
+            const height = 2000;
+            const baseStep = currentUnit === 'in' ? 25.4 : 10; // Subdivisions setup
+            const subStep = baseStep / 2;
+
+            // Draw vertical grid lines
+            for (let x = -500; x <= width; x += subStep) {
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', x); line.setAttribute('y1', -500);
+                line.setAttribute('x2', x); line.setAttribute('y2', height);
+
+                const ratio = x / baseStep;
+                const isMajor = Math.abs(ratio - Math.round(ratio)) < 0.001 && Math.round(ratio) % (currentUnit === 'in' ? 4 : 5) === 0;
+                const isHalf = Math.abs(ratio - Math.round(ratio)) < 0.001;
+
+                if (isMajor) {
+                    line.setAttribute('class', 'grid-line-major');
+                } else if (isHalf) {
+                    line.setAttribute('class', 'grid-line-half');
+                } else {
+                    line.setAttribute('class', 'grid-line-sub');
+                }
+                gridGroup.appendChild(line);
+            }
+
+            // Draw horizontal grid lines
+            for (let y = -500; y <= height; y += subStep) {
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', -500); line.setAttribute('y1', y);
+                line.setAttribute('x2', width); line.setAttribute('y2', y);
+
+                const ratio = y / baseStep;
+                const isMajor = Math.abs(ratio - Math.round(ratio)) < 0.001 && Math.round(ratio) % (currentUnit === 'in' ? 4 : 5) === 0;
+                const isHalf = Math.abs(ratio - Math.round(ratio)) < 0.001;
+
+                if (isMajor) {
+                    line.setAttribute('class', 'grid-line-major');
+                } else if (isHalf) {
+                    line.setAttribute('class', 'grid-line-half');
+                } else {
+                    line.setAttribute('class', 'grid-line-sub');
+                }
+                gridGroup.appendChild(line);
+            }
+        }
+
+        function renderPattern() {
+            patternGroup.innerHTML = '';
+            const bust = parseFloat(document.getElementById('mBust').value) || 88;
+            const waist = parseFloat(document.getElementById('mWaist').value) || 70;
+            const backLength = parseFloat(document.getElementById('mBackLength').value) || 40;
+            const piece = document.getElementById('garmentPiece').value;
+
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            let d = '';
+
+            if (piece === 'bodice') {
+                const w = bust / 4;
+                const h = backLength;
+                d = `M 50 50 L ${50 + w} 50 L ${50 + w} ${50 + h} L 50 ${50 + h} Z`;
+            } else if (piece === 'skirt') {
+                const w = bust / 4;
+                d = `M 50 50 L ${50 + w} 50 L ${50 + w + 10} 150 L 40 150 Z`;
+            } else {
+                d = `M 50 50 L 150 50 L 130 200 L 70 200 Z`;
+            }
+
+            path.setAttribute('d', d);
+            path.setAttribute('class', 'pattern-path');
+            patternGroup.appendChild(path);
+        }
+
+        function updateViewBox() {
+            svgCanvas.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.w} ${viewBox.h}`);
+        }
+
+        function adjustZoom(factor) {
+            viewBox.w *= factor;
+            viewBox.h *= factor;
+            updateViewBox();
+        }
+
+        function resetView() {
+            viewBox = { x: -100, y: -100, w: 1000, h: 800 };
+            updateViewBox();
+        }
+
+        function updateUnits() {
+            currentUnit = document.getElementById('unitSystem').value;
+            initGrid();
+        }
+
+        function loadStandardSize() {
+            document.getElementById('mBust').value = 88;
+            document.getElementById('mWaist').value = 70;
+            document.getElementById('mHips').value = 96;
+            document.getElementById('mBackLength').value = 40;
+            renderPattern();
+        }
+
+        function exportSVG() {
+            const serializer = new XMLSerializer();
+            const source = serializer.serializeToString(svgCanvas);
+            const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'lilinora-pattern.svg';
+            link.click();
+        }
+
+        // Panning event handlers
+        svgCanvas.addEventListener('mousedown', (e) => {
+            isPanning = true;
+            startPoint = { x: e.clientX, y: e.clientY };
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isPanning) return;
+            const dx = (e.clientX - startPoint.x) * (viewBox.w / svgCanvas.clientWidth);
+            const dy = (e.clientY - startPoint.y) * (viewBox.h / svgCanvas.clientHeight);
+            viewBox.x -= dx;
+            viewBox.y -= dy;
+            startPoint = { x: e.clientX, y: e.clientY };
+            updateViewBox();
+        });
+
+        window.addEventListener('mouseup', () => { isPanning = false; });
+
+        // Initial setup
+        initGrid();
+        renderPattern();
+    </script>
 </body>
 </html>
