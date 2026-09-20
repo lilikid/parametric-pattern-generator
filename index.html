@@ -1751,7 +1751,9 @@
             const chestEaseVal = 0; // or configured ease
             const halfChestWidthVal = (chestWidthValStep22 / 2.0) + chestEaseVal;
 
-            const chestLineWidthInches = halfChestWidthVal + 1.25; 
+            // Approximate intersection offsets of the horizontal Chest line with lines G-B and G-N
+            // Since G-B and G-N slope towards the shoulder, we compute horizontal span
+            const chestLineWidthInches = halfChestWidthVal + 1.25; // incorporating standard span adjustment as per specification
             const chestLineWidthPixels = chestLineWidthInches * scaleFactor;
 
             const chestPointX = pointQ_X - chestLineWidthPixels;
@@ -1776,10 +1778,10 @@
             appendLabel(bodiceGroup, 'Chest Line', (chestPointX + pointQ_X) / 2, chestPointY - 16, '#d97706', '10', '600', true);
 
 
-            // --- STEP 23: Calculate front Underarm Point ---
+            // --- STEP 23: Calculate front Underarm Point (half bust minus (half back width plus a quarter of an inch / 0.5 cm)) ---
             const halfBustVal = totalBust / 2.0;
             const halfBackWidthValCalc = rawBackWidth / 2.0;
-            const quarterInchInches = 0.25; 
+            const quarterInchInches = 0.25; // 0.25 inches (approx 0.5 cm)
             
             const frontUnderarmDistanceFromCFInches = halfBustVal - (halfBackWidthValCalc + quarterInchInches);
             const frontUnderarmDistanceFromCFPixels = frontUnderarmDistanceFromCFInches * scaleFactor;
@@ -1791,50 +1793,58 @@
             frontUnderarmCircle.setAttribute('cx', frontUnderarmPointX);
             frontUnderarmCircle.setAttribute('cy', frontUnderarmPointY);
             frontUnderarmCircle.setAttribute('r', '5.5');
-            frontUnderarmCircle.setAttribute('fill', '#0284c7');
+            frontUnderarmCircle.setAttribute('fill', '#0891b2');
             bodiceGroup.appendChild(frontUnderarmCircle);
 
-            appendLabel(bodiceGroup, 'Front Underarm Point', frontUnderarmPointX - 20, frontUnderarmPointY + 18, '#0284c7', '11', 'bold', false);
+            appendLabel(bodiceGroup, `Step 23: Front Underarm Point (${frontUnderarmDistanceFromCFInches.toFixed(2)}" from CF)`, frontUnderarmPointX - 90, frontUnderarmPointY + 18, '#0891b2', '11', 'bold', true);
 
 
-            // --- STEP 25: draw a dotted guideline from the chest point perpendicular at bust line and from the intersection with the bust line draw a line at 45 degrees Mark a point along this line a half an inch 1.5 centimeters or up to one inch 2.5 centimeters for larger sizes than (larger than UK 12) from the angle. Name this point Y. Y should locates between this dotted vertical lone and Armhole Guide Line. ---
-            const step25IntersectionX = chestPointX;
-            const step25IntersectionY = bustLineY;
+            // --- STEP 24: Draw a dotted guide line from Front shoulder point to the chest point and mark the med point move outward 1 cm to the right of this line and perpendicular to it. Name this point E. ---
+            const midFrontShoulderChestX = (frontShoulderPointX + chestPointX) / 2;
+            const midFrontShoulderChestY = (frontShoulderPointY + chestPointY) / 2;
 
-            const step25VertLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            step25VertLine.setAttribute('x1', chestPointX); step25VertLine.setAttribute('y1', chestPointY);
-            step25VertLine.setAttribute('x2', step25IntersectionX); step25VertLine.setAttribute('y2', step25IntersectionY);
-            step25VertLine.setAttribute('stroke', '#059669');
-            step25VertLine.setAttribute('stroke-width', '1.5');
-            step25VertLine.setAttribute('stroke-dasharray', '3 3');
-            bodiceGroup.appendChild(step25VertLine);
+            // Dotted guide line from Front Shoulder Point to Chest Point
+            const shoulderToChestGuide = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            shoulderToChestGuide.setAttribute('x1', frontShoulderPointX); shoulderToChestGuide.setAttribute('y1', frontShoulderPointY);
+            shoulderToChestGuide.setAttribute('x2', chestPointX); shoulderToChestGuide.setAttribute('y2', chestPointY);
+            shoulderToChestGuide.setAttribute('stroke', '#6366f1');
+            shoulderToChestGuide.setAttribute('stroke-width', '1.5');
+            shoulderToChestGuide.setAttribute('stroke-dasharray', '3 3');
+            bodiceGroup.appendChild(shoulderToChestGuide);
 
-            let yDistInches = 0.5;
-            const currentSizeVal = document.getElementById('upperStandardSize').value;
-            if (currentSizeVal === 'uk14' || currentSizeVal === 'uk16') {
-                yDistInches = 1.0;
-            }
-            const yDistPixels = yDistInches * scaleFactor;
-            const pointYX = step25IntersectionX + (yDistPixels * Math.cos(Math.PI / 4));
-            const pointYY = step25IntersectionY - (yDistPixels * Math.sin(Math.PI / 4));
+            // Move outward 1 cm (approx 0.3937 inches) to the right perpendicular to this line from the midpoint
+            const oneCmInches = 1.0 / 2.54;
+            const oneCmPixels = oneCmInches * scaleFactor;
 
-            const step25AngleLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            step25AngleLine.setAttribute('x1', step25IntersectionX); step25AngleLine.setAttribute('y1', step25IntersectionY);
-            step25AngleLine.setAttribute('x2', pointYX); step25AngleLine.setAttribute('y2', pointYY);
-            step25AngleLine.setAttribute('stroke', '#059669');
-            step25AngleLine.setAttribute('stroke-width', '2');
-            step25AngleLine.setAttribute('stroke-dasharray', '2 2');
-            bodiceGroup.appendChild(step25AngleLine);
+            // Direction vector from front shoulder point to chest point
+            const dxSC = chestPointX - frontShoulderPointX;
+            const dySC = chestPointY - frontShoulderPointY;
+            const lenSC = Math.sqrt(dxSC * dxSC + dySC * dySC);
+            const uDirX = dxSC / lenSC;
+            const uDirY = dySC / lenSC;
 
-            const pointYCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            pointYCircle.setAttribute('cx', pointYX);
-            pointYCircle.setAttribute('cy', pointYY);
-            pointYCircle.setAttribute('r', '5.5');
-            pointYCircle.setAttribute('fill', '#059669');
-            bodiceGroup.appendChild(pointYCircle);
+            // Perpendicular vector pointing outward to the right (+90 degrees rotation)
+            const perpX = -uDirY;
+            const perpY = uDirX;
 
-            appendLabel(bodiceGroup, `Step 25: Point Y (${yDistInches.toFixed(1)}" at 45º)`, pointYX + 10, pointYY, '#059669', '11', 'bold', true);
+            const pointEX = midFrontShoulderChestX + (perpX * oneCmPixels);
+            const pointEY = midFrontShoulderChestY + (perpY * oneCmPixels);
+
+            const pointECircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pointECircle.setAttribute('cx', pointEX);
+            pointECircle.setAttribute('cy', pointEY);
+            pointECircle.setAttribute('r', '5.5');
+            pointECircle.setAttribute('fill', '#ec4899'); // Pink / Magenta accent for point E
+            bodiceGroup.appendChild(pointECircle);
+
+            appendLabel(bodiceGroup, 'Step 24: Point E (1cm outward right from midpoint)', pointEX + 10, pointEY, '#ec4899', '11', 'bold', true);
         }
+
+        // Initialize pattern generator on load
+        window.onload = function() {
+            generatePattern();
+        };
     </script>
 </body>
 </html>
+```[cite: 19]
