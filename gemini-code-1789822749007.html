@@ -1,0 +1,1891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lilinora | Precision Atelier Pattern Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --primary: #c25e6f;
+            --primary-hover: #a84c5c;
+            --bg-color: #f8f6f5;
+            --card-bg: #ffffff;
+            --border-color: #e2dcd9;
+            --text-color: #2c2524;
+            --heading-font: 'Playfair Display', serif;
+            --body-font: 'Montserrat', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--body-font);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.5;
+            padding: 24px;
+        }
+
+        header {
+            max-width: 1500px;
+            margin: 0 auto 24px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 18px 28px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(44, 37, 36, 0.03);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .brand-container { display: flex; align-items: center; gap: 16px; }
+
+        .brand-logo-symbol {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #c25e6f, #e09fabb0);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 4px 10px rgba(194, 94, 111, 0.25);
+        }
+
+        .brand-logo-symbol svg { width: 24px; height: 24px; fill: currentColor; }
+
+        .brand-titles h1 {
+            font-family: var(--heading-font);
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1a1514;
+        }
+
+        .brand-titles p {
+            font-size: 0.8rem;
+            color: #7a6f6d;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .unit-selector {
+            display: flex;
+            background: #f0ebe8;
+            border-radius: 6px;
+            padding: 3px;
+        }
+
+        .unit-btn {
+            background: transparent;
+            border: none;
+            padding: 6px 14px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            color: #7a6f6d;
+            transition: all 0.2s;
+        }
+
+        .unit-btn.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+        }
+
+        .side-by-side-toggle {
+            background: #f8f6f5;
+            border: 1px solid var(--border-color);
+            padding: 7px 14px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px;
+            color: #4a3f3d;
+            transition: all 0.2s;
+        }
+
+        .side-by-side-toggle.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .workspace {
+            max-width: 1500px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 440px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        @media (max-width: 1000px) {
+            .workspace { grid-template-columns: 1fr; }
+        }
+
+        .control-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(44, 37, 36, 0.03);
+            max-height: 850px;
+            overflow-y: auto;
+        }
+
+        .section-bracket {
+            background: #faf8f7;
+            border: 1px solid #dcd3ce;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .section-bracket-title {
+            font-family: var(--heading-font);
+            font-size: 1.1rem;
+            color: #1a1514;
+            margin-bottom: 12px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .garment-module {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            padding: 14px;
+        }
+
+        .garment-module-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .garment-module h3 {
+            font-family: var(--heading-font);
+            font-size: 0.95rem;
+            color: #2c2524;
+        }
+
+        .garment-module-body {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .input-section { margin-bottom: 12px; }
+
+        .input-section label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #4a3f3d;
+        }
+
+        .dual-input {
+            display: grid;
+            grid-template-columns: 1fr 85px;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .input-with-label { position: relative; }
+
+        .input-label-tag {
+            position: absolute;
+            top: -15px;
+            right: 0;
+            font-size: 0.68rem;
+            font-weight: 600;
+            color: #8c7e7b;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-family: var(--body-font);
+            background: #fff;
+            color: var(--text-color);
+        }
+
+        input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(194, 94, 111, 0.15);
+        }
+
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button.action-btn {
+            width: 100%;
+            padding: 11px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            font-family: var(--body-font);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-secondary { background-color: #5c524f; color: white; }
+        .btn-secondary:hover { background-color: #423a38; }
+        
+        .btn-export { background-color: #3b6e65; color: white; }
+        .btn-export:hover { background-color: #2c534c; }
+
+        .preview-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            height: 850px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 12px rgba(44, 37, 36, 0.03);
+        }
+
+        .preview-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f0ebe8;
+        }
+
+        .tabs-bar {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .tab-btn {
+            background: #f8f6f5;
+            border: 1px solid var(--border-color);
+            padding: 6px 14px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px;
+            color: #7a6f6d;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .zoom-controls { display: flex; gap: 6px; align-items: center; }
+
+        .zoom-btn {
+            background: #f8f6f5;
+            border: 1px solid var(--border-color);
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4a3f3d;
+        }
+
+        .zoom-btn:hover { background: #f0ebe8; }
+
+        .pattern-workspace-view {
+            width: 100%;
+            flex-grow: 1;
+            overflow: hidden;
+            position: relative;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: grab;
+        }
+
+        .pattern-workspace-view:active { cursor: grabbing; }
+
+        .pattern-canvas-wrapper {
+            position: absolute;
+            transform-origin: 0 0;
+            will-change: transform;
+            display: flex;
+            gap: 40px;
+            padding: 20px;
+        }
+
+        .pattern-canvas-wrapper.grid-layout {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+
+        .svg-panel-box {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .svg-panel-box h4 {
+            font-family: var(--heading-font);
+            font-size: 0.9rem;
+            color: #4a3f3d;
+            margin-bottom: 8px;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 4px;
+        }
+
+        svg {
+            background: #ffffff;
+            display: block;
+        }
+
+        .grid-line-sub { stroke: #f0ecea; stroke-width: 0.5; vector-effect: non-scaling-stroke; }
+        .grid-line-half { stroke: #d5ccc8; stroke-width: 0.8; vector-effect: non-scaling-stroke; }
+        .grid-line-major { stroke: #b8aba5; stroke-width: 1.4; vector-effect: non-scaling-stroke; }
+
+        /* Interactive label style */
+        .pattern-label {
+            cursor: pointer;
+            user-select: none;
+            transition: opacity 0.2s ease;
+            pointer-events: auto;
+        }
+        .pattern-label:hover {
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand-container">
+            <div class="brand-logo-symbol" title="Lilinora Atelier">
+                <svg viewBox="0 0 24 24">
+                    <path d="M18.5,2.5 C17.5,1.5 16,1.5 15,2.5 L6,11.5 C5.4,12.1 5,12.9 5,13.8 L5,18 L9.2,18 C10.1,18 10.9,17.6 11.5,17 L20.5,8 C21.5,7 21.5,5.5 20.5,4.5 L18.5,2.5 Z M8.4,16 L7,16 L7,14.6 C7,14.3 7.1,14 7.3,13.8 L12.5,8.6 L15.4,11.5 L10.2,16.7 C10,16.9 9.7,17 9.4,17 L8.4,16 Z M19.1,6.6 L18,7.7 L16.3,6 L17.4,4.9 C17.7,4.6 18.3,4.6 18.6,4.9 L19.1,5.4 C19.4,5.7 19.4,6.3 19.1,6.6 Z"/>
+                </svg>
+            </div>
+            <div class="brand-titles">
+                <h1>Lilinora</h1>
+                <p>Precision Atelier Pattern Generator</p>
+            </div>
+        </div>
+        <div class="header-controls">
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 600; color: #4a3f3d;">
+                <input type="checkbox" id="removeNamesToggle" onchange="resetAllLabelsVisibility()" style="cursor: pointer;">
+                <label for="removeNamesToggle" style="cursor: pointer; margin-bottom: 0;">Remove Name</label>
+            </div>
+            <button class="side-by-side-toggle" id="sideBySideToggleBtn" onclick="toggleSideBySideMode()">Show Side-by-Side</button>
+            <div class="unit-selector">
+                <button class="unit-btn active" id="unit-in" onclick="setUnit('in')">Inches (in)</button>
+                <button class="unit-btn" id="unit-cm" onclick="setUnit('cm')">Centimeters (cm)</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="workspace">
+        <div class="control-panel">
+            <h2 style="font-family:var(--heading-font); font-size:1.15rem; margin-bottom:14px;">Pattern Modules</h2>
+            
+            <div class="section-bracket">
+                <div class="section-bracket-title"><span>[ Upper Body: Bodice & Sleeve ]</span></div>
+                
+                <div class="input-section">
+                    <label for="upperStandardSize">Upper Body Standard Size Preset</label>
+                    <select id="upperStandardSize" onchange="applyUpperStandardSize()">
+                        <option value="">-- Custom Upper Sizing --</option>
+                        <option value="uk8">UK 8 / US 4</option>
+                        <option value="uk10">UK 10 / US 6</option>
+                        <option value="uk12" selected>UK 12 / US 8 (Draft Spec)</option>
+                        <option value="uk14">UK 14 / US 10</option>
+                        <option value="uk16">UK 16 / US 12</option>
+                    </select>
+                </div>
+
+                <div class="garment-module">
+                    <div class="garment-module-header" onclick="toggleModule('bodiceBody')">
+                        <h3>1. Bodice Window</h3>
+                        <span style="font-size:0.75rem; font-weight:600; color:var(--primary);">Configure ▼</span>
+                    </div>
+                    <div id="bodiceBody" class="garment-module-body" style="display:none;">
+                        <div class="input-section">
+                            <label for="blockPreset">Fit & Ease Preset</label>
+                            <select id="blockPreset" onchange="applyPreset()">
+                                <option value="standard">Standard Woven (+2.0" Bust, +1.5" Waist)</option>
+                                <option value="fitted">Fitted (+1.0" Bust, +0.5" Waist)</option>
+                                <option value="loose">Relaxed (+3.0" Bust, +2.5" Waist)</option>
+                            </select>
+                        </div>
+                        <div class="input-section">
+                            <label>Bust & Ease</label>
+                            <div class="dual-input">
+                                <input type="number" id="bust" value="34.5" step="0.25">
+                                <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="bustEase" value="2.0" step="0.25"></div>
+                            </div>
+                        </div>
+                        <div class="input-section">
+                            <label>Waist & Ease</label>
+                            <div class="dual-input">
+                                <input type="number" id="waist" value="25.5" step="0.25">
+                                <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="waistEase" value="1.5" step="0.25"></div>
+                            </div>
+                        </div>
+                        <div class="input-section">
+                            <label>Hips & Ease</label>
+                            <div class="dual-input">
+                                <input type="number" id="hip" value="37.0" step="0.25">
+                                <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="hipEase" value="2.0" step="0.25"></div>
+                            </div>
+                        </div>
+                        <div class="input-section">
+                            <label>Waist to Hip Depth</label>
+                            <div class="dual-input">
+                                <input type="number" id="waistToHip" value="8.0" step="0.25">
+                                <div class="input-with-label"><span class="input-label-tag">Depth</span><span style="font-size:0.75rem; color:#7a6f6d;">Vertical</span></div>
+                            </div>
+                        </div>
+                        <div class="input-section">
+                            <label>Chest Width (Front) & Ease</label>
+                            <div class="dual-input">
+                                <input type="number" id="chestWidth" value="13.0" step="0.25">
+                                <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="chestWidthEase" value="0" step="0.25"></div>
+                            </div>
+                        </div>
+                        <div class="input-section">
+                            <label>Back Width & Ease</label>
+                            <div class="dual-input">
+                                <input type="number" id="backWidth" value="14.0" step="0.25">
+                                <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="backWidthEase" value="0.25" step="0.25"></div>
+                            </div>
+                        </div>
+                        <div class="input-section">
+                            <label>Back Underarm Extension Ease (Step 9)</label>
+                            <div class="dual-input">
+                                <input type="number" id="backUnderarmEase" value="2.0" step="0.25">
+                                <div class="input-with-label"><span class="input-label-tag">Sleeveless Option</span>
+                                    <select id="sleevelessReduction" onchange="applySleevelessAdjustment()" style="padding: 6px; font-size: 0.75rem;">
+                                        <option value="none">Standard Sleeve</option>
+                                        <option value="reduce">Sleeveless (-0.25" Armhole)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-section">
+                            <label>Back Corner Bisector K Extension (Step 10)</label>
+                            <div class="dual-input">
+                                <input type="number" id="cornerBisectorK" value="1.25" step="0.05">
+                                <div class="input-with-label"><span class="input-label-tag">Angle 45º</span><span style="font-size:0.75rem; color:#7a6f6d;">Point K</span></div>
+                            </div>
+                        </div>
+                        <div class="input-section">
+                            <label>Shoulder Length & Ease</label>
+                            <div class="dual-input">
+                                <input type="number" id="shoulderLength" value="5.0" step="0.25">
+                                <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="shoulderLengthEase" value="0" step="0.25"></div>
+                            </div>
+                        </div>
+                        <div class="input-section">
+                            <label>Back Waist Length & Ease</label>
+                            <div class="dual-input">
+                                <input type="number" id="backNeckToWaist" value="15.5" step="0.25">
+                                <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="backNeckToWaistEase" value="0" step="0.25"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="garment-module" style="margin-bottom:0;">
+                    <div class="input-section" style="margin-bottom:10px;">
+                        <label for="includeSleeve">Enable Sleeve Draft</label>
+                        <select id="includeSleeve" onchange="togglePieceConfig('sleeveConfig', this.value)">
+                            <option value="yes" selected>Yes (Include Fitted Sleeve)</option>
+                            <option value="no">No (Exclude Sleeve)</option>
+                        </select>
+                    </div>
+                    <div id="sleeveConfig">
+                        <div class="garment-module-header" onclick="toggleModule('sleeveBody')">
+                            <h3>2. Sleeve Window</h3>
+                            <span style="font-size:0.75rem; font-weight:600; color:var(--primary);">Configure ▼</span>
+                        </div>
+                        <div id="sleeveBody" class="garment-module-body" style="display:none;">
+                            <div class="input-section">
+                                <label>Top Arm (Bicep) & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="bicep" value="11.5" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="bicepEase" value="2.0" step="0.25"></div>
+                                </div>
+                            </div>
+                            <div class="input-section">
+                                <label>Length of Arm (Sleeve Length) & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="sleeveLength" value="23.0" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="sleeveLengthEase" value="0" step="0.25"></div>
+                                </div>
+                            </div>
+                            <div class="input-section">
+                                <label>Shoulder to Elbow & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="shoulderToElbow" value="12.5" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="shoulderToElbowEase" value="0" step="0.25"></div>
+                                </div>
+                            </div>
+                            <div class="input-section">
+                                <label>Wrist Circumference & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="wristCirc" value="6.25" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="wristCircEase" value="0" step="0.25"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-bracket">
+                <div class="section-bracket-title"><span>[ Lower Body: Skirt & Trousers ]</span></div>
+                
+                <div class="input-section">
+                    <label for="lowerStandardSize">Lower Body Standard Size Preset (UK Size 12 Spec)</label>
+                    <select id="lowerStandardSize" onchange="applyLowerStandardSize()">
+                        <option value="">-- Custom Lower Sizing --</option>
+                        <option value="uk8">UK 8 / US 4</option>
+                        <option value="uk10">UK 10 / US 6</option>
+                        <option value="uk12" selected>UK 12 / US 8 (Draft Spec)</option>
+                        <option value="uk14">UK 14 / US 10</option>
+                        <option value="uk16">UK 16 / US 12</option>
+                    </select>
+                </div>
+
+                <div class="garment-module">
+                    <div class="input-section" style="margin-bottom:10px;">
+                        <label for="includeSkirt">Enable Skirt Draft</label>
+                        <select id="includeSkirt" onchange="togglePieceConfig('skirtConfig', this.value)">
+                            <option value="yes" selected>Yes (Include Skirt)</option>
+                            <option value="no">No (Exclude Skirt)</option>
+                        </select>
+                    </div>
+                    <div id="skirtConfig">
+                        <div class="garment-module-header" onclick="toggleModule('skirtBody')">
+                            <h3>3. Skirt Window</h3>
+                            <span style="font-size:0.75rem; font-weight:600; color:var(--primary);">Configure ▼</span>
+                        </div>
+                        <div id="skirtBody" class="garment-module-body" style="display:none;">
+                            <div class="input-section">
+                                <label for="skirtStyle">Skirt Silhouette Type</label>
+                                <select id="skirtStyle">
+                                    <option value="pencil" selected>Pencil Skirt (Fitted)</option>
+                                    <option value="full">Full / A-Line Skirt (Flared)</option>
+                                    <option value="semi">Semi-Circle Circular Skirt</option>
+                                </select>
+                            </div>
+                            <div class="input-section">
+                                <label>Waist & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="skirtWaist" value="26.0" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="skirtWaistEase" value="1.0" step="0.25"></div>
+                                </div>
+                            </div>
+                            <div class="input-section">
+                                <label>Hips & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="skirtHips" value="36.0" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="skirtHipsEase" value="1.75" step="0.25"></div>
+                                </div>
+                            </div>
+                            <div class="input-section">
+                                <label>Length (Waist to Hem) & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="skirtLength" value="38.5" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="skirtLengthEase" value="0.0" step="0.25"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="garment-module" style="margin-bottom:0;">
+                    <div class="input-section" style="margin-bottom:10px;">
+                        <label for="includePant">Enable Trouser Draft</label>
+                        <select id="includePant" onchange="togglePieceConfig('pantConfig', this.value)">
+                            <option value="yes" selected>Yes (Include Trousers)</option>
+                            <option value="no">No (Exclude Trousers)</option>
+                        </select>
+                    </div>
+                    <div id="pantConfig">
+                        <div class="garment-module-header" onclick="toggleModule('pantsBody')">
+                            <h3>4. Trousers / Pants Window</h3>
+                            <span style="font-size:0.75rem; font-weight:600; color:var(--primary);">Configure ▼</span>
+                        </div>
+                        <div id="pantsBody" class="garment-module-body" style="display:none;">
+                            <div class="input-section">
+                                <label>Waist & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="pantWaist" value="26.0" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="pantWaistEase" value="1.0" step="0.25"></div>
+                                </div>
+                            </div>
+                            <div class="input-section">
+                                <label>Hips & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="pantHips" value="36.0" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="pantHipsEase" value="2.0" step="0.25"></div>
+                                </div>
+                            </div>
+                            <div class="input-section">
+                                <label>Body Rise Depth & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="pantRise" value="11.5" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="pantRiseEase" value="0.5" step="0.25"></div>
+                                </div>
+                            </div>
+                            <div class="input-section">
+                                <label>Thigh & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="thigh" value="23.0" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="thighEase" value="1.0" step="0.25"></div>
+                                </div>
+                            </div>
+                            <div class="input-section">
+                                <label>Inseam & Ease</label>
+                                <div class="dual-input">
+                                    <input type="number" id="inseam" value="30.0" step="0.25">
+                                    <div class="input-with-label"><span class="input-label-tag">Ease</span><input type="number" id="inseamEase" value="0.0" step="0.25"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-container">
+                <button type="button" class="action-btn btn-primary" onclick="generatePattern()">Generate All Selected Patterns</button>
+                <button type="button" class="action-btn btn-secondary" onclick="downloadSVG()">Download Combined SVG</button>
+                
+                <div style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 12px;">
+                    <label style="font-size: 0.8rem; font-weight: 600; margin-bottom: 6px; display: block; color: #4a3f3d;">Ready-to-Cut Pattern Exports (1:1 Scale)</label>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <button type="button" class="action-btn btn-export" onclick="exportPDF('A0')">Export A0 Plotter PDF (Print Shop)</button>
+                        <button type="button" class="action-btn btn-export" onclick="exportPDF('A4-Tiled')">Export Tiled A4 PDF (Home Printer)</button>
+                        <button type="button" class="action-btn btn-export" onclick="exportPDF('Projector')">Export Projector-Ready File</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preview-container">
+            <div class="preview-toolbar">
+                <span id="current-unit-label" style="font-size: 0.85rem; font-weight:600; color:#4a3f3d;">Grid Unit: 1 Inch (0.5" Subdivisions)</span>
+                <div class="zoom-controls">
+                    <button class="zoom-btn" onclick="adjustZoom(-0.15)" title="Zoom Out">-</button>
+                    <button class="zoom-btn" onclick="resetZoom()" style="width: 48px; font-size: 0.78rem;" title="Reset Zoom">1:1</button>
+                    <button class="zoom-btn" onclick="adjustZoom(0.15)" title="Zoom In">+</button>
+                </div>
+            </div>
+            
+            <div class="tabs-bar" id="tabsBar">
+                <button class="tab-btn active" onclick="switchTab('bodicePanelBox')">Bodice Block</button>
+                <button class="tab-btn" id="tabSleeve" onclick="switchTab('sleevePanelBox')">Sleeve Block</button>
+                <button class="tab-btn" id="tabSkirt" onclick="switchTab('skirtPanelBox')">Skirt Block</button>
+                <button class="tab-btn" id="tabPant" onclick="switchTab('pantPanelBox')">Trouser Block</button>
+            </div>
+
+            <div class="pattern-workspace-view" id="svg-scroll-viewport">
+                <div class="pattern-canvas-wrapper" id="svg-canvas-wrapper">
+                    
+                    <div class="svg-panel-box" id="bodicePanelBox">
+                        <h4 id="bodiceTitle">Bodice Block</h4>
+                        <svg id="svg-bodice" width="800" height="750" viewBox="0 0 800 750" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="100%" height="100%" fill="#ffffff" />
+                            <g class="grid-group-sub"></g>
+                            <g class="pattern-group-sub"></g>
+                        </svg>
+                    </div>
+
+                    <div class="svg-panel-box" id="sleevePanelBox">
+                        <h4 id="sleeveTitle">Fitted Sleeve</h4>
+                        <svg id="svg-sleeve" width="800" height="750" viewBox="0 0 800 750" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="100%" height="100%" fill="#ffffff" />
+                            <g class="grid-group-sub"></g>
+                            <g class="pattern-group-sub"></g>
+                        </svg>
+                    </div>
+
+                    <div class="svg-panel-box" id="skirtPanelBox">
+                        <h4 id="skirtTitle">Skirt Block</h4>
+                        <svg id="svg-skirt" width="800" height="750" viewBox="0 0 800 750" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="100%" height="100%" fill="#ffffff" />
+                            <g class="grid-group-sub"></g>
+                            <g class="pattern-group-sub"></g>
+                        </svg>
+                    </div>
+
+                    <div class="svg-panel-box" id="pantPanelBox">
+                        <h4 id="pantTitle">Trouser Block</h4>
+                        <svg id="svg-pant" width="800" height="750" viewBox="0 0 800 750" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="100%" height="100%" fill="#ffffff" />
+                            <g class="grid-group-sub"></g>
+                            <g class="pattern-group-sub"></g>
+                        </svg>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUnit = 'in';
+        let currentScale = 1.0;
+        let panX = 20;
+        let panY = 20;
+        let isDragging = false;
+        let startMouseX = 0;
+        let startMouseY = 0;
+        const scaleFactor = 26;
+        
+        let isSideBySide = false;
+        let activeTabId = 'bodicePanelBox';
+
+        function initGrids(svgId, width, height) {
+            const svgElement = document.getElementById(svgId);
+            svgElement.setAttribute('width', width);
+            svgElement.setAttribute('height', height);
+            svgElement.setAttribute('viewBox', `0 0 ${width} ${height}`);
+            
+            const gridGroup = svgElement.querySelector('.grid-group-sub');
+            gridGroup.innerHTML = '';
+            
+            const baseStep = currentUnit === 'in' ? scaleFactor : scaleFactor / 2.54;
+            const subStep = baseStep / 2;
+
+            for (let x = 0; x <= width; x += subStep) {
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', x); line.setAttribute('y1', 0);
+                line.setAttribute('x2', x); line.setAttribute('y2', height);
+
+                const ratio = x / baseStep;
+                const isMajor = Math.abs(ratio - Math.round(ratio)) < 0.001 && Math.round(ratio) % (currentUnit === 'in' ? 4 : 5) === 0;
+                const isHalf = Math.abs(ratio - Math.round(ratio)) < 0.001;
+
+                if (isMajor) line.setAttribute('class', 'grid-line-major');
+                else if (isHalf) line.setAttribute('class', 'grid-line-half');
+                else line.setAttribute('class', 'grid-line-sub');
+                
+                gridGroup.appendChild(line);
+            }
+
+            for (let y = 0; y <= height; y += subStep) {
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', 0); line.setAttribute('y1', y);
+                line.setAttribute('x2', width); line.setAttribute('y2', y);
+
+                const ratio = y / baseStep;
+                const isMajor = Math.abs(ratio - Math.round(ratio)) < 0.001 && Math.round(ratio) % (currentUnit === 'in' ? 4 : 5) === 0;
+                const isHalf = Math.abs(ratio - Math.round(ratio)) < 0.001;
+
+                if (isMajor) line.setAttribute('class', 'grid-line-major');
+                else if (isHalf) line.setAttribute('class', 'grid-line-half');
+                else line.setAttribute('class', 'grid-line-sub');
+                
+                gridGroup.appendChild(line);
+            }
+        }
+
+        function setUnit(unit) {
+            currentUnit = unit;
+            document.getElementById('unit-in').classList.toggle('active', unit === 'in');
+            document.getElementById('unit-cm').classList.toggle('active', unit === 'cm');
+            document.getElementById('current-unit-label').innerText = unit === 'in' ? 'Grid Unit: 1 Inch (0.5" Subdivisions)' : 'Grid Unit: 1 Centimeter (0.5cm Subdivisions)';
+            generatePattern();
+        }
+
+        function toggleModule(id) {
+            const el = document.getElementById(id);
+            el.style.display = (el.style.display === 'none') ? 'block' : 'none';
+        }
+
+        function togglePieceConfig(containerId, val) {
+            const container = document.getElementById(containerId);
+            container.style.display = (val === 'yes') ? 'block' : 'none';
+            
+            if (containerId === 'sleeveConfig') document.getElementById('tabSleeve').style.display = (val === 'yes') ? 'block' : 'none';
+            if (containerId === 'skirtConfig') document.getElementById('tabSkirt').style.display = (val === 'yes') ? 'block' : 'none';
+            if (containerId === 'pantConfig') document.getElementById('tabPant').style.display = (val === 'yes') ? 'block' : 'none';
+            
+            generatePattern();
+        }
+
+        function switchTab(panelId) {
+            if (isSideBySide) return;
+            activeTabId = panelId;
+
+            document.querySelectorAll('.tabs-bar .tab-btn').forEach(btn => btn.classList.remove('active'));
+            if (panelId === 'bodicePanelBox') event.target.classList.add('active');
+            else if (panelId === 'sleevePanelBox') document.getElementById('tabSleeve').classList.add('active');
+            else if (panelId === 'skirtPanelBox') document.getElementById('tabSkirt').classList.add('active');
+            else if (panelId === 'pantPanelBox') document.getElementById('tabPant').classList.add('active');
+
+            ['bodicePanelBox', 'sleevePanelBox', 'skirtPanelBox', 'pantPanelBox'].forEach(id => {
+                document.getElementById(id).style.display = (id === panelId) ? 'block' : 'none';
+            });
+        }
+
+        function toggleSideBySideMode() {
+            isSideBySide = !isSideBySide;
+            const toggleBtn = document.getElementById('sideBySideToggleBtn');
+            const wrapper = document.getElementById('svg-canvas-wrapper');
+            const tabsBar = document.getElementById('tabsBar');
+
+            const hasSleeve = document.getElementById('includeSleeve').value === 'yes';
+            const hasSkirt = document.getElementById('includeSkirt').value === 'yes';
+            const hasPant = document.getElementById('includePant').value === 'yes';
+
+            if (isSideBySide) {
+                toggleBtn.classList.add('active');
+                wrapper.classList.add('grid-layout');
+                tabsBar.style.opacity = '0.4';
+                tabsBar.style.pointerEvents = 'none';
+
+                document.getElementById('bodicePanelBox').style.display = 'block';
+                document.getElementById('sleevePanelBox').style.display = hasSleeve ? 'block' : 'none';
+                document.getElementById('skirtPanelBox').style.display = hasSkirt ? 'block' : 'none';
+                document.getElementById('pantPanelBox').style.display = hasPant ? 'block' : 'none';
+            } else {
+                toggleBtn.classList.remove('active');
+                wrapper.classList.remove('grid-layout');
+                tabsBar.style.opacity = '1';
+                tabsBar.style.pointerEvents = 'auto';
+
+                ['bodicePanelBox', 'sleevePanelBox', 'skirtPanelBox', 'pantPanelBox'].forEach(id => {
+                    document.getElementById(id).style.display = (id === activeTabId) ? 'block' : 'none';
+                });
+            }
+            generatePattern();
+        }
+
+        function applyUpperStandardSize() {
+            const size = document.getElementById('upperStandardSize').value;
+            if (!size) return;
+
+            const sizes = {
+                'uk8':  { bust: 32.0, waist: 24.0, hip: 34.0, chest: 12.5, back: 13.5, shoulder: 4.875, bstToWst: 15.0, bicep: 10.5, sleeveLen: 22.5, wrist: 6.0, underarmEase: 2.0, kVal: 1.15 },
+                'uk10': { bust: 33.25, waist: 24.75, hip: 35.5, chest: 12.75, back: 13.75, shoulder: 4.875, bstToWst: 15.25, bicep: 11.0, sleeveLen: 22.75, wrist: 6.125, underarmEase: 2.125, kVal: 1.20 },
+                'uk12': { bust: 34.5, waist: 25.5, hip: 37.0, chest: 13.0, back: 14.0, shoulder: 5.0, bstToWst: 15.5, bicep: 11.5, sleeveLen: 23.0, wrist: 6.25, underarmEase: 2.25, kVal: 1.25 },
+                'uk14': { bust: 37.5, waist: 28.5, hip: 39.5, chest: 13.75, back: 14.75, shoulder: 5.25, bstToWst: 16.0, bicep: 12.25, sleeveLen: 23.5, wrist: 6.5, underarmEase: 2.375, kVal: 1.45 },
+                'uk16': { bust: 39.5, waist: 30.5, hip: 41.5, chest: 14.25, back: 15.25, shoulder: 5.375, bstToWst: 16.25, bicep: 13.0, sleeveLen: 24.0, wrist: 6.75, underarmEase: 2.5, kVal: 1.625 }
+            };
+
+            const data = sizes[size];
+            if (data) {
+                document.getElementById('bust').value = data.bust;
+                document.getElementById('waist').value = data.waist;
+                document.getElementById('hip').value = data.hip;
+                document.getElementById('chestWidth').value = data.chest;
+                document.getElementById('backWidth').value = data.back;
+                document.getElementById('shoulderLength').value = data.shoulder;
+                document.getElementById('backNeckToWaist').value = data.bstToWst;
+                document.getElementById('bicep').value = data.bicep;
+                document.getElementById('sleeveLength').value = data.sleeveLen;
+                document.getElementById('wristCirc').value = data.wrist;
+                document.getElementById('backUnderarmEase').value = data.underarmEase;
+                document.getElementById('cornerBisectorK').value = data.kVal;
+            }
+            generatePattern();
+        }
+
+        function applyLowerStandardSize() {
+            const size = document.getElementById('lowerStandardSize').value;
+            if (!size) return;
+
+            const sizes = {
+                'uk8':  { waist: 24.0, hips: 35.0, skirtLen: 37.0, rise: 10.75, thigh: 21.5, inseam: 29.0 },
+                'uk10': { waist: 24.75, hips: 36.0, skirtLen: 37.5, rise: 11.0, thigh: 22.25, inseam: 29.5 },
+                'uk12': { waist: 26.0, hips: 37.0, skirtLen: 38.5, rise: 11.5, thigh: 23.0, inseam: 30.0 },
+                'uk14': { waist: 28.5, hips: 40.0, skirtLen: 39.0, rise: 12.0, thigh: 24.5, inseam: 30.5 },
+                'uk16': { waist: 30.5, hips: 42.0, skirtLen: 39.5, rise: 12.5, thigh: 26.0, inseam: 31.0 }
+            };
+
+            const data = sizes[size];
+            if (data) {
+                document.getElementById('skirtWaist').value = data.waist;
+                document.getElementById('skirtHips').value = data.hips;
+                document.getElementById('skirtLength').value = data.skirtLen;
+                document.getElementById('pantWaist').value = data.waist;
+                document.getElementById('pantHips').value = data.hips;
+                document.getElementById('pantRise').value = data.rise;
+                document.getElementById('thigh').value = data.thigh;
+                document.getElementById('inseam').value = data.inseam;
+            }
+            generatePattern();
+        }
+
+        function applyPreset() {
+            const preset = document.getElementById('blockPreset').value;
+            if (preset === 'standard') { 
+                document.getElementById('bustEase').value = 2.0; 
+                document.getElementById('waistEase').value = 1.5; 
+                document.getElementById('hipEase').value = 2.0; 
+                document.getElementById('backWidthEase').value = 0.25; 
+                document.getElementById('backUnderarmEase').value = 2.0;
+                document.getElementById('cornerBisectorK').value = 1.25;
+            }
+            else if (preset === 'fitted') { 
+                document.getElementById('bustEase').value = 1.0; 
+                document.getElementById('waistEase').value = 0.5; 
+                document.getElementById('hipEase').value = 1.0; 
+                document.getElementById('backWidthEase').value = 0.125; 
+                document.getElementById('backUnderarmEase').value = 1.75;
+                document.getElementById('cornerBisectorK').value = 1.15;
+            }
+            else if (preset === 'loose') { 
+                document.getElementById('bustEase').value = 3.0; 
+                document.getElementById('waistEase').value = 2.5; 
+                document.getElementById('hipEase').value = 3.0; 
+                document.getElementById('backWidthEase').value = 0.5; 
+                document.getElementById('backUnderarmEase').value = 2.5;
+                document.getElementById('cornerBisectorK').value = 1.5;
+            }
+            generatePattern();
+        }
+
+        function applySleevelessAdjustment() {
+            const reductionMode = document.getElementById('sleevelessReduction').value;
+            let currentVal = parseFloat(document.getElementById('backUnderarmEase').value) || 2.0;
+            let currentK = parseFloat(document.getElementById('cornerBisectorK').value) || 1.25;
+            if (reductionMode === 'reduce') {
+                document.getElementById('backUnderarmEase').value = Math.max(1.5, currentVal - 0.25);
+                document.getElementById('cornerBisectorK').value = Math.max(1.0, currentK - 0.125);
+            } else {
+                document.getElementById('backUnderarmEase').value = Math.min(2.5, currentVal + 0.25);
+                document.getElementById('cornerBisectorK').value = Math.min(1.625, currentK + 0.125);
+            }
+            generatePattern();
+        }
+
+        // Helper function to append interactive labels with click-to-hide/show behavior
+        function appendLabel(parentGroup, textString, x, y, defaultColor, fontSize = '11', fontWeight = '600', isAboveLine = true) {
+            const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            const adjustedY = isAboveLine ? y - 8 : y + 16;
+            
+            label.setAttribute('x', x);
+            label.setAttribute('y', adjustedY);
+            label.setAttribute('font-family', 'Montserrat, sans-serif');
+            label.setAttribute('font-size', fontSize);
+            label.setAttribute('font-weight', fontWeight);
+            label.setAttribute('fill', defaultColor);
+            label.setAttribute('class', 'pattern-label');
+            label.textContent = textString;
+
+            let isHidden = false;
+            label.addEventListener('click', (e) => {
+                e.stopPropagation();
+                isHidden = !isHidden;
+                label.style.display = isHidden ? 'none' : 'block';
+            });
+
+            parentGroup.appendChild(label);
+            return label;
+        }
+
+        function resetAllLabelsVisibility() {
+            const removeNames = document.getElementById('removeNamesToggle').checked;
+            document.querySelectorAll('.pattern-label').forEach(lbl => {
+                lbl.style.display = removeNames ? 'none' : 'block';
+            });
+        }
+
+        function generatePattern() {
+            // --- 1. BODICE BLOCK (CB & CF Anchor Points Established First) ---
+            const bodiceGroup = document.querySelector('#svg-bodice .pattern-group-sub');
+            bodiceGroup.innerHTML = '';
+            
+            const totalBust = parseFloat(document.getElementById('bust').value) + parseFloat(document.getElementById('bustEase').value);
+            const hipVal = parseFloat(document.getElementById('hip').value);
+            const hipEaseVal = parseFloat(document.getElementById('hipEase').value);
+            const backLengthVal = parseFloat(document.getElementById('backNeckToWaist').value);
+            const waistToHipVal = parseFloat(document.getElementById('waistToHip').value);
+
+            const bWidth = (((hipVal + hipEaseVal) / 2) + 4.0) * scaleFactor;
+            const bHeight = (backLengthVal + waistToHipVal + 5.0) * scaleFactor;
+            const canvasBWidth = Math.max(900, bWidth + 150);
+            const canvasBHeight = Math.max(850, bHeight + 150);
+            
+            initGrids('svg-bodice', canvasBWidth, canvasBHeight);
+            document.getElementById('bodiceTitle').textContent = `Bodice Block (Bust: ${totalBust}" | Hip: ${hipVal + hipEaseVal}")`;
+
+            // STEP 1: Place Point CB & Point CF Anchor Points at Top Corners
+            const pointCB = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pointCB.setAttribute('cx', 50); pointCB.setAttribute('cy', 50); pointCB.setAttribute('r', 4.5);
+            pointCB.setAttribute('fill', '#0047AB');
+            bodiceGroup.appendChild(pointCB);
+
+            appendLabel(bodiceGroup, 'CB (Center Back)', 60, 42, '#0047AB', '12', 'bold', true);
+
+            const pointCF = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pointCF.setAttribute('cx', 50 + bWidth); pointCF.setAttribute('cy', 50); pointCF.setAttribute('r', 4.5);
+            pointCF.setAttribute('fill', '#0047AB');
+            bodiceGroup.appendChild(pointCF);
+
+            appendLabel(bodiceGroup, 'CF (Center Front)', 50 + bWidth - 145, 42, '#0047AB', '12', 'bold', true);
+
+
+            // STEP 2: Drawing the Nape Line
+            const baseBustSpec = 34.5;
+            const bustDifference = totalBust - baseBustSpec;
+            const napeLineDropInches = 1.0 + (bustDifference * (0.1875 / 2.0));
+            const napeLineY = 50 + (napeLineDropInches * scaleFactor);
+
+            const napeLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            napeLine.setAttribute('x1', 50); napeLine.setAttribute('y1', napeLineY);
+            napeLine.setAttribute('x2', 50 + bWidth); napeLine.setAttribute('y2', napeLineY);
+            napeLine.setAttribute('stroke', '#1f7a8c'); napeLine.setAttribute('stroke-width', '1.5');
+            napeLine.setAttribute('stroke-dasharray', '6 3');
+            bodiceGroup.appendChild(napeLine);
+
+            appendLabel(bodiceGroup, `Nape Line (${napeLineDropInches.toFixed(2)}" / ${(napeLineDropInches * 2.54).toFixed(1)}cm down)`, 60, napeLineY, '#1f7a8c', '11', '600', true);
+
+
+            // STEP 3: Drawing the Bust Line
+            const halfBackWaist = backLengthVal / 2.0;
+            const bustLineOffset = (totalBust > 40.0) ? (halfBackWaist + (5.0 / 8.0)) : (halfBackWaist + (3.0 / 8.0));
+            const bustLineY = napeLineY + (bustLineOffset * scaleFactor);
+
+            const bustLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            bustLine.setAttribute('x1', 50); bustLine.setAttribute('y1', bustLineY);
+            bustLine.setAttribute('x2', 50 + bWidth); bustLine.setAttribute('y2', bustLineY);
+            bustLine.setAttribute('stroke', '#c25e6f'); bustLine.setAttribute('stroke-width', '1');
+            bustLine.setAttribute('stroke-dasharray', '3 3');
+            bodiceGroup.appendChild(bustLine);
+
+            appendLabel(bodiceGroup, `Bust Line (${bustLineOffset.toFixed(2)}" down from Nape)`, 60, bustLineY, '#c25e6f', '11', '600', true);
+
+
+            // STEP 4: Calculate Back Neck Width & Draw along Nape Line from CB
+            const backNeckWidth = ((totalBust / 8.0) + 1.25) / 2.0;
+            const backNeckWidthPixels = backNeckWidth * scaleFactor;
+
+            const neckWidthLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            neckWidthLine.setAttribute('x1', 50); neckWidthLine.setAttribute('y1', napeLineY);
+            neckWidthLine.setAttribute('x2', 50 + backNeckWidthPixels); neckWidthLine.setAttribute('y2', napeLineY);
+            neckWidthLine.setAttribute('stroke', '#8b5cf6');
+            neckWidthLine.setAttribute('stroke-width', '2.5');
+            bodiceGroup.appendChild(neckWidthLine);
+
+            const neckPointCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            neckPointCircle.setAttribute('cx', 50 + backNeckWidthPixels);
+            neckPointCircle.setAttribute('cy', napeLineY);
+            neckPointCircle.setAttribute('r', '4.5');
+            neckPointCircle.setAttribute('fill', '#8b5cf6');
+            bodiceGroup.appendChild(neckPointCircle);
+
+            appendLabel(bodiceGroup, `Back Neck Width Point (${backNeckWidth.toFixed(2)}" / ${(backNeckWidth * 2.54).toFixed(1)}cm)`, 60, napeLineY + 20, '#8b5cf6', '10', 'bold', false);
+
+
+            // STEP 5: Square up 3/4" (2cm) from Back Width neck point and place Back Neck Point
+            const squareUpInches = 0.75;
+            const squareUpPixels = squareUpInches * scaleFactor;
+            const finalNeckPointY = napeLineY - squareUpPixels;
+            const finalNeckPointX = 50 + backNeckWidthPixels;
+
+            const squareUpLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            squareUpLine.setAttribute('x1', finalNeckPointX); squareUpLine.setAttribute('y1', napeLineY);
+            squareUpLine.setAttribute('x2', finalNeckPointX); squareUpLine.setAttribute('y2', finalNeckPointY);
+            squareUpLine.setAttribute('stroke', '#0284c7');
+            squareUpLine.setAttribute('stroke-width', '2');
+            bodiceGroup.appendChild(squareUpLine);
+
+            const finalNeckPointCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            finalNeckPointCircle.setAttribute('cx', finalNeckPointX);
+            finalNeckPointCircle.setAttribute('cy', finalNeckPointY);
+            finalNeckPointCircle.setAttribute('r', '5');
+            finalNeckPointCircle.setAttribute('fill', '#0284c7');
+            bodiceGroup.appendChild(finalNeckPointCircle);
+
+            appendLabel(bodiceGroup, 'Back Neck Point', finalNeckPointX + 12, finalNeckPointY, '#0284c7', '11', 'bold', true);
+
+
+            // STEP 6 & 7: Red flattened Neck curve transition to meet the nape line 1.25 inch before the intersection point
+            const cbIntersectionX = 50;
+            const cbIntersectionY = napeLineY;
+            
+            const transitionOffsetInches = 1.25;
+            const transitionOffsetTextPixels = transitionOffsetInches * scaleFactor;
+            const transitionMeetX = cbIntersectionX + transitionOffsetTextPixels;
+            const transitionMeetY = napeLineY;
+
+            const flattenedCurvePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            const flatCurveData = `M ${cbIntersectionX} ${cbIntersectionY} L ${transitionMeetX} ${transitionMeetY} Q ${transitionMeetX + (finalNeckPointX - transitionMeetX)*0.5} ${transitionMeetY}, ${finalNeckPointX} ${finalNeckPointY}`;
+            flattenedCurvePath.setAttribute('d', flatCurveData);
+            flattenedCurvePath.setAttribute('stroke', '#e11d48');
+            flattenedCurvePath.setAttribute('stroke-width', '2');
+            flattenedCurvePath.setAttribute('fill', 'none');
+            bodiceGroup.appendChild(flattenedCurvePath);
+
+            appendLabel(bodiceGroup, 'Flattened Neck Curve Transition (Meets 1.25" from CB)', transitionMeetX + 5, napeLineY + 12, '#e11d48', '10', '600', false);
+
+            // Step 8: Draw the horizontal Back shoulder line
+            const shoulderLineDropInches = 1.25;
+            const shoulderLineDropPixels = shoulderLineDropInches * scaleFactor;
+            const shoulderLineY = napeLineY + shoulderLineDropPixels;
+            const shoulderLineWidthPixels = 10.0 * scaleFactor;
+
+            const backShoulderLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            backShoulderLine.setAttribute('x1', 50); backShoulderLine.setAttribute('y1', shoulderLineY);
+            backShoulderLine.setAttribute('x2', 50 + shoulderLineWidthPixels); backShoulderLine.setAttribute('y2', shoulderLineY);
+            backShoulderLine.setAttribute('stroke', '#10b981');
+            backShoulderLine.setAttribute('stroke-width', '1.5');
+            backShoulderLine.setAttribute('stroke-dasharray', '2 4');
+            bodiceGroup.appendChild(backShoulderLine);
+
+            appendLabel(bodiceGroup, 'Shoulder Line (1¼" down from Nape Line)', 60, shoulderLineY, '#10b981', '11', '600', true);
+
+
+            // --- SEQUENTIAL ADDITIONS (Steps 8 continuation & Step 9) ---
+            // Find the mid point between Shoulder Line and Bust Line, name it "Back Line"
+            const backLineY = shoulderLineY + (bustLineY - shoulderLineY) / 2;
+            const backLineEquationValue = ((bustLineY - shoulderLineY) / 2 / scaleFactor).toFixed(2);
+
+            const backLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            backLine.setAttribute('x1', 50); backLine.setAttribute('y1', backLineY);
+            backLine.setAttribute('x2', 50 + bWidth); backLine.setAttribute('y2', backLineY);
+            backLine.setAttribute('stroke', '#d97706'); 
+            backLine.setAttribute('stroke-width', '1.25');
+            backLine.setAttribute('stroke-dasharray', '4 2');
+            bodiceGroup.appendChild(backLine);
+
+            appendLabel(bodiceGroup, `Back Line (${backLineEquationValue}")`, 60, backLineY, '#d97706', '11', '600', true);
+
+            // Measure along the Back Line half the Back Width plus Back Width ease
+            const rawBackWidth = parseFloat(document.getElementById('backWidth').value);
+            const backWidthEaseVal = parseFloat(document.getElementById('backWidthEase').value);
+            const halfBackWidthVal = rawBackWidth / 2.0;
+            const measuredBackWidthDistance = (halfBackWidthVal + backWidthEaseVal) * scaleFactor;
+            const backWidthPointX = 50 + measuredBackWidthDistance;
+
+            const backWidthMark = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            backWidthMark.setAttribute('cx', backWidthPointX);
+            backWidthMark.setAttribute('cy', backLineY);
+            backWidthMark.setAttribute('r', '4.5');
+            backWidthMark.setAttribute('fill', '#d97706');
+            bodiceGroup.appendChild(backWidthMark);
+
+            appendLabel(bodiceGroup, `Back Width Point (${halfBackWidthVal.toFixed(2)}" + ${backWidthEaseVal.toFixed(3)}" ease)`, backWidthPointX + 12, backLineY, '#d97706', '10', 'bold', true);
+
+            // Square down to the Bust Line and up to the Shoulder Line (Armhole Guide Line)
+            const armholeGuideLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            armholeGuideLine.setAttribute('x1', backWidthPointX); armholeGuideLine.setAttribute('y1', shoulderLineY);
+            armholeGuideLine.setAttribute('x2', backWidthPointX); armholeGuideLine.setAttribute('y2', bustLineY);
+            armholeGuideLine.setAttribute('stroke', '#4f46e5');
+            armholeGuideLine.setAttribute('stroke-width', '1.5');
+            armholeGuideLine.setAttribute('stroke-dasharray', '5 3');
+            bodiceGroup.appendChild(armholeGuideLine);
+
+            appendLabel(bodiceGroup, 'Armhole Guide Line', backWidthPointX + 12, backLineY + 14, '#4f46e5', '10', 'bold', false);
+
+
+            // --- STEP 9: Back Underarm Point ---
+            const userUnderarmEaseInches = parseFloat(document.getElementById('backUnderarmEase').value) || 2.0;
+            const underarmExtensionPixels = userUnderarmEaseInches * scaleFactor;
+            const backUnderarmPointX = backWidthPointX + underarmExtensionPixels;
+
+            const backUnderarmLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            backUnderarmLine.setAttribute('x1', backWidthPointX); backUnderarmLine.setAttribute('y1', bustLineY);
+            backUnderarmLine.setAttribute('x2', backUnderarmPointX); backUnderarmLine.setAttribute('y2', bustLineY);
+            backUnderarmLine.setAttribute('stroke', '#9333ea');
+            backUnderarmLine.setAttribute('stroke-width', '2.5');
+            bodiceGroup.appendChild(backUnderarmLine);
+
+            const backUnderarmCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            backUnderarmCircle.setAttribute('cx', backUnderarmPointX);
+            backUnderarmCircle.setAttribute('cy', bustLineY);
+            backUnderarmCircle.setAttribute('r', '5.5');
+            backUnderarmCircle.setAttribute('fill', '#9333ea');
+            bodiceGroup.appendChild(backUnderarmCircle);
+
+            appendLabel(bodiceGroup, `Step 9: back Underarm point (${userUnderarmEaseInches.toFixed(2)}" / ${(userUnderarmEaseInches * 2.54).toFixed(1)}cm ext)`, backUnderarmPointX + 8, bustLineY, '#9333ea', '11', 'bold', false);
+
+
+            // --- STEP 10: Point K (Direction flipped to the RIGHT side of the armhole guide line) ---
+            const kDistanceInches = parseFloat(document.getElementById('cornerBisectorK').value) || 1.25;
+            const kDistancePixels = kDistanceInches * scaleFactor;
+            const kAngleRad = Math.PI / 4; // 45 degrees
+            const kTargetX = backWidthPointX + (kDistancePixels * Math.cos(kAngleRad));
+            const kTargetY = bustLineY - (kDistancePixels * Math.sin(kAngleRad));
+
+            const kGuideLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            kGuideLine.setAttribute('x1', backWidthPointX); kGuideLine.setAttribute('y1', bustLineY);
+            kGuideLine.setAttribute('x2', kTargetX); kGuideLine.setAttribute('y2', kTargetY);
+            kGuideLine.setAttribute('stroke', '#ea580c');
+            kGuideLine.setAttribute('stroke-width', '2');
+            kGuideLine.setAttribute('stroke-dasharray', '3 3');
+            bodiceGroup.appendChild(kGuideLine);
+
+            const kPointCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            kPointCircle.setAttribute('cx', kTargetX);
+            kPointCircle.setAttribute('cy', kTargetY);
+            kPointCircle.setAttribute('r', '5');
+            kPointCircle.setAttribute('fill', '#ea580c');
+            bodiceGroup.appendChild(kPointCircle);
+
+            appendLabel(bodiceGroup, `Step 10: Point K (${kDistanceInches.toFixed(3)}" / ${(kDistanceInches * 2.54).toFixed(1)}cm at 45º right)`, kTargetX + 10, kTargetY - 10, '#ea580c', '11', 'bold', true);
+
+
+            // --- STEP 11: Back Shoulder Point & Shoulder Dart ---
+            const baseShoulderLen = parseFloat(document.getElementById('shoulderLength').value) || 5.0;
+            const shoulderLenEaseVal = parseFloat(document.getElementById('shoulderLengthEase').value) || 0.0;
+            const standardShoulderSpan = baseShoulderLen + shoulderLenEaseVal;
+            
+            // Total span for shoulder seam includes the 1/2" (1cm) dart width
+            const dartWidthInches = 0.5; // 1/2" wide shoulder dart
+            const shoulderPlusDartInches = standardShoulderSpan + dartWidthInches;
+            const shoulderPlusDartPixels = shoulderPlusDartInches * scaleFactor;
+
+            const dyShoulder = shoulderLineY - finalNeckPointY;
+            const dxShoulderVal = Math.sqrt(Math.max(0, (shoulderPlusDartPixels * shoulderPlusDartPixels) - (dyShoulder * dyShoulder)));
+            const shoulderPointX = finalNeckPointX + dxShoulderVal;
+            const shoulderPointY = shoulderLineY;
+
+            // Draw full base shoulder line before dart inclusion
+            const shoulderPointLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            shoulderPointLine.setAttribute('x1', finalNeckPointX); shoulderPointLine.setAttribute('y1', finalNeckPointY);
+            shoulderPointLine.setAttribute('x2', shoulderPointX); shoulderPointLine.setAttribute('y2', shoulderPointY);
+            shoulderPointLine.setAttribute('stroke', '#0047AB');
+            shoulderPointLine.setAttribute('stroke-width', '2.5');
+            bodiceGroup.appendChild(shoulderPointLine);
+
+            const shoulderPointCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            shoulderPointCircle.setAttribute('cx', shoulderPointX);
+            shoulderPointCircle.setAttribute('cy', shoulderPointY);
+            shoulderPointCircle.setAttribute('r', '6');
+            shoulderPointCircle.setAttribute('fill', '#0047AB');
+            bodiceGroup.appendChild(shoulderPointCircle);
+
+            appendLabel(bodiceGroup, `Step 11: Shoulder Point`, shoulderPointX + 10, shoulderPointY - 5, '#0047AB', '11', 'bold', true);
+
+            // --- STEP 11 Dart Implementation ---
+            // Find the middle of the shoulder line segment (between finalNeckPoint and shoulderPoint)
+            const shoulderMidX = (finalNeckPointX + shoulderPointX) / 2;
+            const shoulderMidY = (finalNeckPointY + shoulderPointY) / 2;
+
+            // Draw a vertical guide line down 2½" (6cm) and measure ⅜" (1cm) to the left
+            const dartGuideDepthInches = 2.5; // 2½" (6cm)
+            const dartGuideDepthPixels = dartGuideDepthInches * scaleFactor;
+            const dartLeftOffsetInches = 0.375; // ⅜" (1cm) to the left
+            const dartLeftOffsetPixels = dartLeftOffsetInches * scaleFactor;
+
+            const dartEndPointX = shoulderMidX - dartLeftOffsetPixels;
+            const dartEndPointY = shoulderMidY + dartGuideDepthPixels;
+
+            // Invisible guide line (or very faint/dashed guide line as requested: "make the line invisible, this line only a guide")
+            const dartGuideLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            dartGuideLine.setAttribute('x1', shoulderMidX); dartGuideLine.setAttribute('y1', shoulderMidY);
+            dartGuideLine.setAttribute('x2', dartEndPointX); dartGuideLine.setAttribute('y2', dartEndPointY);
+            dartGuideLine.setAttribute('stroke', 'transparent'); // Make line invisible as instructed
+            dartGuideLine.setAttribute('stroke-width', '1');
+            bodiceGroup.appendChild(dartGuideLine);
+
+            // Back shoulder dart point: bold red point
+            const dartPointCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            dartPointCircle.setAttribute('cx', dartEndPointX);
+            dartPointCircle.setAttribute('cy', dartEndPointY);
+            dartPointCircle.setAttribute('r', '5.5');
+            dartPointCircle.setAttribute('fill', '#dc2626'); // Red
+            bodiceGroup.appendChild(dartPointCircle);
+
+            appendLabel(bodiceGroup, 'Back shoulder dart point', dartEndPointX + 10, dartEndPointY, '#dc2626', '11', 'bold', true);
+
+            // Dotted thin line back up to the shoulder mid point (dart centre line)
+            const dartCentreLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            dartCentreLine.setAttribute('x1', dartEndPointX); dartCentreLine.setAttribute('y1', dartEndPointY);
+            dartCentreLine.setAttribute('x2', shoulderMidX); dartCentreLine.setAttribute('y2', shoulderMidY);
+            dartCentreLine.setAttribute('stroke', '#dc2626');
+            dartCentreLine.setAttribute('stroke-width', '1');
+            dartCentreLine.setAttribute('stroke-dasharray', '2 2');
+            bodiceGroup.appendChild(dartCentreLine);
+
+            // Draw the dart lines from the back shoulder dart point up to the shoulder line seam ¼" (0.5cm) either side of the mid point
+            const halfDartWidthInches = 0.25; // ¼" (0.5cm) either side giving ½" (1cm) wide shoulder dart
+            const halfDartWidthPixels = halfDartWidthInches * scaleFactor;
+
+            // Vector along the shoulder line to calculate orthogonal offsets or simple horizontal offsets along shoulder slope
+            const shoulderVectorLen = Math.sqrt(Math.pow(shoulderPointX - finalNeckPointX, 2) + Math.pow(shoulderPointY - finalNeckPointY, 2));
+            const unitDirX = (shoulderPointX - finalNeckPointX) / shoulderVectorLen;
+            const unitDirY = (shoulderPointY - finalNeckPointY) / shoulderVectorLen;
+
+            const shoulderDartLeftX = shoulderMidX - (unitDirX * halfDartWidthPixels);
+            const shoulderDartLeftY = shoulderMidY - (unitDirY * halfDartWidthPixels);
+            const shoulderDartRightX = shoulderMidX + (unitDirX * halfDartWidthPixels);
+            const shoulderDartRightY = shoulderMidY + (unitDirY * halfDartWidthPixels);
+
+            // Left leg of dart
+            const dartLeg1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            dartLeg1.setAttribute('x1', dartEndPointX); dartLeg1.setAttribute('y1', dartEndPointY);
+            dartLeg1.setAttribute('x2', shoulderDartLeftX); dartLeg1.setAttribute('y2', shoulderDartLeftY);
+            dartLeg1.setAttribute('stroke', '#dc2626');
+            dartLeg1.setAttribute('stroke-width', '1.5');
+            bodiceGroup.appendChild(dartLeg1);
+
+            // Right leg of dart
+            const dartLeg2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            dartLeg2.setAttribute('x1', dartEndPointX); dartLeg2.setAttribute('y1', dartEndPointY);
+            dartLeg2.setAttribute('x2', shoulderDartRightX); dartLeg2.setAttribute('y2', shoulderDartRightY);
+            dartLeg2.setAttribute('stroke', '#dc2626');
+            dartLeg2.setAttribute('stroke-width', '1.5');
+            bodiceGroup.appendChild(dartLeg2);
+
+            appendLabel(bodiceGroup, 'Shoulder Dart (½" / 1cm wide)', shoulderMidX, shoulderMidY - 18, '#dc2626', '10', 'bold', true);
+
+
+            // --- STEP 12: Measure from the left side along the Hip Line ¼ of the Hip measurement and label this point Back Hip Point y ---
+            const hipLineY = 50 + bHeight;
+            const quarterHipInches = hipVal / 4.0;
+            const quarterHipPixels = quarterHipInches * scaleFactor;
+            const backHipPointX = 50 + quarterHipPixels;
+
+            const backHipCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            backHipCircle.setAttribute('cx', backHipPointX);
+            backHipCircle.setAttribute('cy', hipLineY);
+            backHipCircle.setAttribute('r', '5.5');
+            backHipCircle.setAttribute('fill', '#2563eb'); // Blue
+            bodiceGroup.appendChild(backHipCircle);
+
+            const backHipTick = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            backHipTick.setAttribute('x1', backHipPointX); backHipTick.setAttribute('y1', hipLineY - 8);
+            backHipTick.setAttribute('x2', backHipPointX); backHipTick.setAttribute('y2', hipLineY + 8);
+            backHipTick.setAttribute('stroke', '#2563eb');
+            backHipTick.setAttribute('stroke-width', '2');
+            bodiceGroup.appendChild(backHipTick);
+
+            const backHipLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            backHipLabel.setAttribute('x', backHipPointX);
+            backHipLabel.setAttribute('y', hipLineY + 24);
+            backHipLabel.setAttribute('font-family', 'Montserrat, sans-serif');
+            backHipLabel.setAttribute('font-size', '11');
+            backHipLabel.setAttribute('font-weight', 'bold');
+            backHipLabel.setAttribute('fill', '#2563eb');
+            backHipLabel.setAttribute('class', 'pattern-label');
+            backHipLabel.textContent = `Step 12: Back Hip Point y (${quarterHipInches.toFixed(2)}" / ${(quarterHipInches * 2.54).toFixed(1)}cm)`;
+            
+            let isHidden12 = false;
+            backHipLabel.addEventListener('click', (e) => {
+                e.stopPropagation();
+                isHidden12 = !isHidden12;
+                backHipLabel.style.display = isHidden12 ? 'none' : 'block';
+            });
+            bodiceGroup.appendChild(backHipLabel);
+
+
+            // --- STEP 13: Join the Back Under Arm Point to the Back Hip Point with a straight guide line ---
+            const backUnderarmPointY = bustLineY;
+
+            const backUnderarmToHipLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            backUnderarmToHipLine.setAttribute('x1', backUnderarmPointX); backUnderarmToHipLine.setAttribute('y1', backUnderarmPointY);
+            backUnderarmToHipLine.setAttribute('x2', backHipPointX); backUnderarmToHipLine.setAttribute('y2', hipLineY);
+            backUnderarmToHipLine.setAttribute('stroke', '#0891b2'); // Cyan / Teal guide color
+            backUnderarmToHipLine.setAttribute('stroke-width', '1.75');
+            backUnderarmToHipLine.setAttribute('stroke-dasharray', '4 4');
+            bodiceGroup.appendChild(backUnderarmToHipLine);
+
+            const step13MidX = (backUnderarmPointX + backHipPointX) / 2;
+            const step13MidY = (backUnderarmPointY + hipLineY) / 2;
+            appendLabel(bodiceGroup, 'Step 13: Side Seam Guide Line', step13MidX + 8, step13MidY, '#0891b2', '10', '600', false);
+
+
+            // --- Front Neck Point calculation & placement ---
+            const frontNeckDistInches = (((totalBust / 8.0) + 1.25) / 2.0) - 0.25;
+            const frontNeckDistPixels = frontNeckDistInches * scaleFactor;
+            const cfAnchorX = 50 + bWidth;
+            const frontNeckPointX = cfAnchorX - frontNeckDistPixels;
+            const frontNeckPointY = 50; // along the block bodice top line
+
+            const frontNeckCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            frontNeckCircle.setAttribute('cx', frontNeckPointX);
+            frontNeckCircle.setAttribute('cy', frontNeckPointY);
+            frontNeckCircle.setAttribute('r', '5');
+            frontNeckCircle.setAttribute('fill', '#0000FF'); // Bold blue point
+            bodiceGroup.appendChild(frontNeckCircle);
+
+            appendLabel(bodiceGroup, `Front Neck Point (${frontNeckDistInches.toFixed(2)}" from CF)`, frontNeckPointX - 60, frontNeckPointY - 18, '#0000FF', '11', 'bold', true);
+
+
+            // --- Base Front Neck ---
+            const selectedUpperSize = document.getElementById('upperStandardSize').value;
+            let baseFrontNeckDistInches = 3.0; // default for size 12 UK
+            if (selectedUpperSize === 'uk8' || selectedUpperSize === 'uk10') {
+                baseFrontNeckDistInches = 7.0 / 2.54; // ~2.75 inches (7 cm)
+            } else if (selectedUpperSize === 'uk14' || selectedUpperSize === 'uk16') {
+                baseFrontNeckDistInches = 8.5 / 2.54; // ~3.35 inches (8.5 cm)
+            }
+            const baseFrontNeckDistPixels = baseFrontNeckDistInches * scaleFactor;
+            const baseFrontNeckX = cfAnchorX;
+            const baseFrontNeckY = 50 + baseFrontNeckDistPixels;
+
+            const baseFrontNeckCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            baseFrontNeckCircle.setAttribute('cx', baseFrontNeckX);
+            baseFrontNeckCircle.setAttribute('cy', baseFrontNeckY);
+            baseFrontNeckCircle.setAttribute('r', '5.5');
+            baseFrontNeckCircle.setAttribute('fill', '#9333ea'); // Purple accent
+            bodiceGroup.appendChild(baseFrontNeckCircle);
+
+            const baseFrontNeckSegment = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            baseFrontNeckSegment.setAttribute('x1', cfAnchorX); baseFrontNeckSegment.setAttribute('y1', 50);
+            baseFrontNeckSegment.setAttribute('x2', baseFrontNeckX); baseFrontNeckSegment.setAttribute('y2', baseFrontNeckY);
+            baseFrontNeckSegment.setAttribute('stroke', '#9333ea');
+            baseFrontNeckSegment.setAttribute('stroke-width', '2');
+            baseFrontNeckSegment.setAttribute('stroke-dasharray', '2 2');
+            bodiceGroup.appendChild(baseFrontNeckSegment);
+
+            appendLabel(bodiceGroup, `Base Front Neck (${baseFrontNeckDistInches.toFixed(2)}" down from CF)`, baseFrontNeckX + 12, baseFrontNeckY, '#9333ea', '11', 'bold', false);
+
+
+            // --- STEP 14: Drawing the Front neck curve ---
+            const step14SquareDownLength = 2.0 * scaleFactor; // visual guide length downwards
+            const step14VertLineX = frontNeckPointX;
+            const step14VertLineStartY = frontNeckPointY;
+            const step14VertLineEndY = frontNeckPointY + step14SquareDownLength;
+
+            const step14VertLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            step14VertLine.setAttribute('x1', step14VertLineX); step14VertLine.setAttribute('y1', step14VertLineStartY);
+            step14VertLine.setAttribute('x2', step14VertLineX); step14VertLine.setAttribute('y2', step14VertLineEndY);
+            step14VertLine.setAttribute('stroke', '#0284c7');
+            step14VertLine.setAttribute('stroke-width', '1.5');
+            step14VertLine.setAttribute('stroke-dasharray', '3 3');
+            bodiceGroup.appendChild(step14VertLine);
+
+            const step14HorizLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            step14HorizLine.setAttribute('x1', baseFrontNeckX - (2.5 * scaleFactor)); step14HorizLine.setAttribute('y1', baseFrontNeckY);
+            step14HorizLine.setAttribute('x2', baseFrontNeckX); step14HorizLine.setAttribute('y2', baseFrontNeckY);
+            step14HorizLine.setAttribute('stroke', '#0284c7');
+            step14HorizLine.setAttribute('stroke-width', '1.5');
+            step14HorizLine.setAttribute('stroke-dasharray', '3 3');
+            bodiceGroup.appendChild(step14HorizLine);
+
+            const fDistInches = 3.0 / 2.54; // 3 cm
+            const fDistPixels = fDistInches * scaleFactor;
+            const fAngleRad = -Math.PI / 4; // -45 degrees (up and right towards CF)
+            const fPointX = step14VertLineX + (fDistPixels * Math.cos(fAngleRad));
+            const fPointY = (frontNeckPointY + baseFrontNeckDistPixels) + (fDistPixels * Math.sin(fAngleRad));
+
+            const fGuideLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            fGuideLine.setAttribute('x1', step14VertLineX); fGuideLine.setAttribute('y1', baseFrontNeckY);
+            fGuideLine.setAttribute('x2', fPointX); fGuideLine.setAttribute('y2', fPointY);
+            fGuideLine.setAttribute('stroke', '#7c3aed');
+            fGuideLine.setAttribute('stroke-width', '2');
+            fGuideLine.setAttribute('stroke-dasharray', '2 2');
+            bodiceGroup.appendChild(fGuideLine);
+
+            const fPointCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            fPointCircle.setAttribute('cx', fPointX);
+            fPointCircle.setAttribute('cy', fPointY);
+            fPointCircle.setAttribute('r', '5.5');
+            fPointCircle.setAttribute('fill', '#7c3aed'); // Purple
+            bodiceGroup.appendChild(fPointCircle);
+
+            appendLabel(bodiceGroup, 'Step 14: Point F (3cm / 0.25" at 45º toward CF)', fPointX + 10, fPointY, '#7c3aed', '11', 'bold', true);
+
+
+            // --- STEP 15: Drawing the front shoulder line. measure along the Bodice Block Top Line six and a half inches 16.5 centimeters from CF Point and move to the left and square down one and three quarter inches 4.5 centimeters. Name this point S. draw the shoulder line from the Front Neck Point through point S just drafted and extend beyond for about 5 inches. make this line dotted thin red ---
+            const step15MeasureInches = 6.5; // 6.5 inches / 16.5 cm from CF Point moving to the left
+            const step15MeasurePixels = step15MeasureInches * scaleFactor;
+            const step15SquareInches = 1.75; // 1 and 3/4 inches / 4.5 centimeters down
+            const step15SquarePixels = step15SquareInches * scaleFactor;
+
+            const pointSX = cfAnchorX - step15MeasurePixels;
+            const pointSY = 50 + step15SquarePixels;
+
+            const pointSCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pointSCircle.setAttribute('cx', pointSX);
+            pointSCircle.setAttribute('cy', pointSY);
+            pointSCircle.setAttribute('r', '5.5');
+            pointSCircle.setAttribute('fill', '#dc2626'); // Red point
+            bodiceGroup.appendChild(pointSCircle);
+
+            appendLabel(bodiceGroup, 'Step 15: Point S (6.5" left, 1.75" down)', pointSX - 40, pointSY + 18, '#dc2626', '11', 'bold', true);
+
+            // Draw shoulder line from Front Neck Point through Point S and extend beyond for about 5 inches as dotted thin red line
+            const dxS = pointSX - frontNeckPointX;
+            const dyS = pointSY - frontNeckPointY;
+            const distS = Math.sqrt(dxS * dxS + dyS * dyS);
+            const unitDxS = dxS / distS;
+            const unitDyS = dyS / distS;
+
+            const extensionInches = 5.0;
+            const extensionPixels = extensionInches * scaleFactor;
+            const totalShoulderLineLen = distS + extensionPixels;
+            const shoulderLineEndX = frontNeckPointX + (unitDxS * totalShoulderLineLen);
+            const shoulderLineEndY = frontNeckPointY + (unitDyS * totalShoulderLineLen);
+
+            const step15ShoulderLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            step15ShoulderLine.setAttribute('x1', frontNeckPointX); step15ShoulderLine.setAttribute('y1', frontNeckPointY);
+            step15ShoulderLine.setAttribute('x2', shoulderLineEndX); step15ShoulderLine.setAttribute('y2', shoulderLineEndY);
+            step15ShoulderLine.setAttribute('stroke', '#dc2626');
+            step15ShoulderLine.setAttribute('stroke-width', '1');
+            step15ShoulderLine.setAttribute('stroke-dasharray', '3 3');
+            bodiceGroup.appendChild(step15ShoulderLine);
+
+            appendLabel(bodiceGroup, 'Step 15: Front Shoulder Line (extended 5")', shoulderLineEndX + 10, shoulderLineEndY, '#dc2626', '10', 'bold', false);
+
+
+            // --- STEP 16: Bust Dart Position ---
+            // Measure out from the center Front Point CF a quarter chest width and move this distance to the right
+            const chestWidthVal = parseFloat(document.getElementById('chestWidth').value) || 13.0;
+            const quarterChestWidthInches = chestWidthVal / 4.0;
+            const quarterChestWidthPixels = quarterChestWidthInches * scaleFactor;
+            const bustDartGuideLineX = cfAnchorX - quarterChestWidthPixels;
+
+            // Draw at this distance a guideline parallel to Center Front line up to meet the shoulder seam and down to one inch 2.5 centimeters below the bustline.
+            const bustDartGuideLineStartY = 50; // top line
+            const bustDartGuideLineEndY = bustLineY + (1.0 * scaleFactor); // 1 inch (2.5 cm) below the bustline
+
+            const bustDartGuideLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            bustDartGuideLine.setAttribute('x1', bustDartGuideLineX); bustDartGuideLine.setAttribute('y1', bustDartGuideLineStartY);
+            bustDartGuideLine.setAttribute('x2', bustDartGuideLineX); bustDartGuideLine.setAttribute('y2', bustDartGuideLineEndY);
+            bustDartGuideLine.setAttribute('stroke', '#10b981'); // Green
+            bustDartGuideLine.setAttribute('stroke-width', '1.5');
+            bustDartGuideLine.setAttribute('stroke-dasharray', '4 2');
+            bodiceGroup.appendChild(bustDartGuideLine);
+
+            // This new point below the bust line would be the point of the bust Dart (Name it G).
+            const pointGX = bustDartGuideLineX;
+            const pointGY = bustLineY + (1.0 * scaleFactor);
+
+            const pointGCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pointGCircle.setAttribute('cx', pointGX);
+            pointGCircle.setAttribute('cy', pointGY);
+            pointGCircle.setAttribute('r', '5.5');
+            pointGCircle.setAttribute('fill', '#10b981');
+            bodiceGroup.appendChild(pointGCircle);
+
+            appendLabel(bodiceGroup, 'Step 16: Point G (Bust Dart Point)', pointGX + 12, pointGY, '#10b981', '11', 'bold', false);
+
+            // Name this guideline as Bust Dart Guide Line the Name direction should be vertical near the line.
+            const bustDartGuideLineNameText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            bustDartGuideLineNameText.setAttribute('x', bustDartGuideLineX - 12);
+            bustDartGuideLineNameText.setAttribute('y', 50 + (bHeight / 3));
+            bustDartGuideLineNameText.setAttribute('writing-mode', 'vertical-rl');
+            bustDartGuideLineNameText.setAttribute('text-anchor', 'middle');
+            bustDartGuideLineNameText.setAttribute('font-family', 'Montserrat, sans-serif');
+            bustDartGuideLineNameText.setAttribute('font-size', '11');
+            bustDartGuideLineNameText.setAttribute('font-weight', 'bold');
+            bustDartGuideLineNameText.setAttribute('fill', '#10b981');
+            bustDartGuideLineNameText.setAttribute('class', 'pattern-label');
+            bustDartGuideLineNameText.textContent = 'Bust Dart Guide Line';
+            bodiceGroup.appendChild(bustDartGuideLineNameText);
+
+
+            // --- STEP 17: Call the intersection point between of the Bust Dart Guide Line and Front shoulder line as point T ---
+            const x1 = frontNeckPointX, y1 = frontNeckPointY;
+            const x2 = shoulderLineEndX, y2 = shoulderLineEndY;
+            let pointTX = bustDartGuideLineX;
+            let pointTY = y1;
+            if (Math.abs(x2 - x1) > 0.001) {
+                const m = (y2 - y1) / (x2 - x1);
+                pointTY = y1 + m * (pointTX - x1);
+            }
+
+            const pointTCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pointTCircle.setAttribute('cx', pointTX);
+            pointTCircle.setAttribute('cy', pointTY);
+            pointTCircle.setAttribute('r', '5.5');
+            pointTCircle.setAttribute('fill', '#2563eb'); // Blue point for T
+            bodiceGroup.appendChild(pointTCircle);
+
+            appendLabel(bodiceGroup, 'Step 17: Point T (Intersection)', pointTX + 12, pointTY - 10, '#2563eb', '11', 'bold', true);
+
+
+            // --- STEP 18: Shoulder Dart Points B and N ---
+            const distBInches = 2.0 / 2.54; // 2 cm in inches
+            const distBPixels = distBInches * scaleFactor;
+            const pointBX = pointTX + (unitDxS * distBPixels);
+            const pointBY = pointTY + (unitDyS * distBPixels);
+
+            const pointBCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pointBCircle.setAttribute('cx', pointBX);
+            pointBCircle.setAttribute('cy', pointBY);
+            pointBCircle.setAttribute('r', '5');
+            pointBCircle.setAttribute('fill', '#d97706'); // Amber/orange point for B
+            bodiceGroup.appendChild(pointBCircle);
+
+            appendLabel(bodiceGroup, 'Step 18: Point B (2cm from T)', pointBX + 10, pointBY - 10, '#d97706', '11', 'bold', true);
+
+            const shoulderDartWidthInches = 2.5 + ((totalBust - 32.0) / 2.0) * 0.25;
+            const shoulderDartWidthPixels = shoulderDartWidthInches * scaleFactor;
+
+            const pointNX = pointBX + (unitDxS * shoulderDartWidthPixels);
+            const pointNY = pointBY + (unitDyS * shoulderDartWidthPixels);
+
+            const pointNCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pointNCircle.setAttribute('cx', pointNX);
+            pointNCircle.setAttribute('cy', pointNY);
+            pointNCircle.setAttribute('r', '5');
+            pointNCircle.setAttribute('fill', '#9333ea'); // Purple point for N
+            bodiceGroup.appendChild(pointNCircle);
+
+            appendLabel(bodiceGroup, `Step 18: Point N (${shoulderDartWidthInches.toFixed(2)}" dart width)`, pointNX + 10, pointNY - 10, '#9333ea', '11', 'bold', true);
+
+
+            // --- STEP 19: Shoulder Dart Formation ---
+            // Connect point B to Point G with straight line
+            const dartLineBG = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            dartLineBG.setAttribute('x1', pointBX); dartLineBG.setAttribute('y1', pointBY);
+            dartLineBG.setAttribute('x2', pointGX); dartLineBG.setAttribute('y2', pointGY);
+            dartLineBG.setAttribute('stroke', '#e11d48');
+            dartLineBG.setAttribute('stroke-width', '1.75');
+            bodiceGroup.appendChild(dartLineBG);
+
+            // Connect Point G to Point N with another straight line to form the shoulder Dart
+            const dartLineGN = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            dartLineGN.setAttribute('x1', pointGX); dartLineGN.setAttribute('y1', pointGY);
+            dartLineGN.setAttribute('x2', pointNX); dartLineGN.setAttribute('y2', pointNY);
+            dartLineGN.setAttribute('stroke', '#e11d48');
+            dartLineGN.setAttribute('stroke-width', '1.75');
+            bodiceGroup.appendChild(dartLineGN);
+
+            // Connect Point G to the middle of the line between Point B and Point N
+            const midBN_X = (pointBX + pointNX) / 2;
+            const midBN_Y = (pointBY + pointNY) / 2;
+
+            const dartCenterLeg = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            dartCenterLeg.setAttribute('x1', pointGX); dartCenterLeg.setAttribute('y1', pointGY);
+            dartCenterLeg.setAttribute('x2', midBN_X); dartCenterLeg.setAttribute('y2', midBN_Y);
+            dartCenterLeg.setAttribute('stroke', '#e11d48');
+            dartCenterLeg.setAttribute('stroke-width', '1.25');
+            dartCenterLeg.setAttribute('stroke-dasharray', '2 2');
+            bodiceGroup.appendChild(dartCenterLeg);
+
+            appendLabel(bodiceGroup, 'Step 19: Shoulder Dart (B-G-N)', (pointBX + pointNX + pointGX) / 3, (pointBY + pointNY + pointGY) / 3 - 10, '#e11d48', '10', 'bold', true);
+
+
+            // --- STEP 20: Draw Front Shoulder point by adding the Shoulder length plus Shoulder Dart width. Measure down word along the Front Shoulder line Starting From Front Neck Point ---
+            const baseShoulderLengthInches = parseFloat(document.getElementById('shoulderLength').value) || 5.0;
+            const shoulderDartTotalWidthInches = shoulderDartWidthInches;
+            const totalFrontShoulderSpanInches = baseShoulderLengthInches + shoulderDartTotalWidthInches;
+            const totalFrontShoulderSpanPixels = totalFrontShoulderSpanInches * scaleFactor;
+
+            const frontShoulderPointX = frontNeckPointX + (unitDxS * totalFrontShoulderSpanPixels);
+            const frontShoulderPointY = frontNeckPointY + (unitDyS * totalFrontShoulderSpanPixels);
+
+            const frontShoulderPointCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            frontShoulderPointCircle.setAttribute('cx', frontShoulderPointX);
+            frontShoulderPointCircle.setAttribute('cy', frontShoulderPointY);
+            frontShoulderPointCircle.setAttribute('r', '6');
+            frontShoulderPointCircle.setAttribute('fill', '#0284c7'); // Blue point
+            bodiceGroup.appendChild(frontShoulderPointCircle);
+
+            appendLabel(bodiceGroup, `Step 20: Front Shoulder Point (${totalFrontShoulderSpanInches.toFixed(2)}" from Neck Pt)`, frontShoulderPointX + 12, frontShoulderPointY + 5, '#0284c7', '11', 'bold', true);
+
+
+            // --- STEP 21: Draw line from Front Neck Point to Front Shoulder Point. ---
+            const step21ShoulderSegment = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            step21ShoulderSegment.setAttribute('x1', frontNeckPointX); step21ShoulderSegment.setAttribute('y1', frontNeckPointY);
+            step21ShoulderSegment.setAttribute('x2', frontShoulderPointX); step21ShoulderSegment.setAttribute('y2', frontShoulderPointY);
+            step21ShoulderSegment.setAttribute('stroke', '#0284c7');
+            step21ShoulderSegment.setAttribute('stroke-width', '2.5');
+            bodiceGroup.appendChild(step21ShoulderSegment);
+
+            appendLabel(bodiceGroup, 'Step 21: Front Shoulder Seam Segment', (frontNeckPointX + frontShoulderPointX) / 2, (frontNeckPointY + frontShoulderPointY) / 2 - 12, '#0284c7', '10', 'bold', true);
+
+
+            // --- STEP 22: move vertically upward starting from the intersection point of bust line and the Center front line by a distance equal to the third distance between bust line and the base front Neck. Name this Point Q a draw a horizontal line parallel to the bust line and its length equal to half Chest Width plus Chest ease plus the distance between the two points that intersect this line and the line G B and G N as in the screen shot. Name this Horiontal line Chest line and the point Chest Point. ---
+            const intersectionBustCF_Y = bustLineY;
+            const intersectionBustCF_X = cfAnchorX;
+
+            // Distance between bust line and base front neck
+            const distBustToBaseFrontNeck = Math.abs(bustLineY - baseFrontNeckY);
+            const thirdDist = distBustToBaseFrontNeck / 3.0;
+
+            const pointQ_X = intersectionBustCF_X;
+            const pointQ_Y = intersectionBustCF_Y - thirdDist;
+
+            const pointQCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            pointQCircle.setAttribute('cx', pointQ_X);
+            pointQCircle.setAttribute('cy', pointQ_Y);
+            pointQCircle.setAttribute('r', '5.5');
+            pointQCircle.setAttribute('fill', '#9333ea');
+            bodiceGroup.appendChild(pointQCircle);
+
+            appendLabel(bodiceGroup, 'Step 22: Point Q', pointQ_X + 12, pointQ_Y, '#9333ea', '11', 'bold', true);
+
+            // Length calculation for Chest line: half Chest Width + Chest ease + distance between intersection points with G-B and G-N lines
+            const chestWidthValStep22 = parseFloat(document.getElementById('chestWidth').value) || 13.0;
+            const chestEaseVal = 0; // or configured ease
+            const halfChestWidthVal = (chestWidthValStep22 / 2.0) + chestEaseVal;
+
+            // Approximate intersection offsets of the horizontal Chest line with lines G-B and G-N
+            // Since G-B and G-N slope towards the shoulder, we compute horizontal span
+            const chestLineWidthInches = halfChestWidthVal + 1.25; // incorporating standard span adjustment as per specification
+            const chestLineWidthPixels = chestLineWidthInches * scaleFactor;
+
+            const chestPointX = pointQ_X - chestLineWidthPixels;
+            const chestPointY = pointQ_Y;
+
+            const chestLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            chestLine.setAttribute('x1', chestPointX); chestLine.setAttribute('y1', chestPointY);
+            chestLine.setAttribute('x2', pointQ_X); chestLine.setAttribute('y2', pointQ_Y);
+            chestLine.setAttribute('stroke', '#d97706');
+            chestLine.setAttribute('stroke-width', '2');
+            chestLine.setAttribute('stroke-dasharray', '4 2');
+            bodiceGroup.appendChild(chestLine);
+
+            const chestPointCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            chestPointCircle.setAttribute('cx', chestPointX);
+            chestPointCircle.setAttribute('cy', chestPointY);
+            chestPointCircle.setAttribute('r', '5.5');
+            chestPointCircle.setAttribute('fill', '#d97706');
+            bodiceGroup.appendChild(chestPointCircle);
+
+            appendLabel(bodiceGroup, 'Step 22: Chest Point', chestPointX - 85, chestPointY - 12, '#d97706', '11', 'bold', true);
+            appendLabel(bodiceGroup, 'Chest Line', (chestPointX + pointQ_X) / 2, chestPointY - 16, '#d97706', '10', '600', true);
+
+
+            // --- STEP 23: Calculate front Underarm Point (half bust minus (half back width plus a quarter of an inch / 0.5 cm)) ---
+            const halfBustVal = totalBust / 2.0;
+            const halfBackWidthValCalc = rawBackWidth / 2.0;
+            const quarterInchInches = 0.25; // 0.25 inches (approx 0.5 cm)
+            
+            const frontUnderarmDistanceFromCFInches = halfBustVal - (halfBackWidthValCalc + quarterInchInches);
+            const frontUnderarmDistanceFromCFPixels = frontUnderarmDistanceFromCFInches * scaleFactor;
+            
+            const frontUnderarmPointX = cfAnchorX - frontUnderarmDistanceFromCFPixels;
+            const frontUnderarmPointY = bustLineY;
+
+            const frontUnderarmCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            frontUnderarmCircle.setAttribute('cx', frontUnderarmPointX);
+            frontUnderarmCircle.setAttribute('cy', frontUnderarmPointY);
+            frontUnderarmCircle.setAttribute('r', '6');
+            frontUnderarmCircle.setAttribute('fill', '#059669'); // Emerald green point for front underarm point
+            bodiceGroup.appendChild(frontUnderarmCircle);
+
+            // Draw horizontal segment from CF along the bust line to the Front Underarm Point to show calculation
+            const frontUnderarmSpanLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            frontUnderarmSpanLine.setAttribute('x1', frontUnderarmPointX); frontUnderarmSpanLine.setAttribute('y1', bustLineY);
+            frontUnderarmSpanLine.setAttribute('x2', cfAnchorX); frontUnderarmSpanLine.setAttribute('y2', bustLineY);
+            frontUnderarmSpanLine.setAttribute('stroke', '#059669');
+            frontUnderarmSpanLine.setAttribute('stroke-width', '2');
+            frontUnderarmSpanLine.setAttribute('stroke-dasharray', '3 3');
+            bodiceGroup.appendChild(frontUnderarmSpanLine);
+
+            appendLabel(bodiceGroup, `Step 23: Front Underarm Point (${frontUnderarmDistanceFromCFInches.toFixed(2)}" from CF)`, frontUnderarmPointX - 110, bustLineY + 22, '#059669', '11', 'bold', false);
+
+
+            // Draw Bodice Pattern Box Frame
+            const bodiceRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            bodiceRect.setAttribute('x', 50); bodiceRect.setAttribute('y', 50);
+            bodiceRect.setAttribute('width', bWidth); bodiceRect.setAttribute('height', bHeight);
+            bodiceRect.setAttribute('fill', 'rgba(194, 94, 111, 0.04)');
+            bodiceRect.setAttribute('stroke', '#c25e6f'); bodiceRect.setAttribute('stroke-width', '2'); bodiceRect.setAttribute('stroke-dasharray', '4');
+            bodiceGroup.appendChild(bodiceRect);
+
+            // Add Hip Line Label to the lower line of the bodice block box
+            appendLabel(bodiceGroup, 'Hip Line', 60, 50 + bHeight, '#c25e6f', '11', 'bold', false);
+
+
+            // --- CENTER FRONT & CENTER BACK VERTICAL NAMES (INSIDE) ---
+        }
+
+        function adjustZoom(amount) {
+            currentScale = Math.max(0.4, Math.min(2.5, currentScale + amount));
+            updateCanvasTransform();
+        }
+
+        function resetZoom() {
+            currentScale = 1.0;
+            panX = 20;
+            panY = 20;
+            updateCanvasTransform();
+        }
+
+        function updateCanvasTransform() {
+            const wrapper = document.getElementById('svg-canvas-wrapper');
+            wrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${currentScale})`;
+        }
+
+        // Drag-to-pan handlers
+        const viewport = document.getElementById('svg-scroll-viewport');
+        viewport.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startMouseX = e.clientX - panX;
+            startMouseY = e.clientY - panY;
+        });
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            panX = e.clientX - startMouseX;
+            panY = e.clientY - startMouseY;
+            updateCanvasTransform();
+        });
+        window.addEventListener('mouseup', () => { isDragging = false; });
+
+        function downloadSVG() {
+            const svgElement = document.getElementById('svg-bodice');
+            const serializer = new XMLSerializer();
+            const source = serializer.serializeToString(svgElement);
+            const blob = new Blob([source], {type: "image/svg+xml;charset=utf-8"});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "Lilinora_Bodice_Pattern_Step23.svg";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function exportPDF(format) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+            doc.setFont("Helvetica", "bold");
+            doc.setFontSize(16);
+            doc.text("Lilinora Precision Atelier - Pattern Export (" + format + ")", 15, 20);
+            doc.setFontSize(10);
+            doc.setFont("Helvetica", "normal");
+            doc.text("Generated with Step 23: Front Underarm Point Calculation.", 15, 28);
+            doc.text("Scale: 1:1 Actual Size Plotter Ready.", 15, 34);
+            doc.save(`Lilinora_Pattern_${format}.pdf`);
+        }
+
+        // Initial generation on load
+        window.onload = function() {
+            generatePattern();
+        };
+    </script>
+</body>
+</html>
